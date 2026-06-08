@@ -48,7 +48,9 @@ fun RelaxNavGraph(navController: NavHostController) {
 
         composable(Screen.Login.route) {
             LoginScreen(
-                onNavigateToOtp  = { phone -> navController.navigate(Screen.Otp.createRoute(phone)) },
+                onNavigateToOtp  = { phone, verificationId ->
+                    navController.navigate(Screen.Otp.createRoute(phone, verificationId))
+                },
                 onNavigateToMain = {
                     navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
@@ -59,10 +61,14 @@ fun RelaxNavGraph(navController: NavHostController) {
 
         composable(
             route     = Screen.Otp.route,
-            arguments = listOf(navArgument("phone") { type = NavType.StringType })
+            arguments = listOf(
+                navArgument("phone") { type = NavType.StringType },
+                navArgument("verificationId") { type = NavType.StringType },
+            )
         ) { backStack ->
             OtpScreen(
-                phone    = backStack.arguments?.getString("phone") ?: "",
+                phone          = backStack.arguments?.getString("phone")?.let(Screen.Otp::decodeArg) ?: "",
+                verificationId = backStack.arguments?.getString("verificationId")?.let(Screen.Otp::decodeArg) ?: "",
                 onVerified = {
                     navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }

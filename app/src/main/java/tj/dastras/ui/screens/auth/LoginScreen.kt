@@ -1,5 +1,6 @@
 package tj.dastras.ui.screens.auth
 
+import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -15,17 +16,56 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
+import com.google.firebase.auth.FirebaseAuth
+import tj.dastras.data.findActivity
+import tj.dastras.data.sendPhoneVerificationCode
+import tj.dastras.data.toE164PhoneNumber
 import tj.dastras.ui.components.RelaxButton
 import tj.dastras.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    onNavigateToOtp: (String) -> Unit,
+    onNavigateToOtp: (phone: String, verificationId: String) -> Unit,
     onNavigateToMain: () -> Unit,
 ) {
     var phone    by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val activity = LocalContext.current.findActivity()
+    val auth     = remember { FirebaseAuth.getInstance() }
+
+    fun requestVerificationCode() {
+        val currentActivity = activity ?: return
+        if (phone.isBlank() || isLoading) return
+
+        errorMessage = null
+        isLoading    = true
+        val fullPhone = toE164PhoneNumber(phone)
+
+        sendPhoneVerificationCode(
+            auth        = auth,
+            activity    = currentActivity,
+            phoneNumber = fullPhone,
+            onCodeSent  = { verificationId ->
+                isLoading = false
+                onNavigateToOtp(fullPhone, verificationId)
+            },
+            onAutoVerified = { credential ->
+                auth.signInWithCredential(credential).addOnCompleteListener { task ->
+                    isLoading = false
+                    if (task.isSuccessful) onNavigateToMain()
+                    else errorMessage = "Не удалось подтвердить номер. Попробуйте снова"
+                }
+            },
+            onError = { message ->
+                isLoading    = false
+                errorMessage = message
+            },
+        )
+    }
 
     Column(
         modifier = Modifier
@@ -90,8 +130,8 @@ fun LoginScreen(
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value         = phone,
-                onValueChange = { if (it.length <= 11) phone = it },
-                placeholder   = { Text("+7 (___) ___-__-__", color = RelaxTextHint) },
+                onValueChange = { if (it.length <= 18) phone = it },
+                placeholder   = { Text("+992 (__)___-__-__", color = RelaxTextHint) },
                 leadingIcon   = {
                     Icon(Icons.Rounded.Phone, null, tint = RelaxTextSecondary, modifier = Modifier.size(20.dp))
                 },
@@ -114,12 +154,21 @@ fun LoginScreen(
 
             RelaxButton(
                 text      = "Получить код",
-                onClick   = {
-                    if (phone.isNotEmpty()) onNavigateToOtp(phone)
-                },
+                onClick   = { requestVerificationCode() },
                 modifier  = Modifier.fillMaxWidth(),
                 isLoading = isLoading,
             )
+
+            if (errorMessage != null) {
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text       = errorMessage!!,
+                    color      = RelaxError,
+                    style      = MaterialTheme.typography.bodySmall,
+                    textAlign  = TextAlign.Center,
+                    modifier   = Modifier.fillMaxWidth(),
+                )
+            }
 
             Spacer(Modifier.height(20.dp))
 

@@ -13,23 +13,71 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.PhoneAuthProvider
 import kotlinx.coroutines.delay
+import tj.dastras.data.findActivity
+import tj.dastras.data.sendPhoneVerificationCode
 import tj.dastras.ui.theme.*
+
+private const val OTP_LENGTH = 6
 
 @Composable
 fun OtpScreen(
     phone: String,
+    verificationId: String,
     onVerified: () -> Unit,
     onBack: () -> Unit,
 ) {
-    var otp       by remember { mutableStateOf("") }
-    var timer     by remember { mutableStateOf(59) }
-    var isError   by remember { mutableStateOf(false) }
-    var isVerified by remember { mutableStateOf(false) }
+    var otp            by remember { mutableStateOf("") }
+    var activeVerificationId by remember(verificationId) { mutableStateOf(verificationId) }
+    var timer          by remember { mutableStateOf(59) }
+    var isError        by remember { mutableStateOf(false) }
+    var isVerifying    by remember { mutableStateOf(false) }
+    var errorMessage   by remember { mutableStateOf<String?>(null) }
+
+    val activity = LocalContext.current.findActivity()
+    val auth     = remember { FirebaseAuth.getInstance() }
+
+    fun verifyCode(code: String) {
+        isVerifying = true
+        isError     = false
+        val credential = PhoneAuthProvider.getCredential(activeVerificationId, code)
+        auth.signInWithCredential(credential).addOnCompleteListener { task ->
+            isVerifying = false
+            if (task.isSuccessful) {
+                onVerified()
+            } else {
+                isError = true
+                otp     = ""
+            }
+        }
+    }
+
+    fun resendCode() {
+        val currentActivity = activity ?: return
+        timer        = 59
+        otp          = ""
+        isError      = false
+        errorMessage = null
+        sendPhoneVerificationCode(
+            auth        = auth,
+            activity    = currentActivity,
+            phoneNumber = phone,
+            onCodeSent  = { newVerificationId -> activeVerificationId = newVerificationId },
+            onAutoVerified = { credential ->
+                auth.signInWithCredential(credential).addOnCompleteListener { task ->
+                    if (task.isSuccessful) onVerified()
+                }
+            },
+            onError = { message -> errorMessage = message },
+        )
+    }
 
     LaunchedEffect(Unit) {
         while (timer > 0) { delay(1000); timer-- }
@@ -88,13 +136,10 @@ fun OtpScreen(
             OtpInput(
                 otp       = otp,
                 onOtpChange = { value ->
-                    if (value.length <= 4) {
+                    if (value.length <= OTP_LENGTH) {
                         otp     = value
                         isError = false
-                        if (value.length == 4) {
-                            // Auto verify — for demo any 4-digit code works
-                            isVerified = true
-                        }
+                        if (value.length == OTP_LENGTH) verifyCode(value)
                     }
                 },
                 isError   = isError,
@@ -104,16 +149,20 @@ fun OtpScreen(
                 Spacer(Modifier.height(8.dp))
                 Text("Неверный код. Попробуйте ещё раз.", color = RelaxError, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             }
+            if (errorMessage != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(errorMessage!!, color = RelaxError, style = MaterialTheme.typography.bodySmall, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            }
 
             Spacer(Modifier.height(32.dp))
 
             // Verify button
             Button(
                 onClick  = {
-                    if (otp.length == 4) onVerified()
+                    if (otp.length == OTP_LENGTH) verifyCode(otp)
                     else isError = true
                 },
-                enabled  = otp.length == 4,
+                enabled  = otp.length == OTP_LENGTH && !isVerifying,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape    = RoundedCornerShape(16.dp),
                 colors   = ButtonDefaults.buttonColors(
@@ -123,7 +172,11 @@ fun OtpScreen(
                     disabledContentColor   = RelaxTextHint,
                 ),
             ) {
-                Text("Подтвердить", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                if (isVerifying) {
+                    CircularProgressIndicator(color = RelaxWhite, strokeWidth = 2.dp, modifier = Modifier.size(20.dp))
+                } else {
+                    Text("Подтвердить", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -139,7 +192,7 @@ fun OtpScreen(
                         fontWeight = FontWeight.Bold,
                     )
                 } else {
-                    TextButton(onClick = { timer = 59; otp = "" }) {
+                    TextButton(onClick = { resendCode() }) {
                         Text("Отправить код снова", color = RelaxRed, fontWeight = FontWeight.SemiBold)
                     }
                 }
@@ -152,17 +205,17 @@ fun OtpScreen(
 private fun OtpInput(otp: String, onOtpChange: (String) -> Unit, isError: Boolean) {
     Row(
         modifier              = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        repeat(4) { idx ->
+        repeat(OTP_LENGTH) { idx ->
             val char   = otp.getOrNull(idx)?.toString() ?: ""
             val isFocused = idx == otp.length
 
             Box(
                 modifier = Modifier
                     .weight(1f)
-                    .height(64.dp)
-                    .clip(RoundedCornerShape(16.dp))
+                    .height(56.dp)
+                    .clip(RoundedCornerShape(14.dp))
                     .background(RelaxWhite)
                     .border(
                         width = 2.dp,
@@ -172,12 +225,12 @@ private fun OtpInput(otp: String, onOtpChange: (String) -> Unit, isError: Boolea
                             char.isNotEmpty() -> RelaxDark.copy(alpha = 0.5f)
                             else      -> RelaxDivider
                         },
-                        shape = RoundedCornerShape(16.dp),
+                        shape = RoundedCornerShape(14.dp),
                     ),
                 contentAlignment = Alignment.Center,
             ) {
                 if (char.isNotEmpty()) {
-                    Text(char, fontSize = 28.sp, fontWeight = FontWeight.Bold, color = RelaxTextPrimary)
+                    Text(char, fontSize = 22.sp, fontWeight = FontWeight.Bold, color = RelaxTextPrimary)
                 } else if (isFocused) {
                     val blink = rememberInfiniteTransition(label = "cursor")
                     val alpha by blink.animateFloat(0f, 1f, infiniteRepeatable(tween(500), RepeatMode.Reverse), label = "cursor")
