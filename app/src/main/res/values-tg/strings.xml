@@ -1,0 +1,278 @@
+<resources>
+    <string name="app_name">Dastras</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Асосӣ</string>
+    <string name="nav_catalog">Каталог</string>
+    <string name="nav_card">Корт</string>
+    <string name="nav_bonuses">Бонусҳо</string>
+    <string name="nav_profile">Профил</string>
+
+    <!-- Profile header -->
+    <string name="profile_user_default">Корбар</string>
+    <string name="profile_points">%1$s · %2$d балл</string>
+    <string name="profile_stat_bonuses">Бонусҳо</string>
+    <string name="profile_stat_spent">Сарф шуд</string>
+    <string name="profile_stat_with_us">Бо мо</string>
+
+    <!-- Sections -->
+    <string name="section_purchases">Харидҳо</string>
+    <string name="section_account">Ҳисоб</string>
+    <string name="section_settings">Танзимот</string>
+    <string name="section_support">Дастгирӣ</string>
+
+    <!-- Menu items -->
+    <string name="menu_order_history">Таърихи фармоишҳо</string>
+    <string name="menu_my_orders">Фармоишҳои ман</string>
+    <string name="menu_favorites">Дилхоҳ</string>
+    <string name="menu_favorites_count">%d мол</string>
+    <string name="menu_personal_data">Маълумоти шахсӣ</string>
+    <string name="menu_not_specified">Зикр нашудааст</string>
+    <string name="menu_addresses">Суроғаҳои ман</string>
+    <string name="menu_addresses_count">1 суроға</string>
+    <string name="menu_notifications">Огоҳиномаҳо</string>
+    <string name="menu_notifications_on">Фаъол</string>
+    <string name="menu_language">Забон</string>
+    <string name="menu_theme">Мавзӯъ</string>
+    <string name="menu_theme_light">Равшан</string>
+    <string name="menu_help">Кӯмак</string>
+    <string name="menu_chat_support">Чат бо дастгирӣ</string>
+    <string name="menu_online">Онлайн</string>
+    <string name="menu_about">Дар бораи барнома</string>
+
+    <!-- Logout -->
+    <string name="logout_button">Аз ҳисоб баромадан</string>
+    <string name="logout_dialog_title">Баромадан аз ҳисоб</string>
+    <string name="logout_dialog_text">Шумо мутмаин ҳастед, ки мехоҳед аз барнома хориҷ шавед?</string>
+    <string name="logout_confirm">Баромадан</string>
+    <string name="logout_cancel">Бекор кардан</string>
+
+    <!-- Avatar picker -->
+    <string name="avatar_sheet_title">Акси профил</string>
+    <string name="avatar_take_selfie">Гирифтани селфи</string>
+    <string name="avatar_choose_gallery">Аз галерея интихоб кардан</string>
+    <string name="avatar_delete_photo">Расмро нест кардан</string>
+    <string name="avatar_uploading">Боргузорӣ...</string>
+
+    <!-- Language picker -->
+    <string name="language_sheet_title">Забони барнома</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_english">English</string>
+    <string name="language_tajik">Тоҷикӣ</string>
+
+    <!-- Shared -->
+    <string name="app_tagline">Супермаркети насли нав</string>
+
+    <!-- Login screen -->
+    <string name="login_title">Воридшавӣ ба ҳисоб</string>
+    <string name="login_subtitle">Барои воридшавӣ рақами телефон ва паролро ворид кунед</string>
+    <string name="auth_phone_label">Рақами телефон</string>
+    <string name="auth_phone_placeholder">+992 (__)___-__-__</string>
+    <string name="auth_password_label">Парол</string>
+    <string name="login_password_placeholder">Паролро ворид кунед</string>
+    <string name="login_button">Ворид шавед</string>
+    <string name="login_no_account">Ҳисоб надоред? </string>
+    <string name="login_register_link">Бақайдгирӣ</string>
+    <string name="login_or_divider">  ё  </string>
+    <string name="login_guest_button">Ҳамчун мизмон идома диҳед</string>
+    <string name="login_terms">Бо пахш кардани «Воридшавӣ», шумо бо Шартномаи истифодабарӣ ва Сиёсати махфияти RELAX розӣ мешавед</string>
+
+    <!-- Register screen -->
+    <string name="register_title">Сохтани ҳисоб</string>
+    <string name="register_subtitle">Барои бақайдгирӣ маълумотро пур кунед</string>
+    <string name="register_name_label">Ном</string>
+    <string name="register_name_placeholder">Номи худро ворид кунед</string>
+    <string name="register_password_placeholder">На кам аз 6 аломат</string>
+    <string name="register_confirm_password_label">Паролро такрор кунед</string>
+    <string name="register_confirm_password_placeholder">Паролро такрор кунед</string>
+    <string name="register_button">Бақайдгирӣ</string>
+    <string name="register_have_account">Аллакай ҳисоб доред? </string>
+    <string name="register_login_link">Воридшавӣ</string>
+    <string name="register_terms">Бо пахш кардани «Бақайдгирӣ», шумо бо Шартномаи истифодабарӣ ва Сиёсати махфияти RELAX розӣ мешавед</string>
+
+    <!-- Onboarding screen -->
+    <string name="onboarding_title_1">Беҳтарин маҷулот\nҳар рӯз</string>
+    <string name="onboarding_subtitle_1">Ҳазорон маҷулоти тару тоза аз таъминкунандагони боэътимод. Расонидан дар давоми 2 соат ё гирифтани мустақим.</string>
+    <string name="onboarding_title_2">Бонус ва кэшбэк\nбарои ҳар як харид</string>
+    <string name="onboarding_subtitle_2">Баллҳои бонусиро ҳамҷамъ кунед ва бо онҳо то 50% арзиши хариди навбатиро пардохт кунед.</string>
+    <string name="onboarding_title_3">Аксияҳои истисноӣ\nфақат барои шумо</string>
+    <string name="onboarding_subtitle_3">Тахфифҳои шахсӣ, аксияҳои ҳафтаина ва пешниҳодҳои махсус мустақиман дар барнома.</string>
+    <string name="onboarding_skip">Гузарондан</string>
+    <string name="onboarding_next">Минбаъд</string>
+    <string name="onboarding_start_shopping">Харидро шурӯъ кунед</string>
+
+    <!-- Notifications screen -->
+    <string name="notif_title">Огоҳиномаҳо</string>
+    <string name="notif_mark_all_read">Ҳамаро хондашуда қайд кунед</string>
+    <string name="notif_empty_title">Огоҳинома нест</string>
+
+    <!-- Home screen -->
+    <string name="home_search_placeholder">Ҷустуҷӯи маҷулот...</string>
+    <string name="home_section_categories">Категорияҳо</string>
+    <string name="home_section_popular">Маъмултарин</string>
+    <string name="home_section_new">Навигариҳо</string>
+    <string name="home_section_sale_week">Аксияҳои ҳафта</string>
+    <string name="home_section_best_offers">Беҳтарин пешниҳодҳо</string>
+    <string name="home_address">кӯчаи Ленин, 45</string>
+    <string name="home_promo_title">🔥 Аксияҳои ҳафта</string>
+    <string name="home_promo_subtitle">Тахфиф то 40% барои садҳо маҷулот</string>
+
+    <!-- Catalog screen -->
+    <string name="catalog_title">Каталог</string>
+    <string name="catalog_search_placeholder">Ҷустуҷӯ дар каталог...</string>
+    <string name="catalog_category_all">Ҳама</string>
+    <string name="catalog_products_count">%d мол</string>
+    <string name="catalog_empty_title">Ҳеҷ чиз ёфт нашуд</string>
+    <string name="catalog_empty_subtitle">Филтрҳоро тағйир диҳед</string>
+
+    <!-- Product detail screen -->
+    <string name="product_added_to_cart">Маҷулот ба сабад илова шуд</string>
+    <string name="product_add_to_cart_price">Ба сабад · %1$d TJS</string>
+    <string name="product_savings">Сарфа %1$d TJS</string>
+    <string name="product_discount_badge">−%1$d%%</string>
+    <string name="product_tab_description">Тасвир</string>
+    <string name="product_tab_composition">Таркиб</string>
+    <string name="product_tab_reviews">Шарҳҳо</string>
+    <string name="product_default_description">Маҷулоти баландсифат аз истеҳсолкунандаи боэътимод.</string>
+    <string name="product_no_composition_info">Маълумот дар бораи таркиб мавҷуд нест.</string>
+    <string name="product_char_brand">Бренд</string>
+    <string name="product_char_weight">Вазн / Ҳаҷм</string>
+    <string name="product_char_unit">Воҳид</string>
+    <string name="product_char_in_stock">Дар анбор</string>
+    <string name="product_char_category">Категория</string>
+    <string name="product_in_stock_yes">Ҳаст</string>
+    <string name="product_in_stock_no">Нест</string>
+    <string name="product_no_reviews">Ҳанӯз шарҳҳо нестанд</string>
+    <string name="product_reviews_count">%1$d шарҳ</string>
+    <string name="product_review_name_1">Анна К.</string>
+    <string name="product_review_name_2">Михаил П.</string>
+    <string name="product_review_name_3">Ольга С.</string>
+    <string name="product_review_text_1">Маҷулоти аъло, мунтазам мехарам!</string>
+    <string name="product_review_text_2">Сифати хуб, бори дигар ҳам мехарам.</string>
+    <string name="product_review_text_3">Тару тоза, болаззат, тавсия медиҳам!</string>
+    <string name="product_review_date_1">2 июн</string>
+    <string name="product_review_date_2">28 май</string>
+    <string name="product_review_date_3">20 май</string>
+
+    <!-- Cart screen -->
+    <string name="cart_title">Сабад</string>
+    <string name="cart_clear">Тоза кардан</string>
+    <string name="cart_promo_code_title">Промокод</string>
+    <string name="cart_promo_code_placeholder">Промокодро ворид кунед</string>
+    <string name="cart_promo_ok">ХУБ</string>
+    <string name="cart_promo_applied">✓ Промокод фаъол шуд — тахфиф 5%</string>
+    <string name="cart_bonus_points_title">Баллҳои бонусӣ</string>
+    <string name="cart_bonus_available">Дастрас: %1$d TJS</string>
+    <string name="cart_order_summary_title">Натиҷаи фармоиш</string>
+    <string name="cart_items_count">Маҷулот (%1$d)</string>
+    <string name="cart_discount">Тахфиф</string>
+    <string name="cart_promo_discount">Промокод (−5%)</string>
+    <string name="cart_bonus_discount">Бонусҳо</string>
+    <string name="cart_total_to_pay">Барои пардохт</string>
+    <string name="cart_savings_message">🎉 Сарфаи шумо: %1$d TJS</string>
+    <string name="cart_checkout_button">Фармоиш додан · %1$d TJS</string>
+    <string name="cart_empty_title">Сабад холӣ аст</string>
+    <string name="cart_empty_subtitle">Маҷулотро аз каталог илова кунед</string>
+
+    <!-- Checkout screen -->
+    <string name="checkout_title">Тасдиқи фармоиш</string>
+    <string name="checkout_delivery_method_title">Тарзи гирифтан</string>
+    <string name="checkout_delivery_option">🚀 Расонидан</string>
+    <string name="checkout_pickup_option">🏪 Гирифтани мустақим</string>
+    <string name="checkout_delivery_address_label">Суроғаи расонидан</string>
+    <string name="checkout_delivery_address_value">кӯчаи Ленин, 45, хонаи 12</string>
+    <string name="checkout_pickup_store_label">Мағозаи RELAX</string>
+    <string name="checkout_pickup_store_value">кӯчаи Марказӣ, 1</string>
+    <string name="checkout_time_slot_title">Вақти гирифтан</string>
+    <string name="checkout_slot_today_1">Имрӯз 18:00 – 20:00</string>
+    <string name="checkout_slot_today_2">Имрӯз 20:00 – 22:00</string>
+    <string name="checkout_slot_tomorrow_1">Пагоҳ 10:00 – 12:00</string>
+    <string name="checkout_slot_tomorrow_2">Пагоҳ 14:00 – 16:00</string>
+    <string name="checkout_payment_method_title">Тарзи пардохт</string>
+    <string name="checkout_payment_card_title">Бо корт ҳангоми гирифтан</string>
+    <string name="checkout_payment_card_sub">Ҳар корт</string>
+    <string name="checkout_payment_online_title">Пардохти онлайн</string>
+    <string name="checkout_payment_online_sub">Visa, Mastercard, СБП</string>
+    <string name="checkout_payment_cash_title">Пул нақд</string>
+    <string name="checkout_payment_cash_sub">Ҳангоми гирифтан</string>
+    <string name="checkout_comment_title">Шарҳ ба фармоиш</string>
+    <string name="checkout_comment_placeholder">Масалан: дар назди дар монед, пешакӣ занг занед...</string>
+    <string name="checkout_total_label">Ҳамагӣ</string>
+    <string name="checkout_confirm_button">Тасдиқи фармоиш</string>
+    <string name="checkout_success_title">Фармоиш қабул шуд!</string>
+    <string name="checkout_success_subtitle">Мо аллакай фармоиши шуморо тайёр мекунем. Расониданро дар вақти интихобшуда интизор шавед.</string>
+    <string name="checkout_bonus_earned">🎁 %1$d бонус ҳисоб карда шуд</string>
+    <string name="checkout_go_home">Ба саҳифаи асосӣ</string>
+
+    <!-- Favorites screen -->
+    <string name="favorites_empty_title">Дилхоҳ холӣ аст</string>
+    <string name="favorites_empty_subtitle">Маҷулоти дӯстдоштаро илова кунед</string>
+    <string name="favorites_count">%1$d мол</string>
+
+    <!-- Bonuses screen -->
+    <string name="bonuses_title">Барномаи бонусӣ</string>
+    <string name="bonuses_points">балл</string>
+    <string name="bonuses_cashback">Кэшбэк</string>
+    <string name="bonuses_level">Сатҳ</string>
+    <string name="bonuses_days_to_expire">Рӯз то сӯхтан</string>
+    <string name="bonuses_levels_title">Сатҳҳои барнома</string>
+    <string name="bonuses_cashback_suffix">кэшбэк</string>
+    <string name="bonuses_min_points_from">аз %1$d TJS</string>
+    <string name="bonuses_your_level">Сатҳи шумо</string>
+    <string name="bonuses_achievements_title">Дастовардҳо</string>
+    <string name="bonuses_achievement_first_purchase">Хариди аввал</string>
+    <string name="bonuses_achievement_10_purchases">10 харид</string>
+    <string name="bonuses_achievement_50_purchases">50 харид</string>
+    <string name="bonuses_achievement_vip">Мизоҷи VIP</string>
+    <string name="bonuses_tab_credits">Ҳисобшуда</string>
+    <string name="bonuses_tab_debits">Харҷшуда</string>
+
+    <!-- Loyalty card screen -->
+    <string name="loyalty_title">Корти муштарӣ</string>
+    <string name="loyalty_bonus_balance">Тавозуни бонусӣ</string>
+    <string name="loyalty_points_suffix">балл</string>
+    <string name="loyalty_owner_label">СОҒИБ</string>
+    <string name="loyalty_member_since_label">БО МО АЗ</string>
+    <string name="loyalty_qr_title">QR-код барои скан кардан</string>
+    <string name="loyalty_barcode_title">Штрихкод</string>
+    <string name="loyalty_level_label">Сатҳ</string>
+    <string name="loyalty_next_level_label">Навбатӣ</string>
+    <string name="loyalty_progress_to_level">То сатҳи «%1$s» %2$d балл боқӣ мондааст</string>
+    <string name="loyalty_benefits_title">Имтиёзҳои сатҳ</string>
+    <string name="loyalty_stat_bonuses">Бонусҳо</string>
+    <string name="loyalty_stat_spent">Сарф шуд</string>
+    <string name="loyalty_stat_cashback">Кэшбэк</string>
+
+    <!-- Order history screen -->
+    <string name="order_history_title">Таърихи фармоишҳо</string>
+    <string name="order_empty_title">Ҳанӯз фармоиш нест</string>
+    <string name="order_empty_subtitle">Фармоишҳои шумо дар ин ҷо нишон дода мешаванд</string>
+    <string name="order_total_label">Ҳамагӣ: %1$d TJS</string>
+    <string name="order_repeat_button">Такрор кардан</string>
+    <string name="order_more_items">+%1$d</string>
+    <string name="order_status_delivered">Расонида шуд</string>
+    <string name="order_status_in_progress">Дар роҳ</string>
+    <string name="order_status_processing">Дар ҷараён</string>
+    <string name="order_status_cancelled">Бекор карда шуд</string>
+
+    <!-- Promotions screen -->
+    <string name="promo_title">Аксияҳо</string>
+    <string name="promo_expire_label">Аксияҳо тамом мешаванд баъди</string>
+    <string name="promo_unit_days">рӯз</string>
+    <string name="promo_unit_hours">соат</string>
+    <string name="promo_unit_minutes">дақ</string>
+    <string name="promo_newcomer_coupon">Купони навомада</string>
+    <string name="promo_newcomer_discount">−15% барои фармоиши якум</string>
+    <string name="promo_discounted_products_title">Маҷулот бо тахфиф</string>
+
+    <!-- Shared components -->
+    <string name="relax_see_all">Ҳама</string>
+    <string name="relax_reviews_count_parens">(%1$d шарҳ)</string>
+</resources>
+
+
+
+
+
+
+

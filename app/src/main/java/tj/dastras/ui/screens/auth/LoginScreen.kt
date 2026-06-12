@@ -1,6 +1,5 @@
 package tj.dastras.ui.screens.auth
 
-import android.util.Log
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -15,56 +14,30 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.*
-import com.google.firebase.auth.FirebaseAuth
-import tj.dastras.data.findActivity
-import tj.dastras.data.sendPhoneVerificationCode
-import tj.dastras.data.toE164PhoneNumber
+import androidx.hilt.navigation.compose.hiltViewModel
+import tj.dastras.R
 import tj.dastras.ui.components.RelaxButton
 import tj.dastras.ui.theme.*
 
 @Composable
 fun LoginScreen(
-    onNavigateToOtp: (phone: String, verificationId: String) -> Unit,
+    onNavigateToRegister: () -> Unit,
     onNavigateToMain: () -> Unit,
+    viewModel: AuthViewModel = hiltViewModel(),
 ) {
     var phone    by remember { mutableStateOf("") }
-    var isLoading by remember { mutableStateOf(false) }
-    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
 
-    val activity = LocalContext.current.findActivity()
-    val auth     = remember { FirebaseAuth.getInstance() }
+    val state = viewModel.uiState
 
-    fun requestVerificationCode() {
-        val currentActivity = activity ?: return
-        if (phone.isBlank() || isLoading) return
-
-        errorMessage = null
-        isLoading    = true
-        val fullPhone = toE164PhoneNumber(phone)
-
-        sendPhoneVerificationCode(
-            auth        = auth,
-            activity    = currentActivity,
-            phoneNumber = fullPhone,
-            onCodeSent  = { verificationId ->
-                isLoading = false
-                onNavigateToOtp(fullPhone, verificationId)
-            },
-            onAutoVerified = { credential ->
-                auth.signInWithCredential(credential).addOnCompleteListener { task ->
-                    isLoading = false
-                    if (task.isSuccessful) onNavigateToMain()
-                    else errorMessage = "Не удалось подтвердить номер. Попробуйте снова"
-                }
-            },
-            onError = { message ->
-                isLoading    = false
-                errorMessage = message
-            },
-        )
+    LaunchedEffect(state.isSuccess) {
+        if (state.isSuccess) onNavigateToMain()
     }
 
     Column(
@@ -105,7 +78,7 @@ fun LoginScreen(
                 Spacer(Modifier.height(16.dp))
                 Text("RELAX", color = RelaxWhite, fontSize = 26.sp, fontWeight = FontWeight.Black, letterSpacing = 6.sp)
                 Spacer(Modifier.height(6.dp))
-                Text("Супермаркет нового поколения", color = RelaxTextOnDarkSub, fontSize = 13.sp)
+                Text(stringResource(R.string.app_tagline), color = RelaxTextOnDarkSub, fontSize = 13.sp)
             }
         }
 
@@ -119,19 +92,19 @@ fun LoginScreen(
                 .padding(horizontal = 24.dp)
                 .padding(top = 32.dp, bottom = 32.dp),
         ) {
-            Text("Вход в аккаунт", style = MaterialTheme.typography.headlineLarge, color = RelaxTextPrimary)
+            Text(stringResource(R.string.login_title), style = MaterialTheme.typography.headlineLarge, color = RelaxTextPrimary)
             Spacer(Modifier.height(4.dp))
-            Text("Введите номер телефона, чтобы войти или зарегистрироваться", color = RelaxTextSecondary, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
+            Text(stringResource(R.string.login_subtitle), color = RelaxTextSecondary, style = MaterialTheme.typography.bodyMedium, lineHeight = 20.sp)
 
             Spacer(Modifier.height(28.dp))
 
             // Phone field
-            Text("Номер телефона", style = MaterialTheme.typography.labelLarge, color = RelaxTextPrimary)
+            Text(stringResource(R.string.auth_phone_label), style = MaterialTheme.typography.labelLarge, color = RelaxTextPrimary)
             Spacer(Modifier.height(8.dp))
             OutlinedTextField(
                 value         = phone,
                 onValueChange = { if (it.length <= 18) phone = it },
-                placeholder   = { Text("+992 (__)___-__-__", color = RelaxTextHint) },
+                placeholder   = { Text(stringResource(R.string.auth_phone_placeholder), color = RelaxTextHint) },
                 leadingIcon   = {
                     Icon(Icons.Rounded.Phone, null, tint = RelaxTextSecondary, modifier = Modifier.size(20.dp))
                 },
@@ -150,19 +123,57 @@ fun LoginScreen(
                 textStyle     = MaterialTheme.typography.bodyLarge,
             )
 
+            Spacer(Modifier.height(16.dp))
+
+            // Password field
+            Text(stringResource(R.string.auth_password_label), style = MaterialTheme.typography.labelLarge, color = RelaxTextPrimary)
+            Spacer(Modifier.height(8.dp))
+            OutlinedTextField(
+                value         = password,
+                onValueChange = { password = it },
+                placeholder   = { Text(stringResource(R.string.login_password_placeholder), color = RelaxTextHint) },
+                leadingIcon   = {
+                    Icon(Icons.Rounded.Lock, null, tint = RelaxTextSecondary, modifier = Modifier.size(20.dp))
+                },
+                trailingIcon  = {
+                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        Icon(
+                            if (passwordVisible) Icons.Rounded.VisibilityOff else Icons.Rounded.Visibility,
+                            null,
+                            tint = RelaxTextSecondary,
+                            modifier = Modifier.size(20.dp),
+                        )
+                    }
+                },
+                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                singleLine    = true,
+                modifier      = Modifier.fillMaxWidth().height(56.dp),
+                shape         = RoundedCornerShape(14.dp),
+                colors        = OutlinedTextFieldDefaults.colors(
+                    focusedContainerColor    = RelaxWhite,
+                    unfocusedContainerColor  = RelaxWhite,
+                    focusedBorderColor       = RelaxDark,
+                    unfocusedBorderColor     = RelaxDivider,
+                    focusedTextColor         = RelaxTextPrimary,
+                    unfocusedTextColor       = RelaxTextPrimary,
+                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                textStyle     = MaterialTheme.typography.bodyLarge,
+            )
+
             Spacer(Modifier.height(24.dp))
 
             RelaxButton(
-                text      = "Получить код",
-                onClick   = { requestVerificationCode() },
+                text      = stringResource(R.string.login_button),
+                onClick   = { viewModel.login(phone, password) },
                 modifier  = Modifier.fillMaxWidth(),
-                isLoading = isLoading,
+                isLoading = state.isLoading,
             )
 
-            if (errorMessage != null) {
+            if (state.error != null) {
                 Spacer(Modifier.height(12.dp))
                 Text(
-                    text       = errorMessage!!,
+                    text       = state.error,
                     color      = RelaxError,
                     style      = MaterialTheme.typography.bodySmall,
                     textAlign  = TextAlign.Center,
@@ -172,9 +183,22 @@ fun LoginScreen(
 
             Spacer(Modifier.height(20.dp))
 
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
+                Text(stringResource(R.string.login_no_account), color = RelaxTextSecondary, style = MaterialTheme.typography.bodyMedium)
+                Text(
+                    text     = stringResource(R.string.login_register_link),
+                    color    = RelaxRed,
+                    fontWeight = FontWeight.SemiBold,
+                    style    = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.clickable { onNavigateToRegister() },
+                )
+            }
+
+            Spacer(Modifier.height(20.dp))
+
             Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
                 Divider(modifier = Modifier.weight(1f), color = RelaxDivider)
-                Text("  или войти через  ", color = RelaxTextHint, style = MaterialTheme.typography.bodySmall)
+                Text(stringResource(R.string.login_or_divider), color = RelaxTextHint, style = MaterialTheme.typography.bodySmall)
                 Divider(modifier = Modifier.weight(1f), color = RelaxDivider)
             }
 
@@ -189,13 +213,13 @@ fun LoginScreen(
             ) {
                 Icon(Icons.Rounded.Person, null, tint = RelaxTextSecondary, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
-                Text("Продолжить как гость", color = RelaxTextSecondary, style = MaterialTheme.typography.labelLarge)
+                Text(stringResource(R.string.login_guest_button), color = RelaxTextSecondary, style = MaterialTheme.typography.labelLarge)
             }
 
             Spacer(Modifier.height(24.dp))
 
             Text(
-                text      = "Нажимая «Получить код», вы соглашаетесь с Пользовательским соглашением и Политикой конфиденциальности RELAX",
+                text      = stringResource(R.string.login_terms),
                 color     = RelaxTextHint,
                 style     = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,

@@ -13,9 +13,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import tj.dastras.R
 import tj.dastras.data.MockData
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.theme.*
@@ -40,7 +42,7 @@ fun BonusesScreen() {
                 .padding(20.dp)
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Text("Бонусная программа", color = RelaxWhite, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.bonuses_title), color = RelaxWhite, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(24.dp))
 
                 // Big balance
@@ -54,8 +56,8 @@ fun BonusesScreen() {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("⭐", fontSize = 28.sp)
-                        Text("${user.bonusBalance}", color = RelaxWhite, fontSize = 36.sp, fontWeight = FontWeight.Black)
-                        Text("баллов", color = RelaxTextOnDarkSub, fontSize = 12.sp)
+                        Text("${user.bonusBalance.toInt()}", color = RelaxWhite, fontSize = 36.sp, fontWeight = FontWeight.Black)
+                        Text(stringResource(R.string.bonuses_points), color = RelaxTextOnDarkSub, fontSize = 12.sp)
                     }
                 }
 
@@ -66,9 +68,9 @@ fun BonusesScreen() {
                     modifier              = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
-                    BonusStatChip("${user.level.cashbackPercent.toInt()}%", "Кэшбэк", RelaxOrange)
-                    BonusStatChip(user.level.name, "Уровень", RelaxGold)
-                    BonusStatChip("∞", "Дней до сгорания", RelaxSuccess)
+                    BonusStatChip("${user.level.cashbackPercent.toInt()}%", stringResource(R.string.bonuses_cashback), RelaxOrange)
+                    BonusStatChip(user.level.name, stringResource(R.string.bonuses_level), RelaxGold)
+                    BonusStatChip("∞", stringResource(R.string.bonuses_days_to_expire), RelaxSuccess)
                 }
             }
         }
@@ -80,7 +82,7 @@ fun BonusesScreen() {
         ) {
             item {
                 Spacer(Modifier.height(20.dp))
-                Text("Уровни программы", style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary, modifier = Modifier.padding(horizontal = 20.dp))
+                Text(stringResource(R.string.bonuses_levels_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary, modifier = Modifier.padding(horizontal = 20.dp))
                 Spacer(Modifier.height(12.dp))
 
                 Row(
@@ -105,7 +107,7 @@ fun BonusesScreen() {
             // Achievements
             item {
                 Spacer(Modifier.height(24.dp))
-                Text("Достижения", style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary, modifier = Modifier.padding(horizontal = 20.dp))
+                Text(stringResource(R.string.bonuses_achievements_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary, modifier = Modifier.padding(horizontal = 20.dp))
                 Spacer(Modifier.height(12.dp))
                 Row(
                     modifier        = Modifier
@@ -113,10 +115,10 @@ fun BonusesScreen() {
                         .padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    AchievementChip("🛒", "Первая покупка", true)
-                    AchievementChip("🔥", "10 покупок", true)
-                    AchievementChip("💎", "50 покупок", false)
-                    AchievementChip("👑", "VIP клиент", false)
+                    AchievementChip("🛒", stringResource(R.string.bonuses_achievement_first_purchase), true)
+                    AchievementChip("🔥", stringResource(R.string.bonuses_achievement_10_purchases), true)
+                    AchievementChip("💎", stringResource(R.string.bonuses_achievement_50_purchases), false)
+                    AchievementChip("👑", stringResource(R.string.bonuses_achievement_vip), false)
                 }
             }
 
@@ -131,7 +133,7 @@ fun BonusesScreen() {
                             .background(RelaxSurfaceAlt)
                             .padding(4.dp),
                     ) {
-                        listOf("Начисления", "Списания").forEachIndexed { idx, label ->
+                        listOf(stringResource(R.string.bonuses_tab_credits), stringResource(R.string.bonuses_tab_debits)).forEachIndexed { idx, label ->
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
@@ -203,14 +205,14 @@ private fun LevelCard(name: String, cashback: Float, minPoints: Int, color: Colo
                 fontWeight = FontWeight.Black,
             )
             Text(
-                "кэшбэк",
+                stringResource(R.string.bonuses_cashback_suffix),
                 color = if (isCurrent) RelaxWhite.copy(alpha = 0.7f) else RelaxTextSecondary,
                 fontSize = 11.sp,
             )
             if (minPoints > 0) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    "от $minPoints ₽",
+                    stringResource(R.string.bonuses_min_points_from, minPoints),
                     color    = if (isCurrent) RelaxWhite.copy(alpha = 0.6f) else RelaxTextHint,
                     fontSize = 10.sp,
                 )
@@ -223,7 +225,7 @@ private fun LevelCard(name: String, cashback: Float, minPoints: Int, color: Colo
                         .background(RelaxWhite.copy(alpha = 0.2f))
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
-                    Text("Ваш уровень", color = RelaxWhite, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.bonuses_your_level), color = RelaxWhite, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

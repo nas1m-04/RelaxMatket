@@ -1,3 +1,271 @@
 <resources>
     <string name="app_name">Dastras</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Главная</string>
+    <string name="nav_catalog">Каталог</string>
+    <string name="nav_card">Карта</string>
+    <string name="nav_bonuses">Бонусы</string>
+    <string name="nav_profile">Профиль</string>
+
+    <!-- Profile header -->
+    <string name="profile_user_default">Пользователь</string>
+    <string name="profile_points">%1$s · %2$d баллов</string>
+    <string name="profile_stat_bonuses">Бонусов</string>
+    <string name="profile_stat_spent">Потрачено</string>
+    <string name="profile_stat_with_us">С нами</string>
+
+    <!-- Sections -->
+    <string name="section_purchases">Покупки</string>
+    <string name="section_account">Аккаунт</string>
+    <string name="section_settings">Настройки</string>
+    <string name="section_support">Поддержка</string>
+
+    <!-- Menu items -->
+    <string name="menu_order_history">История заказов</string>
+    <string name="menu_my_orders">Мои заказы</string>
+    <string name="menu_favorites">Избранное</string>
+    <string name="menu_favorites_count">%d товаров</string>
+    <string name="menu_personal_data">Личные данные</string>
+    <string name="menu_not_specified">Не указан</string>
+    <string name="menu_addresses">Мои адреса</string>
+    <string name="menu_addresses_count">1 адрес</string>
+    <string name="menu_notifications">Уведомления</string>
+    <string name="menu_notifications_on">Включены</string>
+    <string name="menu_language">Язык</string>
+    <string name="menu_theme">Тема</string>
+    <string name="menu_theme_light">Светлая</string>
+    <string name="menu_help">Помощь</string>
+    <string name="menu_chat_support">Чат с поддержкой</string>
+    <string name="menu_online">Онлайн</string>
+    <string name="menu_about">О приложении</string>
+
+    <!-- Logout -->
+    <string name="logout_button">Выйти из аккаунта</string>
+    <string name="logout_dialog_title">Выход из аккаунта</string>
+    <string name="logout_dialog_text">Вы действительно хотите выйти из приложения?</string>
+    <string name="logout_confirm">Выйти</string>
+    <string name="logout_cancel">Отмена</string>
+
+    <!-- Avatar picker -->
+    <string name="avatar_sheet_title">Фото профиля</string>
+    <string name="avatar_take_selfie">Сделать селфи</string>
+    <string name="avatar_choose_gallery">Выбрать из галереи</string>
+    <string name="avatar_delete_photo">Удалить фото</string>
+    <string name="avatar_uploading">Загрузка...</string>
+
+    <!-- Language picker -->
+    <string name="language_sheet_title">Язык приложения</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_english">English</string>
+    <string name="language_tajik">Тоҷикӣ</string>
+
+    <!-- Shared -->
+    <string name="app_tagline">Супермаркет нового поколения</string>
+
+    <!-- Login screen -->
+    <string name="login_title">Вход в аккаунт</string>
+    <string name="login_subtitle">Введите номер телефона и пароль для входа</string>
+    <string name="auth_phone_label">Номер телефона</string>
+    <string name="auth_phone_placeholder">+992 (__)___-__-__</string>
+    <string name="auth_password_label">Пароль</string>
+    <string name="login_password_placeholder">Введите пароль</string>
+    <string name="login_button">Войти</string>
+    <string name="login_no_account">Нет аккаунта? </string>
+    <string name="login_register_link">Зарегистрироваться</string>
+    <string name="login_or_divider">  или  </string>
+    <string name="login_guest_button">Продолжить как гость</string>
+    <string name="login_terms">Нажимая «Войти», вы соглашаетесь с Пользовательским соглашением и Политикой конфиденциальности RELAX</string>
+
+    <!-- Register screen -->
+    <string name="register_title">Создать аккаунт</string>
+    <string name="register_subtitle">Заполните данные, чтобы зарегистрироваться</string>
+    <string name="register_name_label">Имя</string>
+    <string name="register_name_placeholder">Введите ваше имя</string>
+    <string name="register_password_placeholder">Не менее 6 символов</string>
+    <string name="register_confirm_password_label">Повторите пароль</string>
+    <string name="register_confirm_password_placeholder">Повторите пароль</string>
+    <string name="register_button">Зарегистрироваться</string>
+    <string name="register_have_account">Уже есть аккаунт? </string>
+    <string name="register_login_link">Войти</string>
+    <string name="register_terms">Нажимая «Зарегистрироваться», вы соглашаетесь с Пользовательским соглашением и Политикой конфиденциальности RELAX</string>
+
+    <!-- Onboarding screen -->
+    <string name="onboarding_title_1">Лучшие продукты\nкаждый день</string>
+    <string name="onboarding_subtitle_1">Тысячи свежих товаров от проверенных поставщиков. Доставка за 2 часа или самовывоз.</string>
+    <string name="onboarding_title_2">Бонусы и кэшбэк\nза каждую покупку</string>
+    <string name="onboarding_subtitle_2">Копите бонусные баллы и оплачивайте ими до 50% стоимости следующей покупки.</string>
+    <string name="onboarding_title_3">Эксклюзивные акции\nтолько для вас</string>
+    <string name="onboarding_subtitle_3">Персональные скидки, акции недели и специальные предложения прямо в приложении.</string>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Далее</string>
+    <string name="onboarding_start_shopping">Начать покупки</string>
+
+    <!-- Notifications screen -->
+    <string name="notif_title">Уведомления</string>
+    <string name="notif_mark_all_read">Прочитать все</string>
+    <string name="notif_empty_title">Нет уведомлений</string>
+
+    <!-- Home screen -->
+    <string name="home_search_placeholder">Поиск товаров...</string>
+    <string name="home_section_categories">Категории</string>
+    <string name="home_section_popular">Популярное</string>
+    <string name="home_section_new">Новинки</string>
+    <string name="home_section_sale_week">Акции недели</string>
+    <string name="home_section_best_offers">Лучшие предложения</string>
+    <string name="home_address">ул. Ленина, 45</string>
+    <string name="home_promo_title">🔥 Акции недели</string>
+    <string name="home_promo_subtitle">Скидки до 40% на сотни товаров</string>
+
+    <!-- Catalog screen -->
+    <string name="catalog_title">Каталог</string>
+    <string name="catalog_search_placeholder">Поиск в каталоге...</string>
+    <string name="catalog_category_all">Все</string>
+    <string name="catalog_products_count">%d товаров</string>
+    <string name="catalog_empty_title">Ничего не найдено</string>
+    <string name="catalog_empty_subtitle">Попробуйте изменить фильтры</string>
+
+    <!-- Product detail screen -->
+    <string name="product_added_to_cart">Товар добавлен в корзину</string>
+    <string name="product_add_to_cart_price">В корзину · %1$d TJS</string>
+    <string name="product_savings">Экономия %1$d TJS</string>
+    <string name="product_discount_badge">−%1$d%%</string>
+    <string name="product_tab_description">Описание</string>
+    <string name="product_tab_composition">Состав</string>
+    <string name="product_tab_reviews">Отзывы</string>
+    <string name="product_default_description">Высококачественный продукт от проверенного производителя.</string>
+    <string name="product_no_composition_info">Информация о составе отсутствует.</string>
+    <string name="product_char_brand">Бренд</string>
+    <string name="product_char_weight">Масса / Объём</string>
+    <string name="product_char_unit">Единица</string>
+    <string name="product_char_in_stock">В наличии</string>
+    <string name="product_char_category">Категория</string>
+    <string name="product_in_stock_yes">Есть</string>
+    <string name="product_in_stock_no">Нет</string>
+    <string name="product_no_reviews">Отзывов пока нет</string>
+    <string name="product_reviews_count">%1$d отзывов</string>
+    <string name="product_review_name_1">Анна К.</string>
+    <string name="product_review_name_2">Михаил П.</string>
+    <string name="product_review_name_3">Ольга С.</string>
+    <string name="product_review_text_1">Отличный продукт, покупаю регулярно!</string>
+    <string name="product_review_text_2">Хорошее качество, буду брать ещё.</string>
+    <string name="product_review_text_3">Свежий, вкусный, рекомендую!</string>
+    <string name="product_review_date_1">2 июня</string>
+    <string name="product_review_date_2">28 мая</string>
+    <string name="product_review_date_3">20 мая</string>
+
+    <!-- Cart screen -->
+    <string name="cart_title">Корзина</string>
+    <string name="cart_clear">Очистить</string>
+    <string name="cart_promo_code_title">Промокод</string>
+    <string name="cart_promo_code_placeholder">Введите промокод</string>
+    <string name="cart_promo_ok">ОК</string>
+    <string name="cart_promo_applied">✓ Промокод применён — скидка 5%</string>
+    <string name="cart_bonus_points_title">Бонусные баллы</string>
+    <string name="cart_bonus_available">Доступно: %1$d TJS</string>
+    <string name="cart_order_summary_title">Итог заказа</string>
+    <string name="cart_items_count">Товары (%1$d)</string>
+    <string name="cart_discount">Скидка</string>
+    <string name="cart_promo_discount">Промокод (−5%)</string>
+    <string name="cart_bonus_discount">Бонусы</string>
+    <string name="cart_total_to_pay">К оплате</string>
+    <string name="cart_savings_message">🎉 Ваша экономия: %1$d TJS</string>
+    <string name="cart_checkout_button">Оформить заказ · %1$d TJS</string>
+    <string name="cart_empty_title">Корзина пуста</string>
+    <string name="cart_empty_subtitle">Добавьте товары из каталога</string>
+
+    <!-- Checkout screen -->
+    <string name="checkout_title">Оформление заказа</string>
+    <string name="checkout_delivery_method_title">Способ получения</string>
+    <string name="checkout_delivery_option">🚀 Доставка</string>
+    <string name="checkout_pickup_option">🏪 Самовывоз</string>
+    <string name="checkout_delivery_address_label">Адрес доставки</string>
+    <string name="checkout_delivery_address_value">ул. Ленина, 45, кв. 12</string>
+    <string name="checkout_pickup_store_label">Магазин RELAX</string>
+    <string name="checkout_pickup_store_value">ул. Центральная, 1</string>
+    <string name="checkout_time_slot_title">Время получения</string>
+    <string name="checkout_slot_today_1">Сегодня 18:00 – 20:00</string>
+    <string name="checkout_slot_today_2">Сегодня 20:00 – 22:00</string>
+    <string name="checkout_slot_tomorrow_1">Завтра 10:00 – 12:00</string>
+    <string name="checkout_slot_tomorrow_2">Завтра 14:00 – 16:00</string>
+    <string name="checkout_payment_method_title">Способ оплаты</string>
+    <string name="checkout_payment_card_title">Картой при получении</string>
+    <string name="checkout_payment_card_sub">Любая карта</string>
+    <string name="checkout_payment_online_title">Онлайн-оплата</string>
+    <string name="checkout_payment_online_sub">Visa, Mastercard, СБП</string>
+    <string name="checkout_payment_cash_title">Наличными</string>
+    <string name="checkout_payment_cash_sub">При получении</string>
+    <string name="checkout_comment_title">Комментарий к заказу</string>
+    <string name="checkout_comment_placeholder">Например: оставить у двери, позвонить заранее...</string>
+    <string name="checkout_total_label">Итого</string>
+    <string name="checkout_confirm_button">Подтвердить заказ</string>
+    <string name="checkout_success_title">Заказ оформлен!</string>
+    <string name="checkout_success_subtitle">Мы уже готовим ваш заказ. Ожидайте доставку в выбранное время.</string>
+    <string name="checkout_bonus_earned">🎁 Начислено %1$d бонусов</string>
+    <string name="checkout_go_home">На главную</string>
+
+    <!-- Favorites screen -->
+    <string name="favorites_empty_title">Пусто в избранном</string>
+    <string name="favorites_empty_subtitle">Добавляйте любимые товары</string>
+    <string name="favorites_count">%1$d товаров</string>
+
+    <!-- Bonuses screen -->
+    <string name="bonuses_title">Бонусная программа</string>
+    <string name="bonuses_points">баллов</string>
+    <string name="bonuses_cashback">Кэшбэк</string>
+    <string name="bonuses_level">Уровень</string>
+    <string name="bonuses_days_to_expire">Дней до сгорания</string>
+    <string name="bonuses_levels_title">Уровни программы</string>
+    <string name="bonuses_cashback_suffix">кэшбэк</string>
+    <string name="bonuses_min_points_from">от %1$d TJS</string>
+    <string name="bonuses_your_level">Ваш уровень</string>
+    <string name="bonuses_achievements_title">Достижения</string>
+    <string name="bonuses_achievement_first_purchase">Первая покупка</string>
+    <string name="bonuses_achievement_10_purchases">10 покупок</string>
+    <string name="bonuses_achievement_50_purchases">50 покупок</string>
+    <string name="bonuses_achievement_vip">VIP клиент</string>
+    <string name="bonuses_tab_credits">Начисления</string>
+    <string name="bonuses_tab_debits">Списания</string>
+
+    <!-- Loyalty card screen -->
+    <string name="loyalty_title">Карта клиента</string>
+    <string name="loyalty_bonus_balance">Бонусный баланс</string>
+    <string name="loyalty_points_suffix">баллов</string>
+    <string name="loyalty_owner_label">ВЛАДЕЛЕЦ</string>
+    <string name="loyalty_member_since_label">С НАМИ С</string>
+    <string name="loyalty_qr_title">QR-код для сканирования</string>
+    <string name="loyalty_barcode_title">Штрихкод</string>
+    <string name="loyalty_level_label">Уровень</string>
+    <string name="loyalty_next_level_label">Следующий</string>
+    <string name="loyalty_progress_to_level">До уровня «%1$s» осталось %2$d баллов</string>
+    <string name="loyalty_benefits_title">Привилегии уровня</string>
+    <string name="loyalty_stat_bonuses">Бонусов</string>
+    <string name="loyalty_stat_spent">Потрачено</string>
+    <string name="loyalty_stat_cashback">Кэшбэк</string>
+
+    <!-- Order history screen -->
+    <string name="order_history_title">История заказов</string>
+    <string name="order_empty_title">Заказов пока нет</string>
+    <string name="order_empty_subtitle">Ваши заказы появятся здесь</string>
+    <string name="order_total_label">Итого: %1$d TJS</string>
+    <string name="order_repeat_button">Повторить</string>
+    <string name="order_more_items">+%1$d</string>
+    <string name="order_status_delivered">Доставлен</string>
+    <string name="order_status_in_progress">В пути</string>
+    <string name="order_status_processing">Обрабатывается</string>
+    <string name="order_status_cancelled">Отменён</string>
+
+    <!-- Promotions screen -->
+    <string name="promo_title">Акции</string>
+    <string name="promo_expire_label">Акции сгорают через</string>
+    <string name="promo_unit_days">дня</string>
+    <string name="promo_unit_hours">часа</string>
+    <string name="promo_unit_minutes">мин</string>
+    <string name="promo_newcomer_coupon">Купон новичка</string>
+    <string name="promo_newcomer_discount">−15% на первый заказ</string>
+    <string name="promo_discounted_products_title">Товары со скидкой</string>
+
+    <!-- Shared components -->
+    <string name="relax_see_all">Все</string>
+    <string name="relax_reviews_count_parens">(%1$d отзывов)</string>
 </resources>

@@ -1,5 +1,11 @@
 package tj.dastras.ui.screens.profile
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -13,141 +19,216 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import tj.dastras.data.MockData
+import tj.dastras.R
+import tj.dastras.data.UserProfile
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.theme.*
+import tj.dastras.util.LocaleManager
+import java.io.ByteArrayOutputStream
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onOrders: () -> Unit,
     onFavorites: () -> Unit,
     onNotifications: () -> Unit,
+    onLoggedOut: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
-    val user = MockData.currentUser
+    val state   = viewModel.uiState
+    val user    = state.profile
+    val context = LocalContext.current
+    var showLogoutDialog  by remember { mutableStateOf(false) }
+    var showAvatarSheet   by remember { mutableStateOf(false) }
+    var showLanguageSheet by remember { mutableStateOf(false) }
+    var currentLanguage   by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(RelaxBackground)
-    ) {
-        // Header
+    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        uri?.let {
+            context.contentResolver.openInputStream(it)?.use { input ->
+                viewModel.uploadAvatar(input.readBytes())
+            }
+        }
+        showAvatarSheet = false
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
+        bitmap?.let {
+            val stream = ByteArrayOutputStream()
+            it.compress(Bitmap.CompressFormat.JPEG, 85, stream)
+            viewModel.uploadAvatar(stream.toByteArray())
+        }
+        showAvatarSheet = false
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) cameraLauncher.launch(null)
+    }
+
+    LaunchedEffect(state.loggedOut) {
+        if (state.loggedOut) onLoggedOut()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.load(forceRefresh = true)
+    }
+
+    if (showAvatarSheet) {
+        AvatarPickerSheet(
+            hasAvatar   = !user?.avatarUrl.isNullOrEmpty(),
+            isUploading = state.isUploadingAvatar,
+            onCamera    = {
+                val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
+                if (granted) cameraLauncher.launch(null) else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            },
+            onGallery   = { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+            onDelete    = { viewModel.removeAvatar(); showAvatarSheet = false },
+            onDismiss   = { showAvatarSheet = false },
+        )
+    }
+
+    if (showLanguageSheet) {
+        LanguageSheet(
+            currentLanguage = currentLanguage,
+            onSelect = { code ->
+                LocaleManager.setLanguage(code)
+                currentLanguage = code
+                showLanguageSheet = false
+            },
+            onDismiss = { showLanguageSheet = false },
+        )
+    }
+
+    if (showLogoutDialog) {
+        AlertDialog(
+            onDismissRequest = { showLogoutDialog = false },
+            icon             = { Icon(Icons.Rounded.Logout, null, tint = RelaxError) },
+            title            = { Text(stringResource(R.string.logout_dialog_title)) },
+            text             = { Text(stringResource(R.string.logout_dialog_text)) },
+            confirmButton    = {
+                TextButton(onClick = { showLogoutDialog = false; viewModel.logout() }) {
+                    Text(stringResource(R.string.logout_confirm), color = RelaxError, fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton    = {
+                TextButton(onClick = { showLogoutDialog = false }) {
+                    Text(stringResource(R.string.logout_cancel))
+                }
+            },
+        )
+    }
+
+    if (state.isLoading || user == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = RelaxDark)
+        }
+        return
+    }
+
+    Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(Brush.verticalGradient(listOf(RelaxDark, RelaxDarkSecondary)))
-                .statusBarsPadding()
+            modifier = Modifier.fillMaxWidth().background(Brush.verticalGradient(listOf(RelaxDark, RelaxDarkSecondary))).statusBarsPadding()
         ) {
-            Column(
-                modifier            = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                // Avatar
+            Column(modifier = Modifier.fillMaxWidth().padding(20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
-                    modifier = Modifier
-                        .size(88.dp)
-                        .shadow(12.dp, CircleShape)
-                        .clip(CircleShape)
+                    modifier = Modifier.size(88.dp).shadow(12.dp, CircleShape).clip(CircleShape)
                         .border(3.dp, RelaxWhite.copy(alpha = 0.3f), CircleShape)
+                        .background(RelaxDarkSecondary)
+                        .clickable { showAvatarSheet = true },
+                    contentAlignment = Alignment.Center,
                 ) {
-                    AsyncImage(
-                        model             = user.avatarUrl,
-                        contentDescription = user.name,
-                        contentScale      = ContentScale.Crop,
-                        modifier          = Modifier.fillMaxSize(),
-                    )
+                    if (user.avatarUrl.isNullOrEmpty()) {
+                        Icon(Icons.Rounded.Person, null, tint = RelaxTextOnDarkSub, modifier = Modifier.size(44.dp))
+                    } else {
+                        AsyncImage(model = user.avatarUrl, contentDescription = user.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                    }
+                    if (state.isUploadingAvatar) {
+                        Box(modifier = Modifier.fillMaxSize().background(RelaxOverlay), contentAlignment = Alignment.Center) {
+                            CircularProgressIndicator(modifier = Modifier.size(28.dp), strokeWidth = 2.dp, color = RelaxWhite)
+                        }
+                    }
+                    Box(
+                        modifier = Modifier.align(Alignment.BottomEnd).size(26.dp).clip(CircleShape)
+                            .background(RelaxOrange).border(2.dp, RelaxDark, CircleShape),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(Icons.Rounded.PhotoCamera, null, tint = RelaxWhite, modifier = Modifier.size(14.dp))
+                    }
                 }
                 Spacer(Modifier.height(12.dp))
-                Text(user.name, color = RelaxWhite, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+                Text(user.name.ifEmpty { stringResource(R.string.profile_user_default) }, color = RelaxWhite, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(Modifier.height(4.dp))
                 Text(user.phone, color = RelaxTextOnDarkSub, style = MaterialTheme.typography.bodyMedium)
                 Spacer(Modifier.height(12.dp))
-                // Level badge
                 Row(
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color(user.level.color).copy(alpha = 0.8f))
-                        .padding(horizontal = 16.dp, vertical = 6.dp),
-                    verticalAlignment = Alignment.CenterVertically,
+                    modifier              = Modifier.clip(RoundedCornerShape(20.dp)).background(Color(user.level.color).copy(alpha = 0.8f)).padding(horizontal = 16.dp, vertical = 6.dp),
+                    verticalAlignment     = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Icon(Icons.Rounded.Stars, null, tint = RelaxWhite, modifier = Modifier.size(16.dp))
-                    Text("${user.level.name} · ${user.bonusBalance} баллов", color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.profile_points, user.level.name, user.bonusBalance.toInt()), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                 }
                 Spacer(Modifier.height(8.dp))
             }
         }
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-        ) {
+        Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
             Spacer(Modifier.height(12.dp))
 
-            // Quick stats
-            Row(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-            ) {
-                QuickStat("${user.bonusBalance}", "Бонусов", modifier = Modifier.weight(1f))
-                QuickStat("${user.totalSpent.toInt()} ₽", "Потрачено", modifier = Modifier.weight(1f))
-                QuickStat("3", "Заказа", modifier = Modifier.weight(1f))
+            Row(modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                QuickStat("${user.bonusBalance.toInt()}", stringResource(R.string.profile_stat_bonuses), modifier = Modifier.weight(1f))
+                QuickStat("${user.totalSpent.toInt()} TJS", stringResource(R.string.profile_stat_spent), modifier = Modifier.weight(1f))
+                QuickStat(user.memberSince, stringResource(R.string.profile_stat_with_us), modifier = Modifier.weight(1f))
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Menu sections
-            ProfileSection(title = "Покупки") {
-                ProfileMenuItem(Icons.Rounded.Receipt, "История заказов", "3 заказа", onClick = onOrders)
-                ProfileMenuItem(Icons.Rounded.FavoriteBorder, "Избранное", "5 товаров", onClick = onFavorites)
+            ProfileSection(title = stringResource(R.string.section_purchases)) {
+                ProfileMenuItem(Icons.Rounded.Receipt,       stringResource(R.string.menu_order_history), stringResource(R.string.menu_my_orders), onClick = onOrders)
+                ProfileMenuItem(Icons.Rounded.FavoriteBorder,stringResource(R.string.menu_favorites),      stringResource(R.string.menu_favorites_count, user.favoriteIds.size), onClick = onFavorites)
             }
 
             Spacer(Modifier.height(12.dp))
 
-            ProfileSection(title = "Аккаунт") {
-                ProfileMenuItem(Icons.Rounded.Person, "Личные данные", user.email, onClick = {})
-                ProfileMenuItem(Icons.Rounded.Home, "Мои адреса", "1 адрес", onClick = {})
-                ProfileMenuItem(Icons.Rounded.Notifications, "Уведомления", "Включены", onClick = onNotifications)
+            ProfileSection(title = stringResource(R.string.section_account)) {
+                ProfileMenuItem(Icons.Rounded.Person,        stringResource(R.string.menu_personal_data), user.email.ifEmpty { stringResource(R.string.menu_not_specified) }, onClick = {})
+                ProfileMenuItem(Icons.Rounded.Home,          stringResource(R.string.menu_addresses),      stringResource(R.string.menu_addresses_count), onClick = {})
+                ProfileMenuItem(Icons.Rounded.Notifications, stringResource(R.string.menu_notifications),  stringResource(R.string.menu_notifications_on), onClick = onNotifications)
             }
 
             Spacer(Modifier.height(12.dp))
 
-            ProfileSection(title = "Настройки") {
-                ProfileMenuItem(Icons.Rounded.Language, "Язык", "Русский", onClick = {})
-                ProfileMenuItem(Icons.Rounded.DarkMode, "Тема", "Светлая", onClick = {})
+            ProfileSection(title = stringResource(R.string.section_settings)) {
+                ProfileMenuItem(Icons.Rounded.Language, stringResource(R.string.menu_language), languageDisplayName(currentLanguage), onClick = { showLanguageSheet = true })
+                ProfileMenuItem(Icons.Rounded.DarkMode, stringResource(R.string.menu_theme), stringResource(R.string.menu_theme_light), onClick = {})
             }
 
             Spacer(Modifier.height(12.dp))
 
-            ProfileSection(title = "Поддержка") {
-                ProfileMenuItem(Icons.Rounded.Help, "Помощь", "", onClick = {})
-                ProfileMenuItem(Icons.Rounded.Chat, "Чат с поддержкой", "Онлайн", onClick = {})
-                ProfileMenuItem(Icons.Rounded.Info, "О приложении", "v1.0.0", onClick = {})
+            ProfileSection(title = stringResource(R.string.section_support)) {
+                ProfileMenuItem(Icons.Rounded.Help,  stringResource(R.string.menu_help),         "",        onClick = {})
+                ProfileMenuItem(Icons.Rounded.Chat,  stringResource(R.string.menu_chat_support), stringResource(R.string.menu_online), onClick = {})
+                ProfileMenuItem(Icons.Rounded.Info,  stringResource(R.string.menu_about),        "v1.0.0",  onClick = {})
             }
 
             Spacer(Modifier.height(16.dp))
 
-            // Logout
             Box(
-                modifier = Modifier
-                    .padding(horizontal = 20.dp)
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFFEE2E2))
-                    .clickable {}
-                    .padding(16.dp),
+                modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth()
+                    .clip(RoundedCornerShape(16.dp)).background(Color(0xFFFEE2E2))
+                    .clickable { showLogoutDialog = true }.padding(16.dp),
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                     Icon(Icons.Rounded.Logout, null, tint = RelaxError, modifier = Modifier.size(20.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text("Выйти из аккаунта", color = RelaxError, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                    Text(stringResource(R.string.logout_button), color = RelaxError, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
                 }
             }
 
@@ -158,16 +239,8 @@ fun ProfileScreen(
 
 @Composable
 private fun QuickStat(value: String, label: String, modifier: Modifier = Modifier) {
-    Card(
-        modifier  = modifier,
-        shape     = RoundedCornerShape(16.dp),
-        colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-        elevation = CardDefaults.cardElevation(0.dp),
-    ) {
-        Column(
-            modifier            = Modifier.padding(12.dp).fillMaxWidth(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
+    Card(modifier = modifier, shape = RoundedCornerShape(16.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
+        Column(modifier = Modifier.padding(12.dp).fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(value, fontWeight = FontWeight.Black, fontSize = 16.sp, color = RelaxTextPrimary)
             Text(label, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
         }
@@ -178,12 +251,7 @@ private fun QuickStat(value: String, label: String, modifier: Modifier = Modifie
 private fun ProfileSection(title: String, content: @Composable ColumnScope.() -> Unit) {
     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
         Text(title, style = MaterialTheme.typography.labelMedium, color = RelaxTextSecondary, modifier = Modifier.padding(start = 4.dp, bottom = 8.dp))
-        Card(
-            modifier  = Modifier.fillMaxWidth(),
-            shape     = RoundedCornerShape(18.dp),
-            colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-            elevation = CardDefaults.cardElevation(0.dp),
-        ) {
+        Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
             content()
         }
     }
@@ -191,33 +259,26 @@ private fun ProfileSection(title: String, content: @Composable ColumnScope.() ->
 
 @Composable
 private fun ColumnScope.ProfileMenuItem(icon: ImageVector, title: String, subtitle: String, onClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 14.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        Box(
-            modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(RelaxSurfaceAlt),
-            contentAlignment = Alignment.Center,
-        ) {
+    Row(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(RelaxSurfaceAlt), contentAlignment = Alignment.Center) {
             Icon(icon, null, tint = RelaxTextPrimary, modifier = Modifier.size(20.dp))
         }
         Spacer(Modifier.width(12.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(title, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
-            if (subtitle.isNotEmpty()) {
-                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
-            }
+            if (subtitle.isNotEmpty()) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
         }
         Icon(Icons.Rounded.ChevronRight, null, tint = RelaxTextHint, modifier = Modifier.size(20.dp))
     }
     RelaxDivider(modifier = Modifier.padding(start = 68.dp))
 }
 
-private val CircleShape  = RoundedCornerShape(50)
-private val RelaxError   = Color(0xFFEF4444)
+@Composable
+private fun languageDisplayName(code: String): String = when (code) {
+    LocaleManager.ENGLISH -> stringResource(R.string.language_english)
+    LocaleManager.TAJIK   -> stringResource(R.string.language_tajik)
+    else                  -> stringResource(R.string.language_russian)
+}
+
+private val CircleShape = RoundedCornerShape(50)
+private val RelaxError  = Color(0xFFEF4444)

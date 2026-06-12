@@ -1,13 +1,16 @@
 package tj.dastras.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import tj.dastras.ui.screens.splash.SplashViewModel
 import tj.dastras.ui.screens.auth.LoginScreen
-import tj.dastras.ui.screens.auth.OtpScreen
+import tj.dastras.ui.screens.auth.RegisterScreen
 import tj.dastras.ui.screens.bonuses.BonusesScreen
 import tj.dastras.ui.screens.cart.CartScreen
 import tj.dastras.ui.screens.catalog.CatalogScreen
@@ -26,13 +29,24 @@ import tj.dastras.ui.screens.splash.SplashScreen
 
 @Composable
 fun RelaxNavGraph(navController: NavHostController) {
+    val sessionViewModel: SessionViewModel = hiltViewModel()
+    LaunchedEffect(Unit) {
+        sessionViewModel.sessionExpired.collect {
+            navController.navigate(Screen.Login.route) {
+                popUpTo(0) { inclusive = true }
+            }
+        }
+    }
+
     NavHost(
         navController    = navController,
         startDestination = Screen.Splash.route,
     ) {
         composable(Screen.Splash.route) {
+            val splashViewModel: SplashViewModel = hiltViewModel()
             SplashScreen(onFinished = {
-                navController.navigate(Screen.Onboarding.route) {
+                val destination = if (splashViewModel.isLoggedIn) Screen.Main.route else Screen.Onboarding.route
+                navController.navigate(destination) {
                     popUpTo(Screen.Splash.route) { inclusive = true }
                 }
             })
@@ -48,8 +62,8 @@ fun RelaxNavGraph(navController: NavHostController) {
 
         composable(Screen.Login.route) {
             LoginScreen(
-                onNavigateToOtp  = { phone, verificationId ->
-                    navController.navigate(Screen.Otp.createRoute(phone, verificationId))
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route)
                 },
                 onNavigateToMain = {
                     navController.navigate(Screen.Main.route) {
@@ -59,27 +73,26 @@ fun RelaxNavGraph(navController: NavHostController) {
             )
         }
 
-        composable(
-            route     = Screen.Otp.route,
-            arguments = listOf(
-                navArgument("phone") { type = NavType.StringType },
-                navArgument("verificationId") { type = NavType.StringType },
-            )
-        ) { backStack ->
-            OtpScreen(
-                phone          = backStack.arguments?.getString("phone")?.let(Screen.Otp::decodeArg) ?: "",
-                verificationId = backStack.arguments?.getString("verificationId")?.let(Screen.Otp::decodeArg) ?: "",
-                onVerified = {
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                onBack = { navController.popBackStack() },
+                onNavigateToMain = {
                     navController.navigate(Screen.Main.route) {
                         popUpTo(Screen.Login.route) { inclusive = true }
                     }
-                },
-                onBack   = { navController.popBackStack() }
+                }
             )
         }
 
         composable(Screen.Main.route) {
-            MainScreen(rootNavController = navController)
+            MainScreen(
+                rootNavController = navController,
+                onLoggedOut = {
+                    navController.navigate(Screen.Login.route) {
+                        popUpTo(Screen.Main.route) { inclusive = true }
+                    }
+                }
+            )
         }
 
         composable(
@@ -89,7 +102,6 @@ fun RelaxNavGraph(navController: NavHostController) {
             ProductDetailScreen(
                 productId = backStack.arguments?.getInt("id") ?: 1,
                 onBack    = { navController.popBackStack() },
-                onCart    = { navController.navigate(Screen.Cart.route) }
             )
         }
 

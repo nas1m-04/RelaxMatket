@@ -11,8 +11,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import tj.dastras.R
 import tj.dastras.ui.components.RelaxTopBar
 import tj.dastras.ui.theme.*
 
@@ -24,11 +26,16 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
     var comment         by remember { mutableStateOf("") }
     var showSuccess     by remember { mutableStateOf(false) }
 
-    val timeSlots = listOf("Сегодня 18:00 – 20:00", "Сегодня 20:00 – 22:00", "Завтра 10:00 – 12:00", "Завтра 14:00 – 16:00")
+    val timeSlots = listOf(
+        stringResource(R.string.checkout_slot_today_1),
+        stringResource(R.string.checkout_slot_today_2),
+        stringResource(R.string.checkout_slot_tomorrow_1),
+        stringResource(R.string.checkout_slot_tomorrow_2),
+    )
     val payments  = listOf(
-        Triple(Icons.Rounded.CreditCard, "Картой при получении", "Любая карта"),
-        Triple(Icons.Rounded.Phone,      "Онлайн-оплата",        "Visa, Mastercard, СБП"),
-        Triple(Icons.Rounded.Money,      "Наличными",            "При получении"),
+        Triple(Icons.Rounded.CreditCard, stringResource(R.string.checkout_payment_card_title), stringResource(R.string.checkout_payment_card_sub)),
+        Triple(Icons.Rounded.Phone,      stringResource(R.string.checkout_payment_online_title), stringResource(R.string.checkout_payment_online_sub)),
+        Triple(Icons.Rounded.Money,      stringResource(R.string.checkout_payment_cash_title), stringResource(R.string.checkout_payment_cash_sub)),
     )
 
     if (showSuccess) {
@@ -38,7 +45,7 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = "Оформление заказа", onBack = onBack)
+            RelaxTopBar(title = stringResource(R.string.checkout_title), onBack = onBack)
         }
 
         Column(
@@ -49,7 +56,7 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             // Delivery type toggle
-            SectionCard(title = "Способ получения") {
+            SectionCard(title = stringResource(R.string.checkout_delivery_method_title)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -57,7 +64,7 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
                         .background(RelaxSurfaceAlt)
                         .padding(4.dp),
                 ) {
-                    listOf("🚀 Доставка", "🏪 Самовывоз").forEachIndexed { idx, label ->
+                    listOf(stringResource(R.string.checkout_delivery_option), stringResource(R.string.checkout_pickup_option)).forEachIndexed { idx, label ->
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -91,8 +98,8 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
                         Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed, modifier = Modifier.size(22.dp))
                         Spacer(Modifier.width(10.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Адрес доставки", style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
-                            Text("ул. Ленина, 45, кв. 12", style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.checkout_delivery_address_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
+                            Text(stringResource(R.string.checkout_delivery_address_value), style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
                         }
                         Icon(Icons.Rounded.Edit, null, tint = RelaxTextSecondary, modifier = Modifier.size(16.dp))
                     }
@@ -108,15 +115,15 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
                         Icon(Icons.Rounded.Store, null, tint = RelaxDark, modifier = Modifier.size(22.dp))
                         Spacer(Modifier.width(10.dp))
                         Column {
-                            Text("Магазин RELAX", style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
-                            Text("ул. Центральная, 1", style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                            Text(stringResource(R.string.checkout_pickup_store_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
+                            Text(stringResource(R.string.checkout_pickup_store_value), style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
             }
 
             // Time slot
-            SectionCard(title = "Время получения") {
+            SectionCard(title = stringResource(R.string.checkout_time_slot_title)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     timeSlots.forEachIndexed { idx, slot ->
                         Row(
@@ -147,7 +154,7 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
             }
 
             // Payment method
-            SectionCard(title = "Способ оплаты") {
+            SectionCard(title = stringResource(R.string.checkout_payment_method_title)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     payments.forEachIndexed { idx, (icon, title, sub) ->
                         Row(
@@ -187,11 +194,11 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
             }
 
             // Comment
-            SectionCard(title = "Комментарий к заказу") {
+            SectionCard(title = stringResource(R.string.checkout_comment_title)) {
                 OutlinedTextField(
                     value         = comment,
                     onValueChange = { comment = it },
-                    placeholder   = { Text("Например: оставить у двери, позвонить заранее...", color = RelaxTextHint, fontSize = 14.sp) },
+                    placeholder   = { Text(stringResource(R.string.checkout_comment_placeholder), color = RelaxTextHint, fontSize = 14.sp) },
                     modifier      = Modifier.fillMaxWidth().height(100.dp),
                     shape         = RoundedCornerShape(12.dp),
                     colors        = OutlinedTextFieldDefaults.colors(
@@ -215,8 +222,8 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                    Text("Итого", style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
-                    Text("2 687 ₽", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.checkout_total_label), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text("2 687 TJS", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                 }
                 Button(
                     onClick   = { showSuccess = true },
@@ -224,7 +231,7 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
                     shape     = RoundedCornerShape(16.dp),
                     colors    = ButtonDefaults.buttonColors(containerColor = RelaxRed),
                 ) {
-                    Text("Подтвердить заказ", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
         }
@@ -264,11 +271,11 @@ private fun OrderSuccessScreen(onDone: () -> Unit) {
                 Text("✅", fontSize = 56.sp)
             }
             Spacer(Modifier.height(24.dp))
-            Text("Заказ оформлен!", style = MaterialTheme.typography.displaySmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.checkout_success_title), style = MaterialTheme.typography.displaySmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(8.dp))
-            Text("Мы уже готовим ваш заказ. Ожидайте доставку в выбранное время.", color = RelaxTextSecondary, style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 24.sp)
+            Text(stringResource(R.string.checkout_success_subtitle), color = RelaxTextSecondary, style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 24.sp)
             Spacer(Modifier.height(32.dp))
-            Text("🎁 Начислено 350 бонусов", color = Color(0xFFD4AF37), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.checkout_bonus_earned, 350), color = Color(0xFFD4AF37), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(32.dp))
             Button(
                 onClick  = onDone,
@@ -276,7 +283,7 @@ private fun OrderSuccessScreen(onDone: () -> Unit) {
                 shape    = RoundedCornerShape(16.dp),
                 colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
             ) {
-                Text("На главную", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.checkout_go_home), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }

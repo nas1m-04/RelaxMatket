@@ -14,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import tj.dastras.R
 import tj.dastras.data.MockData
 import tj.dastras.data.Notification
 import tj.dastras.data.NotificationType
@@ -30,11 +32,11 @@ fun NotificationsScreen(onBack: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
             RelaxTopBar(
-                title  = "Уведомления",
+                title  = stringResource(R.string.notif_title),
                 onBack = onBack,
                 actions = {
                     TextButton(onClick = {}) {
-                        Text("Прочитать все", color = RelaxRed, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(R.string.notif_mark_all_read), color = RelaxRed, style = MaterialTheme.typography.labelMedium)
                     }
                 }
             )
@@ -45,7 +47,7 @@ fun NotificationsScreen(onBack: () -> Unit) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("🔔", fontSize = 64.sp)
                     Spacer(Modifier.height(16.dp))
-                    Text("Нет уведомлений", style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                    Text(stringResource(R.string.notif_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
                 }
             }
         } else {
