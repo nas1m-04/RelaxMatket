@@ -15,9 +15,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import tj.dastras.R
 import tj.dastras.data.MockData
 import tj.dastras.ui.theme.*
 
@@ -48,7 +50,7 @@ fun LoyaltyCardScreen() {
                 .padding(horizontal = 20.dp, vertical = 20.dp)
         ) {
             Text(
-                "Карта клиента",
+                stringResource(R.string.loyalty_title),
                 color      = RelaxWhite,
                 style      = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
@@ -164,18 +166,18 @@ fun LoyaltyCardScreen() {
 
                     // Bonus balance — big number
                     Column {
-                        Text("Бонусный баланс", color = RelaxTextOnDarkSub, fontSize = 11.sp, letterSpacing = 0.5.sp)
+                        Text(stringResource(R.string.loyalty_bonus_balance), color = RelaxTextOnDarkSub, fontSize = 11.sp, letterSpacing = 0.5.sp)
                         Spacer(Modifier.height(2.dp))
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
-                                text       = "${user.bonusBalance}",
+                                text       = "${user.bonusBalance.toInt()}",
                                 color      = RelaxWhite,
                                 fontSize   = 42.sp,
                                 fontWeight = FontWeight.Black,
                                 fontFamily = FontFamily.Default,
                             )
                             Spacer(Modifier.width(6.dp))
-                            Text("баллов", color = RelaxTextOnDarkSub, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
+                            Text(stringResource(R.string.loyalty_points_suffix), color = RelaxTextOnDarkSub, fontSize = 14.sp, modifier = Modifier.padding(bottom = 8.dp))
                         }
                     }
 
@@ -188,11 +190,11 @@ fun LoyaltyCardScreen() {
                         verticalAlignment = Alignment.Bottom,
                     ) {
                         Column {
-                            Text("ВЛАДЕЛЕЦ", color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
+                            Text(stringResource(R.string.loyalty_owner_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
                             Text(user.name.uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                         }
                         Column(horizontalAlignment = Alignment.End) {
-                            Text("С НАМИ С", color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
+                            Text(stringResource(R.string.loyalty_member_since_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
                             Text(user.memberSince.uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
@@ -236,7 +238,7 @@ fun LoyaltyCardScreen() {
                     modifier            = Modifier.padding(24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("QR-код для сканирования", style = MaterialTheme.typography.titleSmall, color = RelaxTextSecondary)
+                    Text(stringResource(R.string.loyalty_qr_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextSecondary)
                     Spacer(Modifier.height(16.dp))
 
                     // QR code placeholder (visual)
@@ -253,7 +255,7 @@ fun LoyaltyCardScreen() {
                     Spacer(Modifier.height(16.dp))
 
                     // Barcode
-                    Text("Штрихкод", style = MaterialTheme.typography.bodySmall, color = RelaxTextHint)
+                    Text(stringResource(R.string.loyalty_barcode_title), style = MaterialTheme.typography.bodySmall, color = RelaxTextHint)
                     Spacer(Modifier.height(8.dp))
                     BarcodeVisual(modifier = Modifier.fillMaxWidth().height(50.dp))
                     Spacer(Modifier.height(6.dp))
@@ -273,7 +275,7 @@ fun LoyaltyCardScreen() {
                 Column(modifier = Modifier.padding(20.dp)) {
                     Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                         Column {
-                            Text("Уровень", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                            Text(stringResource(R.string.loyalty_level_label), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                 Box(
                                     modifier = Modifier
@@ -286,7 +288,7 @@ fun LoyaltyCardScreen() {
                         }
                         if (nextLevel != null) {
                             Column(horizontalAlignment = Alignment.End) {
-                                Text("Следующий", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                Text(stringResource(R.string.loyalty_next_level_label), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                                 Text(nextLevel.name, style = MaterialTheme.typography.titleMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                             }
                         }
@@ -304,7 +306,7 @@ fun LoyaltyCardScreen() {
                     if (nextLevel != null) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            "До уровня «${nextLevel.name}» осталось ${nextLevel.minPoints - user.bonusBalance} баллов",
+                            stringResource(R.string.loyalty_progress_to_level, nextLevel.name, (nextLevel.minPoints - user.bonusBalance).toInt()),
                             style = MaterialTheme.typography.bodySmall,
                             color = RelaxTextSecondary,
                         )
@@ -312,7 +314,7 @@ fun LoyaltyCardScreen() {
 
                     Spacer(Modifier.height(16.dp))
 
-                    Text("Привилегии уровня", style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.loyalty_benefits_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(10.dp))
                     level.benefits.forEach { benefit ->
                         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
@@ -345,11 +347,11 @@ fun LoyaltyCardScreen() {
                     modifier = Modifier.padding(24.dp),
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
-                    StatBlock("${user.bonusBalance}", "Бонусов", RelaxGold)
+                    StatBlock("${user.bonusBalance.toInt()}", stringResource(R.string.loyalty_stat_bonuses), RelaxGold)
                     Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
-                    StatBlock("${user.totalSpent.toInt()} ₽", "Потрачено", RelaxWhite)
+                    StatBlock("${user.totalSpent.toInt()} TJS", stringResource(R.string.loyalty_stat_spent), RelaxWhite)
                     Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
-                    StatBlock("${(user.bonusBalance * (level.cashbackPercent / 100)).toInt()} ₽", "Кэшбэк", RelaxOrange)
+                    StatBlock("${(user.bonusBalance * (level.cashbackPercent / 100)).toInt()} TJS", stringResource(R.string.loyalty_stat_cashback), RelaxOrange)
                 }
             }
 

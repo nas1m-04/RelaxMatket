@@ -9,10 +9,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.delay
+import tj.dastras.R
 import tj.dastras.ui.theme.*
 
 @Composable
@@ -108,7 +110,7 @@ fun SplashScreen(onFinished: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text      = "Супермаркет нового поколения",
+                    text      = stringResource(R.string.app_tagline),
                     color     = RelaxTextOnDarkSub,
                     fontSize  = 14.sp,
                     textAlign = TextAlign.Center,

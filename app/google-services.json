@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "810008185760",
+    "project_id": "relaxmarket-bccdc",
+    "storage_bucket": "relaxmarket-bccdc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:810008185760:android:20683a6c6c717cee79f2c5",
+        "android_client_info": {
+          "package_name": "tj.dastras"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD3iF537azvyngqN6ihvOtd1qCedl6u37g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

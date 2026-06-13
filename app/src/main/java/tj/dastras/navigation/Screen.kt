@@ -4,9 +4,7 @@ sealed class Screen(val route: String) {
     object Splash        : Screen("splash")
     object Onboarding    : Screen("onboarding")
     object Login         : Screen("login")
-    object Otp           : Screen("otp/{phone}") {
-        fun createRoute(phone: String) = "otp/$phone"
-    }
+    object Register      : Screen("register")
     object Main          : Screen("main")
     object Home          : Screen("home")
     object Catalog       : Screen("catalog")

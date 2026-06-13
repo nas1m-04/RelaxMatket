@@ -13,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
+import tj.dastras.R
 import tj.dastras.navigation.Screen
 import tj.dastras.ui.screens.bonuses.BonusesScreen
 import tj.dastras.ui.screens.catalog.CatalogScreen
@@ -29,20 +31,20 @@ private data class NavItem(
     val route: String,
     val icon: ImageVector,
     val iconSelected: ImageVector,
-    val label: String,
+    val labelRes: Int,
     val isCenter: Boolean = false,
 )
 
 private val navItems = listOf(
-    NavItem(Screen.Home.route,        Icons.Rounded.Home,           Icons.Rounded.Home,           "Главная"),
-    NavItem(Screen.Catalog.route,     Icons.Rounded.GridView,       Icons.Rounded.GridView,       "Каталог"),
-    NavItem(Screen.LoyaltyCard.route, Icons.Rounded.CreditCard,     Icons.Rounded.CreditCard,     "Карта", true),
-    NavItem(Screen.Bonuses.route,     Icons.Rounded.Stars,          Icons.Rounded.Stars,          "Бонусы"),
-    NavItem(Screen.Profile.route,     Icons.Rounded.PersonOutline,  Icons.Rounded.Person,         "Профиль"),
+    NavItem(Screen.Home.route,        Icons.Rounded.Home,           Icons.Rounded.Home,           R.string.nav_home),
+    NavItem(Screen.Catalog.route,     Icons.Rounded.GridView,       Icons.Rounded.GridView,       R.string.nav_catalog),
+    NavItem(Screen.LoyaltyCard.route, Icons.Rounded.CreditCard,     Icons.Rounded.CreditCard,     R.string.nav_card, true),
+    NavItem(Screen.Bonuses.route,     Icons.Rounded.Stars,          Icons.Rounded.Stars,          R.string.nav_bonuses),
+    NavItem(Screen.Profile.route,     Icons.Rounded.PersonOutline,  Icons.Rounded.Person,         R.string.nav_profile),
 )
 
 @Composable
-fun MainScreen(rootNavController: NavHostController) {
+fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
     val bottomNavController = rememberNavController()
     val backStack           by bottomNavController.currentBackStackEntryAsState()
     val currentRoute        = backStack?.destination?.route
@@ -93,6 +95,7 @@ fun MainScreen(rootNavController: NavHostController) {
                     onOrders       = { rootNavController.navigate(Screen.OrderHistory.route) },
                     onFavorites    = { rootNavController.navigate(Screen.Favorites.route) },
                     onNotifications = { rootNavController.navigate(Screen.Notifications.route) },
+                    onLoggedOut    = onLoggedOut,
                 )
             }
         }
@@ -143,17 +146,18 @@ private fun RelaxBottomNavBar(currentRoute: String?, onNavigate: (String) -> Uni
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center,
                     ) {
+                        val label = stringResource(item.labelRes)
                         AnimatedContent(targetState = isSelected, label = "nav_icon") { selected ->
                             Icon(
                                 imageVector = if (selected) item.iconSelected else item.icon,
-                                contentDescription = item.label,
+                                contentDescription = label,
                                 tint = if (selected) RelaxDark else RelaxTextHint,
                                 modifier = Modifier.size(24.dp),
                             )
                         }
                         Spacer(Modifier.height(3.dp))
                         Text(
-                            text       = item.label,
+                            text       = label,
                             fontSize   = 10.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             color      = if (isSelected) RelaxDark else RelaxTextHint,

@@ -14,55 +14,54 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
+import tj.dastras.R
 import tj.dastras.data.CartItem
-import tj.dastras.data.MockData
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.components.RelaxTopBar
+import tj.dastras.ui.components.activityViewModel
 import tj.dastras.ui.theme.*
 
 @Composable
-fun CartScreen(onBack: () -> Unit, onCheckout: () -> Unit) {
-    var cartItems by remember {
-        mutableStateOf(
-            listOf(
-                CartItem(MockData.products[0], 1),
-                CartItem(MockData.products[4], 2),
-                CartItem(MockData.products[6], 1),
-                CartItem(MockData.products[3], 1),
-            )
-        )
-    }
-    var promoCode       by remember { mutableStateOf("") }
-    var promoApplied    by remember { mutableStateOf(false) }
-    var useBonuses      by remember { mutableStateOf(false) }
-
-    val subtotal        = cartItems.sumOf { it.product.price * it.quantity }
-    val savings         = cartItems.sumOf { ((it.product.oldPrice ?: it.product.price) - it.product.price) * it.quantity }
-    val promoDiscount   = if (promoApplied) subtotal * 0.05 else 0.0
-    val bonusDiscount   = if (useBonuses) minOf(MockData.currentUser.bonusBalance.toDouble(), subtotal * 0.5) else 0.0
-    val total           = subtotal - promoDiscount - bonusDiscount
+fun CartScreen(
+    onBack: () -> Unit,
+    onCheckout: () -> Unit,
+    viewModel: CartViewModel = activityViewModel(),
+) {
+    val state         = viewModel.uiState
+    val subtotal      = state.items.sumOf { it.product.price * it.quantity }
+    val savings       = state.items.sumOf { ((it.product.oldPrice ?: it.product.price) - it.product.price) * it.quantity }
+    val promoDiscount = if (state.promoApplied) subtotal * 0.05 else 0.0
+    val bonusDiscount = if (state.useBonuses) minOf(state.bonusBalance, subtotal * 0.5) else 0.0
+    val total         = subtotal - promoDiscount - bonusDiscount
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
-        // Top bar
         Box(modifier = Modifier.fillMaxWidth().background(RelaxWhite)) {
             RelaxTopBar(
-                title  = "Корзина",
+                title  = stringResource(R.string.cart_title),
                 onBack = onBack,
                 actions = {
-                    if (cartItems.isNotEmpty()) {
-                        TextButton(onClick = { cartItems = emptyList() }) {
-                            Text("Очистить", color = RelaxRed, style = MaterialTheme.typography.labelLarge)
+                    if (state.items.isNotEmpty()) {
+                        TextButton(onClick = { viewModel.clear() }) {
+                            Text(stringResource(R.string.cart_clear), color = RelaxRed, style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
             )
         }
 
-        if (cartItems.isEmpty()) {
+        if (state.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator(color = RelaxDark)
+            }
+            return@Column
+        }
+
+        if (state.items.isEmpty()) {
             EmptyCart()
             return@Column
         }
@@ -72,147 +71,75 @@ fun CartScreen(onBack: () -> Unit, onCheckout: () -> Unit) {
             contentPadding      = PaddingValues(20.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            // Cart items
-            items(cartItems, key = { it.product.id }) { item ->
+            items(state.items, key = { it.product.id }) { item ->
                 CartItemCard(
                     item       = item,
-                    onIncrease = {
-                        cartItems = cartItems.map {
-                            if (it.product.id == item.product.id) it.copy(quantity = it.quantity + 1) else it
-                        }
-                    },
-                    onDecrease = {
-                        cartItems = cartItems.mapNotNull {
-                            if (it.product.id == item.product.id) {
-                                if (it.quantity > 1) it.copy(quantity = it.quantity - 1) else null
-                            } else it
-                        }
-                    },
-                    onRemove   = { cartItems = cartItems.filter { it.product.id != item.product.id } }
+                    onIncrease = { viewModel.increase(item.product.id) },
+                    onDecrease = { viewModel.decrease(item.product.id) },
+                    onRemove   = { viewModel.remove(item.product.id) },
                 )
             }
 
-            // Promo code
             item {
-                Card(
-                    modifier  = Modifier.fillMaxWidth(),
-                    shape     = RoundedCornerShape(18.dp),
-                    colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                ) {
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Промокод", style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
+                        Text(stringResource(R.string.cart_promo_code_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
                         Spacer(Modifier.height(10.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
-                                value         = promoCode,
-                                onValueChange = { promoCode = it.uppercase() },
-                                placeholder   = { Text("Введите промокод", color = RelaxTextHint, fontSize = 14.sp) },
+                                value         = state.promoCode,
+                                onValueChange = { viewModel.setPromoCode(it.uppercase()) },
+                                placeholder   = { Text(stringResource(R.string.cart_promo_code_placeholder), color = RelaxTextHint, fontSize = 14.sp) },
                                 singleLine    = true,
                                 modifier      = Modifier.weight(1f).height(50.dp),
                                 shape         = RoundedCornerShape(12.dp),
-                                colors        = OutlinedTextFieldDefaults.colors(
-                                    focusedBorderColor   = RelaxDark,
-                                    unfocusedBorderColor = RelaxDivider,
-                                    focusedContainerColor    = RelaxWhite,
-                                    unfocusedContainerColor  = RelaxInputBg,
-                                ),
+                                colors        = OutlinedTextFieldDefaults.colors(focusedBorderColor = RelaxDark, unfocusedBorderColor = RelaxDivider, focusedContainerColor = RelaxWhite, unfocusedContainerColor = RelaxInputBg),
                                 textStyle     = MaterialTheme.typography.bodyMedium.copy(color = RelaxTextPrimary, fontWeight = FontWeight.Bold),
                             )
-                            Button(
-                                onClick  = { if (promoCode.isNotEmpty()) promoApplied = !promoApplied },
-                                shape    = RoundedCornerShape(12.dp),
-                                modifier = Modifier.height(50.dp),
-                                colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
-                            ) {
-                                Text(if (promoApplied) "✓" else "ОК", fontWeight = FontWeight.Bold)
+                            Button(onClick = { viewModel.togglePromo() }, shape = RoundedCornerShape(12.dp), modifier = Modifier.height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = RelaxDark)) {
+                                Text(if (state.promoApplied) "✓" else stringResource(R.string.cart_promo_ok), fontWeight = FontWeight.Bold)
                             }
                         }
-                        if (promoApplied) {
+                        if (state.promoApplied) {
                             Spacer(Modifier.height(8.dp))
-                            Text("✓ Промокод применён — скидка 5%", color = RelaxSuccess, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(R.string.cart_promo_applied), color = RelaxSuccess, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
             }
 
-            // Bonus toggle
             item {
-                Card(
-                    modifier  = Modifier.fillMaxWidth(),
-                    shape     = RoundedCornerShape(18.dp),
-                    colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                ) {
-                    Row(
-                        modifier          = Modifier.fillMaxWidth().padding(16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(44.dp)
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(RelaxGoldLight),
-                            contentAlignment = Alignment.Center,
-                        ) {
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Box(modifier = Modifier.size(44.dp).clip(RoundedCornerShape(12.dp)).background(RelaxGoldLight), contentAlignment = Alignment.Center) {
                             Text("⭐", fontSize = 22.sp)
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Бонусные баллы", style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
-                            Text("Доступно: ${MockData.currentUser.bonusBalance} ₽", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                            Text(stringResource(R.string.cart_bonus_points_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
+                            Text(stringResource(R.string.cart_bonus_available, state.bonusBalance.toInt()), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                         }
-                        Switch(
-                            checked       = useBonuses,
-                            onCheckedChange = { useBonuses = it },
-                            colors        = SwitchDefaults.colors(
-                                checkedThumbColor   = RelaxWhite,
-                                checkedTrackColor   = RelaxDark,
-                                uncheckedThumbColor = RelaxWhite,
-                                uncheckedTrackColor = RelaxDivider,
-                            )
-                        )
+                        Switch(checked = state.useBonuses, onCheckedChange = { viewModel.toggleBonuses(it) }, colors = SwitchDefaults.colors(checkedThumbColor = RelaxWhite, checkedTrackColor = RelaxDark, uncheckedThumbColor = RelaxWhite, uncheckedTrackColor = RelaxDivider))
                     }
                 }
             }
 
-            // Summary
             item {
-                Card(
-                    modifier  = Modifier.fillMaxWidth(),
-                    shape     = RoundedCornerShape(18.dp),
-                    colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                ) {
+                Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
                     Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text("Итог заказа", style = MaterialTheme.typography.titleMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
-
-                        SummaryRow("Товары (${cartItems.size})", "${subtotal.toInt()} ₽")
-                        if (savings > 0) SummaryRow("Скидка", "−${savings.toInt()} ₽", RelaxSuccess)
-                        if (promoApplied) SummaryRow("Промокод (−5%)", "−${promoDiscount.toInt()} ₽", RelaxSuccess)
-                        if (useBonuses) SummaryRow("Бонусы", "−${bonusDiscount.toInt()} ₽", Color(0xFFD4AF37))
-
+                        Text(stringResource(R.string.cart_order_summary_title), style = MaterialTheme.typography.titleMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                        SummaryRow(stringResource(R.string.cart_items_count, state.items.size), "${subtotal.toInt()} TJS")
+                        if (savings > 0) SummaryRow(stringResource(R.string.cart_discount), "−${savings.toInt()} TJS", RelaxSuccess)
+                        if (state.promoApplied) SummaryRow(stringResource(R.string.cart_promo_discount), "−${promoDiscount.toInt()} TJS", RelaxSuccess)
+                        if (state.useBonuses) SummaryRow(stringResource(R.string.cart_bonus_discount), "−${bonusDiscount.toInt()} TJS", Color(0xFFD4AF37))
                         RelaxDivider()
-
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text("К оплате", style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
-                            Text("${total.toInt()} ₽", fontSize = 26.sp, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
+                            Text(stringResource(R.string.cart_total_to_pay), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                            Text("${total.toInt()} TJS", fontSize = 26.sp, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
                         }
-
                         if (savings + promoDiscount + bonusDiscount > 0) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(10.dp))
-                                    .background(RelaxSuccessBg)
-                                    .padding(12.dp)
-                            ) {
-                                Text(
-                                    "🎉 Ваша экономия: ${(savings + promoDiscount + bonusDiscount).toInt()} ₽",
-                                    color = RelaxSuccess,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                )
+                            Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(RelaxSuccessBg).padding(12.dp)) {
+                                Text(stringResource(R.string.cart_savings_message, (savings + promoDiscount + bonusDiscount).toInt()), color = RelaxSuccess, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -220,21 +147,9 @@ fun CartScreen(onBack: () -> Unit, onCheckout: () -> Unit) {
             }
         }
 
-        // Checkout button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(RelaxWhite)
-                .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
-        ) {
-            Button(
-                onClick   = onCheckout,
-                modifier  = Modifier.fillMaxWidth().height(56.dp),
-                shape     = RoundedCornerShape(16.dp),
-                colors    = ButtonDefaults.buttonColors(containerColor = RelaxRed),
-            ) {
-                Text("Оформить заказ · ${total.toInt()} ₽", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+        Box(modifier = Modifier.fillMaxWidth().background(RelaxWhite).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 16.dp)) {
+            Button(onClick = onCheckout, modifier = Modifier.fillMaxWidth().height(56.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = RelaxRed)) {
+                Text(stringResource(R.string.cart_checkout_button, total.toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
@@ -242,61 +157,27 @@ fun CartScreen(onBack: () -> Unit, onCheckout: () -> Unit) {
 
 @Composable
 private fun CartItemCard(item: CartItem, onIncrease: () -> Unit, onDecrease: () -> Unit, onRemove: () -> Unit) {
-    Card(
-        modifier  = Modifier.fillMaxWidth(),
-        shape     = RoundedCornerShape(18.dp),
-        colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-        elevation = CardDefaults.cardElevation(0.dp),
-    ) {
+    Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
         Row(modifier = Modifier.padding(12.dp), verticalAlignment = Alignment.CenterVertically) {
-            // Image
-            Box(
-                modifier = Modifier
-                    .size(80.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(RelaxInputBg)
-            ) {
-                AsyncImage(
-                    model             = item.product.imageUrl,
-                    contentDescription = item.product.name,
-                    contentScale      = ContentScale.Crop,
-                    modifier          = Modifier.fillMaxSize(),
-                )
+            Box(modifier = Modifier.size(80.dp).clip(RoundedCornerShape(14.dp)).background(RelaxInputBg)) {
+                AsyncImage(model = item.product.imageUrl, contentDescription = item.product.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
             }
             Spacer(Modifier.width(12.dp))
-
             Column(modifier = Modifier.weight(1f)) {
                 Text(item.product.name, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary, maxLines = 2)
-                Spacer(Modifier.height(4.dp))
-                if (item.product.weight.isNotEmpty()) {
-                    Text(item.product.weight, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                if (!item.product.weight.isNullOrEmpty()) {
+                    Spacer(Modifier.height(4.dp))
+                    Text(item.product.weight ?: "", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                 }
                 Spacer(Modifier.height(8.dp))
-                // Price + controls
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
                     Column {
-                        Text(
-                            "${(item.product.price * item.quantity).toInt()} ₽",
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 16.sp,
-                            color      = RelaxTextPrimary,
-                        )
+                        Text("${(item.product.price * item.quantity).toInt()} TJS", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
                         if (item.product.oldPrice != null) {
-                            Text(
-                                "${(item.product.oldPrice * item.quantity).toInt()} ₽",
-                                style          = MaterialTheme.typography.bodySmall,
-                                color          = RelaxTextHint,
-                                textDecoration = TextDecoration.LineThrough,
-                            )
+                            Text("${(item.product.oldPrice * item.quantity).toInt()} TJS", style = MaterialTheme.typography.bodySmall, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
                         }
                     }
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(RelaxSurfaceAlt)
-                            .padding(horizontal = 4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
+                    Row(modifier = Modifier.clip(RoundedCornerShape(12.dp)).background(RelaxSurfaceAlt).padding(horizontal = 4.dp), verticalAlignment = Alignment.CenterVertically) {
                         IconButton(onClick = onDecrease, modifier = Modifier.size(32.dp)) {
                             Icon(if (item.quantity == 1) Icons.Rounded.DeleteOutline else Icons.Rounded.Remove, null, tint = RelaxTextPrimary, modifier = Modifier.size(14.dp))
                         }
@@ -325,8 +206,8 @@ private fun EmptyCart() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("🛒", fontSize = 64.sp)
             Spacer(Modifier.height(16.dp))
-            Text("Корзина пуста", style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
-            Text("Добавьте товары из каталога", style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+            Text(stringResource(R.string.cart_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+            Text(stringResource(R.string.cart_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
         }
     }
 }

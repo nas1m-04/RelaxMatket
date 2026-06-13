@@ -11,42 +11,44 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.launch
+import tj.dastras.R
 import tj.dastras.ui.components.RelaxButton
 import tj.dastras.ui.theme.*
 
 private data class OnboardingPage(
     val emoji: String,
-    val title: String,
-    val subtitle: String,
+    val titleRes: Int,
+    val subtitleRes: Int,
     val bg: List<Color>,
     val accent: Color,
 )
 
 private val pages = listOf(
     OnboardingPage(
-        emoji    = "🛒",
-        title    = "Лучшие продукты\nкаждый день",
-        subtitle = "Тысячи свежих товаров от проверенных поставщиков. Доставка за 2 часа или самовывоз.",
-        bg       = listOf(Color(0xFF0F172A), Color(0xFF1E3A5F)),
-        accent   = Color(0xFFE53935),
+        emoji       = "🛒",
+        titleRes    = R.string.onboarding_title_1,
+        subtitleRes = R.string.onboarding_subtitle_1,
+        bg          = listOf(Color(0xFF0F172A), Color(0xFF1E3A5F)),
+        accent      = Color(0xFFE53935),
     ),
     OnboardingPage(
-        emoji    = "💎",
-        title    = "Бонусы и кэшбэк\nза каждую покупку",
-        subtitle = "Копите бонусные баллы и оплачивайте ими до 50% стоимости следующей покупки.",
-        bg       = listOf(Color(0xFF1A237E), Color(0xFF283593)),
-        accent   = Color(0xFFD4AF37),
+        emoji       = "💎",
+        titleRes    = R.string.onboarding_title_2,
+        subtitleRes = R.string.onboarding_subtitle_2,
+        bg          = listOf(Color(0xFF1A237E), Color(0xFF283593)),
+        accent      = Color(0xFFD4AF37),
     ),
     OnboardingPage(
-        emoji    = "🔥",
-        title    = "Эксклюзивные акции\nтолько для вас",
-        subtitle = "Персональные скидки, акции недели и специальные предложения прямо в приложении.",
-        bg       = listOf(Color(0xFF4A0E0E), Color(0xFF7B1F1F)),
-        accent   = Color(0xFFFF6B35),
+        emoji       = "🔥",
+        titleRes    = R.string.onboarding_title_3,
+        subtitleRes = R.string.onboarding_subtitle_3,
+        bg          = listOf(Color(0xFF4A0E0E), Color(0xFF7B1F1F)),
+        accent      = Color(0xFFFF6B35),
     ),
 )
 
@@ -96,7 +98,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TextButton(onClick = onFinished) {
-                        Text("Пропустить", color = RelaxWhite.copy(alpha = 0.6f), style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(R.string.onboarding_skip), color = RelaxWhite.copy(alpha = 0.6f), style = MaterialTheme.typography.labelLarge)
                     }
                     Button(
                         onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
@@ -104,7 +106,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                         colors  = ButtonDefaults.buttonColors(containerColor = RelaxWhite),
                         modifier = Modifier.height(50.dp).padding(start = 8.dp),
                     ) {
-                        Text("Далее", color = RelaxTextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Text(stringResource(R.string.onboarding_next), color = RelaxTextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         Spacer(Modifier.width(6.dp))
                         Text("→", color = RelaxTextPrimary, fontSize = 18.sp)
                     }
@@ -116,7 +118,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     shape    = RoundedCornerShape(16.dp),
                     colors   = ButtonDefaults.buttonColors(containerColor = RelaxRed),
                 ) {
-                    Text("Начать покупки", color = RelaxWhite, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(R.string.onboarding_start_shopping), color = RelaxWhite, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
         }
@@ -183,7 +185,7 @@ private fun OnboardingPage(page: OnboardingPage) {
             Spacer(Modifier.height(32.dp))
 
             Text(
-                text       = page.title,
+                text       = stringResource(page.titleRes),
                 color      = RelaxWhite,
                 fontSize   = 30.sp,
                 fontWeight = FontWeight.Bold,
@@ -194,7 +196,7 @@ private fun OnboardingPage(page: OnboardingPage) {
             Spacer(Modifier.height(16.dp))
 
             Text(
-                text      = page.subtitle,
+                text      = stringResource(page.subtitleRes),
                 color     = RelaxWhite.copy(alpha = 0.72f),
                 fontSize  = 15.sp,
                 textAlign = TextAlign.Center,

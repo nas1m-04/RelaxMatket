@@ -1,0 +1,278 @@
+<resources>
+    <string name="app_name">Dastras</string>
+
+    <!-- Bottom navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_catalog">Catalog</string>
+    <string name="nav_card">Card</string>
+    <string name="nav_bonuses">Bonuses</string>
+    <string name="nav_profile">Profile</string>
+
+    <!-- Profile header -->
+    <string name="profile_user_default">User</string>
+    <string name="profile_points">%1$s · %2$d points</string>
+    <string name="profile_stat_bonuses">Bonuses</string>
+    <string name="profile_stat_spent">Spent</string>
+    <string name="profile_stat_with_us">With us</string>
+
+    <!-- Sections -->
+    <string name="section_purchases">Purchases</string>
+    <string name="section_account">Account</string>
+    <string name="section_settings">Settings</string>
+    <string name="section_support">Support</string>
+
+    <!-- Menu items -->
+    <string name="menu_order_history">Order history</string>
+    <string name="menu_my_orders">My orders</string>
+    <string name="menu_favorites">Favorites</string>
+    <string name="menu_favorites_count">%d items</string>
+    <string name="menu_personal_data">Personal data</string>
+    <string name="menu_not_specified">Not specified</string>
+    <string name="menu_addresses">My addresses</string>
+    <string name="menu_addresses_count">1 address</string>
+    <string name="menu_notifications">Notifications</string>
+    <string name="menu_notifications_on">Enabled</string>
+    <string name="menu_language">Language</string>
+    <string name="menu_theme">Theme</string>
+    <string name="menu_theme_light">Light</string>
+    <string name="menu_help">Help</string>
+    <string name="menu_chat_support">Support chat</string>
+    <string name="menu_online">Online</string>
+    <string name="menu_about">About app</string>
+
+    <!-- Logout -->
+    <string name="logout_button">Log out</string>
+    <string name="logout_dialog_title">Log out</string>
+    <string name="logout_dialog_text">Are you sure you want to exit the app?</string>
+    <string name="logout_confirm">Log out</string>
+    <string name="logout_cancel">Cancel</string>
+
+    <!-- Avatar picker -->
+    <string name="avatar_sheet_title">Profile photo</string>
+    <string name="avatar_take_selfie">Take a selfie</string>
+    <string name="avatar_choose_gallery">Choose from gallery</string>
+    <string name="avatar_delete_photo">Delete photo</string>
+    <string name="avatar_uploading">Uploading...</string>
+
+    <!-- Language picker -->
+    <string name="language_sheet_title">App language</string>
+    <string name="language_russian">Русский</string>
+    <string name="language_english">English</string>
+    <string name="language_tajik">Тоҷикӣ</string>
+
+    <!-- Shared -->
+    <string name="app_tagline">The next generation supermarket</string>
+
+    <!-- Login screen -->
+    <string name="login_title">Sign in</string>
+    <string name="login_subtitle">Enter your phone number and password to sign in</string>
+    <string name="auth_phone_label">Phone number</string>
+    <string name="auth_phone_placeholder">+992 (__)___-__-__</string>
+    <string name="auth_password_label">Password</string>
+    <string name="login_password_placeholder">Enter your password</string>
+    <string name="login_button">Sign in</string>
+    <string name="login_no_account">No account? </string>
+    <string name="login_register_link">Sign up</string>
+    <string name="login_or_divider">  or  </string>
+    <string name="login_guest_button">Continue as guest</string>
+    <string name="login_terms">By tapping \"Sign in\", you agree to RELAX\'s Terms of Use and Privacy Policy</string>
+
+    <!-- Register screen -->
+    <string name="register_title">Create account</string>
+    <string name="register_subtitle">Fill in your details to sign up</string>
+    <string name="register_name_label">Name</string>
+    <string name="register_name_placeholder">Enter your name</string>
+    <string name="register_password_placeholder">At least 6 characters</string>
+    <string name="register_confirm_password_label">Repeat password</string>
+    <string name="register_confirm_password_placeholder">Repeat password</string>
+    <string name="register_button">Sign up</string>
+    <string name="register_have_account">Already have an account? </string>
+    <string name="register_login_link">Sign in</string>
+    <string name="register_terms">By tapping \"Sign up\", you agree to RELAX\'s Terms of Use and Privacy Policy</string>
+
+    <!-- Onboarding screen -->
+    <string name="onboarding_title_1">The best products\nevery day</string>
+    <string name="onboarding_subtitle_1">Thousands of fresh products from trusted suppliers. Delivery in 2 hours or pickup.</string>
+    <string name="onboarding_title_2">Bonuses and cashback\nfor every purchase</string>
+    <string name="onboarding_subtitle_2">Collect bonus points and pay up to 50% of your next purchase with them.</string>
+    <string name="onboarding_title_3">Exclusive deals\njust for you</string>
+    <string name="onboarding_subtitle_3">Personal discounts, weekly deals and special offers right in the app.</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_start_shopping">Start shopping</string>
+
+    <!-- Notifications screen -->
+    <string name="notif_title">Notifications</string>
+    <string name="notif_mark_all_read">Mark all as read</string>
+    <string name="notif_empty_title">No notifications</string>
+
+    <!-- Home screen -->
+    <string name="home_search_placeholder">Search products...</string>
+    <string name="home_section_categories">Categories</string>
+    <string name="home_section_popular">Popular</string>
+    <string name="home_section_new">New arrivals</string>
+    <string name="home_section_sale_week">Weekly deals</string>
+    <string name="home_section_best_offers">Best offers</string>
+    <string name="home_address">45 Lenina St.</string>
+    <string name="home_promo_title">🔥 Weekly deals</string>
+    <string name="home_promo_subtitle">Up to 40% off hundreds of products</string>
+
+    <!-- Catalog screen -->
+    <string name="catalog_title">Catalog</string>
+    <string name="catalog_search_placeholder">Search the catalog...</string>
+    <string name="catalog_category_all">All</string>
+    <string name="catalog_products_count">%d products</string>
+    <string name="catalog_empty_title">Nothing found</string>
+    <string name="catalog_empty_subtitle">Try changing the filters</string>
+
+    <!-- Product detail screen -->
+    <string name="product_added_to_cart">Item added to cart</string>
+    <string name="product_add_to_cart_price">Add to cart · %1$d TJS</string>
+    <string name="product_savings">Save %1$d TJS</string>
+    <string name="product_discount_badge">−%1$d%%</string>
+    <string name="product_tab_description">Description</string>
+    <string name="product_tab_composition">Composition</string>
+    <string name="product_tab_reviews">Reviews</string>
+    <string name="product_default_description">High-quality product from a trusted manufacturer.</string>
+    <string name="product_no_composition_info">No composition information available.</string>
+    <string name="product_char_brand">Brand</string>
+    <string name="product_char_weight">Weight / Volume</string>
+    <string name="product_char_unit">Unit</string>
+    <string name="product_char_in_stock">In stock</string>
+    <string name="product_char_category">Category</string>
+    <string name="product_in_stock_yes">Yes</string>
+    <string name="product_in_stock_no">No</string>
+    <string name="product_no_reviews">No reviews yet</string>
+    <string name="product_reviews_count">%1$d reviews</string>
+    <string name="product_review_name_1">Anna K.</string>
+    <string name="product_review_name_2">Mikhail P.</string>
+    <string name="product_review_name_3">Olga S.</string>
+    <string name="product_review_text_1">Great product, I buy it regularly!</string>
+    <string name="product_review_text_2">Good quality, will buy again.</string>
+    <string name="product_review_text_3">Fresh, tasty, recommend!</string>
+    <string name="product_review_date_1">June 2</string>
+    <string name="product_review_date_2">May 28</string>
+    <string name="product_review_date_3">May 20</string>
+
+    <!-- Cart screen -->
+    <string name="cart_title">Cart</string>
+    <string name="cart_clear">Clear</string>
+    <string name="cart_promo_code_title">Promo code</string>
+    <string name="cart_promo_code_placeholder">Enter promo code</string>
+    <string name="cart_promo_ok">OK</string>
+    <string name="cart_promo_applied">✓ Promo code applied — 5% discount</string>
+    <string name="cart_bonus_points_title">Bonus points</string>
+    <string name="cart_bonus_available">Available: %1$d TJS</string>
+    <string name="cart_order_summary_title">Order summary</string>
+    <string name="cart_items_count">Items (%1$d)</string>
+    <string name="cart_discount">Discount</string>
+    <string name="cart_promo_discount">Promo code (−5%)</string>
+    <string name="cart_bonus_discount">Bonuses</string>
+    <string name="cart_total_to_pay">Total to pay</string>
+    <string name="cart_savings_message">🎉 Your savings: %1$d TJS</string>
+    <string name="cart_checkout_button">Checkout · %1$d TJS</string>
+    <string name="cart_empty_title">Cart is empty</string>
+    <string name="cart_empty_subtitle">Add products from the catalog</string>
+
+    <!-- Checkout screen -->
+    <string name="checkout_title">Checkout</string>
+    <string name="checkout_delivery_method_title">Delivery method</string>
+    <string name="checkout_delivery_option">🚀 Delivery</string>
+    <string name="checkout_pickup_option">🏪 Pickup</string>
+    <string name="checkout_delivery_address_label">Delivery address</string>
+    <string name="checkout_delivery_address_value">45 Lenina St., apt. 12</string>
+    <string name="checkout_pickup_store_label">RELAX Store</string>
+    <string name="checkout_pickup_store_value">1 Tsentralnaya St.</string>
+    <string name="checkout_time_slot_title">Pickup time</string>
+    <string name="checkout_slot_today_1">Today 18:00 – 20:00</string>
+    <string name="checkout_slot_today_2">Today 20:00 – 22:00</string>
+    <string name="checkout_slot_tomorrow_1">Tomorrow 10:00 – 12:00</string>
+    <string name="checkout_slot_tomorrow_2">Tomorrow 14:00 – 16:00</string>
+    <string name="checkout_payment_method_title">Payment method</string>
+    <string name="checkout_payment_card_title">Card on delivery</string>
+    <string name="checkout_payment_card_sub">Any card</string>
+    <string name="checkout_payment_online_title">Online payment</string>
+    <string name="checkout_payment_online_sub">Visa, Mastercard, SBP</string>
+    <string name="checkout_payment_cash_title">Cash</string>
+    <string name="checkout_payment_cash_sub">On delivery</string>
+    <string name="checkout_comment_title">Order comment</string>
+    <string name="checkout_comment_placeholder">E.g.: leave at the door, call in advance...</string>
+    <string name="checkout_total_label">Total</string>
+    <string name="checkout_confirm_button">Confirm order</string>
+    <string name="checkout_success_title">Order placed!</string>
+    <string name="checkout_success_subtitle">We are already preparing your order. Expect delivery at the selected time.</string>
+    <string name="checkout_bonus_earned">🎁 %1$d bonuses earned</string>
+    <string name="checkout_go_home">Go to home</string>
+
+    <!-- Favorites screen -->
+    <string name="favorites_empty_title">No favorites yet</string>
+    <string name="favorites_empty_subtitle">Add the products you love</string>
+    <string name="favorites_count">%1$d products</string>
+
+    <!-- Bonuses screen -->
+    <string name="bonuses_title">Loyalty program</string>
+    <string name="bonuses_points">points</string>
+    <string name="bonuses_cashback">Cashback</string>
+    <string name="bonuses_level">Level</string>
+    <string name="bonuses_days_to_expire">Days until expiry</string>
+    <string name="bonuses_levels_title">Program levels</string>
+    <string name="bonuses_cashback_suffix">cashback</string>
+    <string name="bonuses_min_points_from">from %1$d TJS</string>
+    <string name="bonuses_your_level">Your level</string>
+    <string name="bonuses_achievements_title">Achievements</string>
+    <string name="bonuses_achievement_first_purchase">First purchase</string>
+    <string name="bonuses_achievement_10_purchases">10 purchases</string>
+    <string name="bonuses_achievement_50_purchases">50 purchases</string>
+    <string name="bonuses_achievement_vip">VIP client</string>
+    <string name="bonuses_tab_credits">Earned</string>
+    <string name="bonuses_tab_debits">Spent</string>
+
+    <!-- Loyalty card screen -->
+    <string name="loyalty_title">Loyalty card</string>
+    <string name="loyalty_bonus_balance">Bonus balance</string>
+    <string name="loyalty_points_suffix">points</string>
+    <string name="loyalty_owner_label">CARDHOLDER</string>
+    <string name="loyalty_member_since_label">MEMBER SINCE</string>
+    <string name="loyalty_qr_title">QR code for scanning</string>
+    <string name="loyalty_barcode_title">Barcode</string>
+    <string name="loyalty_level_label">Level</string>
+    <string name="loyalty_next_level_label">Next</string>
+    <string name="loyalty_progress_to_level">%2$d points left to reach \"%1$s\" level</string>
+    <string name="loyalty_benefits_title">Level benefits</string>
+    <string name="loyalty_stat_bonuses">Bonuses</string>
+    <string name="loyalty_stat_spent">Spent</string>
+    <string name="loyalty_stat_cashback">Cashback</string>
+
+    <!-- Order history screen -->
+    <string name="order_history_title">Order history</string>
+    <string name="order_empty_title">No orders yet</string>
+    <string name="order_empty_subtitle">Your orders will appear here</string>
+    <string name="order_total_label">Total: %1$d TJS</string>
+    <string name="order_repeat_button">Reorder</string>
+    <string name="order_more_items">+%1$d</string>
+    <string name="order_status_delivered">Delivered</string>
+    <string name="order_status_in_progress">On the way</string>
+    <string name="order_status_processing">Processing</string>
+    <string name="order_status_cancelled">Cancelled</string>
+
+    <!-- Promotions screen -->
+    <string name="promo_title">Promotions</string>
+    <string name="promo_expire_label">Deals end in</string>
+    <string name="promo_unit_days">days</string>
+    <string name="promo_unit_hours">hrs</string>
+    <string name="promo_unit_minutes">min</string>
+    <string name="promo_newcomer_coupon">Welcome coupon</string>
+    <string name="promo_newcomer_discount">−15% on your first order</string>
+    <string name="promo_discounted_products_title">Discounted products</string>
+
+    <!-- Shared components -->
+    <string name="relax_see_all">All</string>
+    <string name="relax_reviews_count_parens">(%1$d reviews)</string>
+</resources>
+
+
+
+
+
+
+

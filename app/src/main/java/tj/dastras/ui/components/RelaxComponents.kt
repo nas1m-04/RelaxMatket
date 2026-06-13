@@ -16,11 +16,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
+import tj.dastras.R
 import tj.dastras.data.Product
 import tj.dastras.ui.theme.*
 
@@ -173,14 +175,14 @@ fun RelaxSearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    placeholder: String = "Поиск товаров...",
+    placeholder: String? = null,
     onSearch: () -> Unit = {},
 ) {
     OutlinedTextField(
         value         = query,
         onValueChange = onQueryChange,
         placeholder   = {
-            Text(placeholder, color = RelaxTextHint, style = MaterialTheme.typography.bodyLarge)
+            Text(placeholder ?: stringResource(R.string.home_search_placeholder), color = RelaxTextHint, style = MaterialTheme.typography.bodyLarge)
         },
         leadingIcon   = {
             Icon(Icons.Rounded.Search, null, tint = RelaxTextSecondary, modifier = Modifier.size(22.dp))
@@ -225,7 +227,7 @@ fun SectionHeader(
         if (onSeeAll != null) {
             TextButton(onClick = onSeeAll) {
                 Text(
-                    text  = "Все",
+                    text  = stringResource(R.string.relax_see_all),
                     style = MaterialTheme.typography.labelLarge,
                     color = RelaxRed,
                 )
@@ -239,11 +241,13 @@ fun SectionHeader(
 fun ProductCardGrid(
     product: Product,
     onClick: () -> Unit,
-    onAddToCart: () -> Unit,
+    onIncrease: () -> Unit,
+    onDecrease: () -> Unit,
+    quantity: Int = 0,
+    isFavorite: Boolean = false,
+    onToggleFavorite: (() -> Unit)? = null,
     modifier: Modifier = Modifier,
 ) {
-    var count by remember { mutableStateOf(product.cartCount) }
-
     Card(
         onClick   = onClick,
         modifier  = modifier
@@ -291,6 +295,25 @@ fun ProductCardGrid(
                         Text("NEW", color = RelaxWhite, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
                     }
                 }
+                if (onToggleFavorite != null) {
+                    Box(
+                        modifier = Modifier
+                            .padding(10.dp)
+                            .size(32.dp)
+                            .clip(CircleShape)
+                            .background(RelaxWhite.copy(alpha = 0.85f))
+                            .align(Alignment.BottomEnd)
+                            .clickable(onClick = onToggleFavorite),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                            contentDescription = null,
+                            tint     = if (isFavorite) RelaxRed else RelaxTextSecondary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    }
+                }
             }
 
             Column(modifier = Modifier.padding(12.dp)) {
@@ -302,9 +325,9 @@ fun ProductCardGrid(
                     overflow = TextOverflow.Ellipsis,
                     lineHeight = 18.sp,
                 )
-                if (product.weight.isNotEmpty()) {
+                if (!product.weight.isNullOrEmpty()) {
                     Text(
-                        text  = product.weight,
+                        text  = product.weight ?: "",
                         style = MaterialTheme.typography.bodySmall,
                         color = RelaxTextSecondary,
                     )
@@ -317,7 +340,7 @@ fun ProductCardGrid(
                 ) {
                     Column {
                         Text(
-                            text       = "${product.price.toInt()} ₽",
+                            text       = "${product.price.toInt()} TJS",
                             style      = MaterialTheme.typography.titleMedium,
                             color      = RelaxTextPrimary,
                             fontWeight = FontWeight.Bold,
@@ -325,20 +348,20 @@ fun ProductCardGrid(
                         )
                         if (product.oldPrice != null) {
                             Text(
-                                text           = "${product.oldPrice.toInt()} ₽",
+                                text           = "${product.oldPrice.toInt()} TJS",
                                 style          = MaterialTheme.typography.bodySmall,
                                 color          = RelaxTextHint,
                                 textDecoration = TextDecoration.LineThrough,
                             )
                         }
                     }
-                    if (count == 0) {
+                    if (quantity == 0) {
                         Box(
                             modifier = Modifier
                                 .size(36.dp)
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(RelaxDark)
-                                .clickable { count = 1; onAddToCart() },
+                                .clickable(onClick = onIncrease),
                             contentAlignment = Alignment.Center,
                         ) {
                             Icon(Icons.Rounded.Add, null, tint = RelaxWhite, modifier = Modifier.size(20.dp))
@@ -351,11 +374,11 @@ fun ProductCardGrid(
                                 .background(RelaxDark)
                                 .padding(horizontal = 4.dp),
                         ) {
-                            IconButton(onClick = { if (count > 0) count-- }, modifier = Modifier.size(28.dp)) {
+                            IconButton(onClick = onDecrease, modifier = Modifier.size(28.dp)) {
                                 Icon(Icons.Rounded.Remove, null, tint = RelaxWhite, modifier = Modifier.size(14.dp))
                             }
-                            Text("$count", color = RelaxWhite, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
-                            IconButton(onClick = { count++ }, modifier = Modifier.size(28.dp)) {
+                            Text("$quantity", color = RelaxWhite, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                            IconButton(onClick = onIncrease, modifier = Modifier.size(28.dp)) {
                                 Icon(Icons.Rounded.Add, null, tint = RelaxWhite, modifier = Modifier.size(14.dp))
                             }
                         }
@@ -419,9 +442,9 @@ fun ProductCardHorizontal(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column {
-                        Text("${product.price.toInt()} ₽", style = MaterialTheme.typography.labelLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                        Text("${product.price.toInt()} TJS", style = MaterialTheme.typography.labelLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                         if (product.oldPrice != null) {
-                            Text("${product.oldPrice.toInt()} ₽", style = MaterialTheme.typography.labelSmall, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
+                            Text("${product.oldPrice.toInt()} TJS", style = MaterialTheme.typography.labelSmall, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
                         }
                     }
                     Box(
@@ -476,14 +499,14 @@ fun RelaxBadge(text: String, color: Color, modifier: Modifier = Modifier) {
 fun PriceTag(price: Double, oldPrice: Double? = null, modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            text       = "${price.toInt()} ₽",
+            text       = "${price.toInt()} TJS",
             style      = MaterialTheme.typography.headlineMedium,
             color      = RelaxTextPrimary,
             fontWeight = FontWeight.Bold,
         )
         if (oldPrice != null) {
             Text(
-                text           = "${oldPrice.toInt()} ₽",
+                text           = "${oldPrice.toInt()} TJS",
                 style          = MaterialTheme.typography.bodyMedium,
                 color          = RelaxTextHint,
                 textDecoration = TextDecoration.LineThrough,
@@ -494,11 +517,11 @@ fun PriceTag(price: Double, oldPrice: Double? = null, modifier: Modifier = Modif
 
 // ── Rating Row ────────────────────────────────────────────────
 @Composable
-fun RatingRow(rating: Float, reviewCount: Int, modifier: Modifier = Modifier) {
+fun RatingRow(rating: Double, reviewCount: Int, modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Icon(Icons.Rounded.Star, null, tint = Color(0xFFFBBC04), modifier = Modifier.size(16.dp))
         Text("$rating", style = MaterialTheme.typography.labelMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
-        Text("($reviewCount отзывов)", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+        Text(stringResource(R.string.relax_reviews_count_parens, reviewCount), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
     }
 }
 

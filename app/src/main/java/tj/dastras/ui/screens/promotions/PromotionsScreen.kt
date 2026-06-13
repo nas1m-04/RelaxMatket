@@ -14,9 +14,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
+import tj.dastras.R
 import tj.dastras.data.MockData
 import tj.dastras.data.Promotion
 import tj.dastras.ui.components.RelaxTopBar
@@ -26,7 +28,7 @@ import tj.dastras.ui.theme.*
 fun PromotionsScreen(onBack: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = "Акции", onBack = onBack)
+            RelaxTopBar(title = stringResource(R.string.promo_title), onBack = onBack)
         }
 
         LazyColumn(
@@ -46,15 +48,15 @@ fun PromotionsScreen(onBack: () -> Unit) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(Icons.Rounded.Timer, null, tint = RelaxWhite, modifier = Modifier.size(20.dp))
                             Spacer(Modifier.width(8.dp))
-                            Text("Акции сгорают через", color = RelaxWhite.copy(alpha = 0.85f), fontSize = 13.sp)
+                            Text(stringResource(R.string.promo_expire_label), color = RelaxWhite.copy(alpha = 0.85f), fontSize = 13.sp)
                         }
                         Spacer(Modifier.height(8.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            TimeUnit("02", "дня")
+                            TimeUnit("02", stringResource(R.string.promo_unit_days))
                             Text(":", color = RelaxWhite, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                            TimeUnit("14", "часа")
+                            TimeUnit("14", stringResource(R.string.promo_unit_hours))
                             Text(":", color = RelaxWhite, fontSize = 28.sp, fontWeight = FontWeight.Bold)
-                            TimeUnit("33", "мин")
+                            TimeUnit("33", stringResource(R.string.promo_unit_minutes))
                         }
                     }
                 }
@@ -79,8 +81,8 @@ fun PromotionsScreen(onBack: () -> Unit) {
                         ) { Text("🎁", fontSize = 28.sp) }
                         Spacer(Modifier.width(14.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text("Купон новичка", style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
-                            Text("−15% на первый заказ", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                            Text(stringResource(R.string.promo_newcomer_coupon), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
+                            Text(stringResource(R.string.promo_newcomer_discount), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                             Spacer(Modifier.height(6.dp))
                             Box(
                                 modifier = Modifier
@@ -104,7 +106,7 @@ fun PromotionsScreen(onBack: () -> Unit) {
 
             // Product promotions
             item {
-                Text("Товары со скидкой", style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                Text(stringResource(R.string.promo_discounted_products_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
             }
 
             items(MockData.products.filter { it.oldPrice != null }) { product ->
@@ -127,8 +129,8 @@ fun PromotionsScreen(onBack: () -> Unit) {
                             Text(product.name, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary, maxLines = 2)
                             Spacer(Modifier.height(4.dp))
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                                Text("${product.price.toInt()} ₽", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
-                                Text("${product.oldPrice!!.toInt()} ₽", fontSize = 12.sp, color = RelaxTextHint)
+                                Text("${product.price.toInt()} TJS", fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
+                                Text("${product.oldPrice!!.toInt()} TJS", fontSize = 12.sp, color = RelaxTextHint)
                                 Box(
                                     modifier = Modifier
                                         .clip(RoundedCornerShape(6.dp))

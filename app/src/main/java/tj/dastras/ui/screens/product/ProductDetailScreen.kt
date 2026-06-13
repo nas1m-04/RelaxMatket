@@ -1,5 +1,6 @@
 package tj.dastras.ui.screens.product
 
+import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.*
@@ -13,79 +14,67 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import tj.dastras.data.MockData
+import tj.dastras.R
+import tj.dastras.data.Product
 import tj.dastras.ui.components.*
+import tj.dastras.ui.screens.cart.CartViewModel
+import tj.dastras.ui.screens.favorites.FavoritesViewModel
 import tj.dastras.ui.theme.*
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ProductDetailScreen(productId: Int, onBack: () -> Unit, onCart: () -> Unit) {
-    val product      = MockData.products.find { it.id == productId } ?: MockData.products.first()
-    var isFavorite   by remember { mutableStateOf(product.isFavorite) }
-    var count        by remember { mutableStateOf(0) }
-    var activeTab    by remember { mutableStateOf(0) }
+fun ProductDetailScreen(
+    productId: Int,
+    onBack: () -> Unit,
+    viewModel: ProductDetailViewModel = hiltViewModel(),
+    cartViewModel: CartViewModel = activityViewModel(),
+    favoritesViewModel: FavoritesViewModel = activityViewModel(),
+) {
+    val state   = viewModel.uiState
+    val product = state.product
+    val context = LocalContext.current
+    val cartState = cartViewModel.uiState
+    val favoritesState = favoritesViewModel.uiState
 
-    // Multiple image seeds for gallery
-    val images = listOf(product.imageUrl, "https://picsum.photos/seed/${product.id}a/400/400", "https://picsum.photos/seed/${product.id}b/400/400")
+    if (state.isLoading || product == null) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            CircularProgressIndicator(color = RelaxDark)
+        }
+        return
+    }
+
+    val images     = listOf(product.imageUrl, "https://picsum.photos/seed/${product.id}a/400/400", "https://picsum.photos/seed/${product.id}b/400/400")
     val pagerState = rememberPagerState(pageCount = { images.size })
-
-    val discount = if (product.oldPrice != null) ((1 - product.price / product.oldPrice) * 100).toInt() else 0
+    val discount   = if (product.oldPrice != null) ((1 - product.price / product.oldPrice) * 100).toInt() else 0
 
     Box(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(bottom = 100.dp)) {
 
-            // ── Photo Gallery ──────────────────────────────────
             Box(modifier = Modifier.fillMaxWidth().height(340.dp)) {
                 HorizontalPager(state = pagerState) { page ->
-                    AsyncImage(
-                        model             = images[page],
-                        contentDescription = product.name,
-                        contentScale      = ContentScale.Crop,
-                        modifier          = Modifier.fillMaxSize(),
-                    )
+                    AsyncImage(model = images[page], contentDescription = product.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
                 }
-
-                // Gradient overlay (bottom)
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(120.dp)
-                        .align(Alignment.BottomCenter)
-                        .background(Brush.verticalGradient(listOf(Color.Transparent, RelaxBackground)))
-                )
-
-                // Top actions
+                Box(modifier = Modifier.fillMaxWidth().height(120.dp).align(Alignment.BottomCenter).background(Brush.verticalGradient(listOf(Color.Transparent, RelaxBackground))))
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .padding(horizontal = 20.dp, vertical = 12.dp)
-                        .align(Alignment.TopStart),
+                    modifier              = Modifier.fillMaxWidth().statusBarsPadding().padding(horizontal = 20.dp, vertical = 12.dp).align(Alignment.TopStart),
                     horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
-                    IconButton(
-                        onClick  = onBack,
-                        modifier = Modifier
-                            .size(42.dp)
-                            .shadow(8.dp, CircleShape)
-                            .clip(CircleShape)
-                            .background(RelaxWhite)
-                    ) {
+                    IconButton(onClick = onBack, modifier = Modifier.size(42.dp).shadow(8.dp, CircleShape).clip(CircleShape).background(RelaxWhite)) {
                         Icon(Icons.Rounded.ArrowBackIosNew, null, tint = RelaxTextPrimary, modifier = Modifier.size(16.dp))
                     }
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         IconButton(
-                            onClick  = { isFavorite = !isFavorite },
-                            modifier = Modifier
-                                .size(42.dp)
-                                .shadow(8.dp, CircleShape)
-                                .clip(CircleShape)
-                                .background(RelaxWhite)
+                            onClick  = { favoritesViewModel.toggle(product) },
+                            modifier = Modifier.size(42.dp).shadow(8.dp, CircleShape).clip(CircleShape).background(RelaxWhite)
                         ) {
+                            val isFavorite = favoritesState.favorites.any { it.id == product.id }
                             Icon(
                                 imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
                                 contentDescription = null,
@@ -93,239 +82,153 @@ fun ProductDetailScreen(productId: Int, onBack: () -> Unit, onCart: () -> Unit) 
                                 modifier = Modifier.size(20.dp),
                             )
                         }
-                        IconButton(
-                            onClick  = {},
-                            modifier = Modifier
-                                .size(42.dp)
-                                .shadow(8.dp, CircleShape)
-                                .clip(CircleShape)
-                                .background(RelaxWhite)
-                        ) {
+                        IconButton(onClick = {}, modifier = Modifier.size(42.dp).shadow(8.dp, CircleShape).clip(CircleShape).background(RelaxWhite)) {
                             Icon(Icons.Rounded.Share, null, tint = RelaxTextSecondary, modifier = Modifier.size(20.dp))
                         }
                     }
                 }
-
-                // Discount badge
                 if (product.oldPrice != null) {
-                    Box(
-                        modifier = Modifier
-                            .padding(20.dp)
-                            .clip(RoundedCornerShape(10.dp))
-                            .background(RelaxRed)
-                            .padding(horizontal = 12.dp, vertical = 6.dp)
-                            .align(Alignment.BottomStart)
-                    ) {
-                        Text("−$discount%", color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                    Box(modifier = Modifier.padding(20.dp).clip(RoundedCornerShape(10.dp)).background(RelaxRed).padding(horizontal = 12.dp, vertical = 6.dp).align(Alignment.BottomStart)) {
+                        Text(stringResource(R.string.product_discount_badge, discount), color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
                     }
                 }
-
-                // Page dots
-                Row(
-                    modifier              = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
+                Row(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
                     repeat(images.size) { idx ->
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .clip(CircleShape)
-                                .background(if (idx == pagerState.currentPage) RelaxDark else RelaxDivider)
-                        )
+                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(if (idx == pagerState.currentPage) RelaxDark else RelaxDivider))
                     }
                 }
             }
 
-            // ── Product Info ───────────────────────────────────
             Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                if (product.brand.isNotEmpty()) {
-                    Text(product.brand, style = MaterialTheme.typography.labelMedium, color = RelaxRed, fontWeight = FontWeight.Bold)
+                if (!product.brand.isNullOrEmpty()) {
+                    Text(product.brand ?: "", style = MaterialTheme.typography.labelMedium, color = RelaxRed, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(4.dp))
                 }
                 Text(product.name, style = MaterialTheme.typography.headlineMedium, color = RelaxTextPrimary, lineHeight = 28.sp)
-
                 Spacer(Modifier.height(12.dp))
 
-                // Rating & weight
                 Row(horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically) {
-                    if (product.rating > 0) {
-                        RatingRow(product.rating, product.reviewCount)
-                    }
-                    if (product.weight.isNotEmpty()) {
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(RelaxSurfaceAlt)
-                                .padding(horizontal = 10.dp, vertical = 4.dp)
-                        ) {
-                            Text(product.weight, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary, fontWeight = FontWeight.Medium)
+                    if (product.rating > 0) RatingRow(product.rating, product.reviewCount)
+                    if (!product.weight.isNullOrEmpty()) {
+                        Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(RelaxSurfaceAlt).padding(horizontal = 10.dp, vertical = 4.dp)) {
+                            Text(product.weight ?: "", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary, fontWeight = FontWeight.Medium)
                         }
                     }
                 }
 
                 Spacer(Modifier.height(20.dp))
 
-                // Price
                 Row(verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    Text(
-                        text       = "${product.price.toInt()} ₽",
-                        fontSize   = 32.sp,
-                        fontWeight = FontWeight.Black,
-                        color      = RelaxTextPrimary,
-                    )
+                    Text("${product.price.toInt()} TJS", fontSize = 32.sp, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
                     if (product.oldPrice != null) {
                         Column {
-                            Text(
-                                text           = "${product.oldPrice.toInt()} ₽",
-                                style          = MaterialTheme.typography.bodyLarge,
-                                color          = RelaxTextHint,
-                                textDecoration = TextDecoration.LineThrough,
-                            )
-                            Text(
-                                "Экономия ${(product.oldPrice - product.price).toInt()} ₽",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = RelaxSuccess,
-                                fontWeight = FontWeight.SemiBold,
-                            )
+                            Text("${product.oldPrice.toInt()} TJS", style = MaterialTheme.typography.bodyLarge, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
+                            Text(stringResource(R.string.product_savings, (product.oldPrice - product.price).toInt()), style = MaterialTheme.typography.bodySmall, color = RelaxSuccess, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
 
                 Spacer(Modifier.height(20.dp))
 
-                // Quantity selector
-                Row(
-                    modifier          = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(16.dp))
-                            .background(RelaxSurfaceAlt)
-                            .padding(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        IconButton(onClick = { if (count > 0) count-- }, modifier = Modifier.size(40.dp)) {
+                val cartQuantity = cartState.items.find { it.product.id == product.id }?.quantity ?: 0
+                Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
+                    Row(modifier = Modifier.clip(RoundedCornerShape(16.dp)).background(RelaxSurfaceAlt).padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
+                        IconButton(
+                            onClick  = { cartViewModel.decrease(product.id) },
+                            enabled  = cartQuantity > 0,
+                            modifier = Modifier.size(40.dp),
+                        ) {
                             Icon(Icons.Rounded.Remove, null, tint = RelaxTextPrimary, modifier = Modifier.size(18.dp))
                         }
-                        Text(
-                            text       = "$count",
-                            modifier   = Modifier.widthIn(min = 40.dp),
-                            fontSize   = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color      = RelaxTextPrimary,
-                        )
-                        IconButton(onClick = { count++ }, modifier = Modifier.size(40.dp)) {
+                        Text("${cartQuantity.coerceAtLeast(1)}", modifier = Modifier.widthIn(min = 40.dp), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = RelaxTextPrimary, textAlign = androidx.compose.ui.text.style.TextAlign.Center)
+                        IconButton(onClick = { cartViewModel.add(product) }, modifier = Modifier.size(40.dp)) {
                             Icon(Icons.Rounded.Add, null, tint = RelaxTextPrimary, modifier = Modifier.size(18.dp))
                         }
                     }
-                    Text(
-                        "${(product.price * count.coerceAtLeast(1)).toInt()} ₽",
-                        fontSize   = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color      = RelaxTextPrimary,
-                    )
+                    Text("${(product.price * cartQuantity.coerceAtLeast(1)).toInt()} TJS", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RelaxTextPrimary)
                 }
 
                 Spacer(Modifier.height(24.dp))
-
-                // Tabs
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clip(RoundedCornerShape(14.dp))
-                        .background(RelaxSurfaceAlt)
-                        .padding(4.dp),
-                ) {
-                    listOf("Описание", "Состав", "Отзывы").forEachIndexed { idx, label ->
-                        Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(if (activeTab == idx) RelaxWhite else Color.Transparent)
-                                .clickable { activeTab = idx }
-                                .padding(vertical = 10.dp),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Text(
-                                text       = label,
-                                fontSize   = 13.sp,
-                                fontWeight = if (activeTab == idx) FontWeight.Bold else FontWeight.Normal,
-                                color      = if (activeTab == idx) RelaxTextPrimary else RelaxTextSecondary,
-                            )
-                        }
-                    }
-                }
-
-                Spacer(Modifier.height(20.dp))
-
-                when (activeTab) {
-                    0 -> {
-                        Text(
-                            text       = if (product.description.isNotEmpty()) product.description else "Высококачественный продукт от проверенного производителя. Идеальный выбор для здорового питания.",
-                            style      = MaterialTheme.typography.bodyLarge,
-                            color      = RelaxTextSecondary,
-                            lineHeight = 26.sp,
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        CharacteristicsTable(product)
-                    }
-                    1 -> {
-                        Text(
-                            text       = if (product.composition.isNotEmpty()) product.composition else "Информация о составе отсутствует.",
-                            style      = MaterialTheme.typography.bodyLarge,
-                            color      = RelaxTextSecondary,
-                            lineHeight = 26.sp,
-                        )
-                    }
-                    2 -> ReviewsSection(product.rating, product.reviewCount)
-                }
+                ProductTabs(product = product, categoryName = state.category?.name)
             }
         }
 
-        // ── Fixed Bottom Button ────────────────────────────────
         Box(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .fillMaxWidth()
+            modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                 .background(Brush.verticalGradient(listOf(Color.Transparent, RelaxWhite, RelaxWhite)))
-                .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+                .navigationBarsPadding().padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
+            val cartQuantity = cartState.items.find { it.product.id == product.id }?.quantity ?: 0
+            val addedToCartMessage = stringResource(R.string.product_added_to_cart)
             Button(
-                onClick   = { if (count == 0) count = 1; onCart() },
+                onClick   = {
+                    cartViewModel.add(product)
+                    Toast.makeText(context, addedToCartMessage, Toast.LENGTH_SHORT).show()
+                },
                 modifier  = Modifier.fillMaxWidth().height(56.dp),
                 shape     = RoundedCornerShape(16.dp),
                 colors    = ButtonDefaults.buttonColors(containerColor = RelaxRed),
             ) {
                 Icon(Icons.Rounded.ShoppingCart, null, tint = RelaxWhite, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(10.dp))
-                Text("В корзину · ${(product.price * count.coerceAtLeast(1)).toInt()} ₽", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(R.string.product_add_to_cart_price, (product.price * cartQuantity.coerceAtLeast(1)).toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
 }
 
 @Composable
-private fun CharacteristicsTable(product: tj.dastras.data.Product) {
-    val rows = buildList {
-        if (product.brand.isNotEmpty())  add(Pair("Бренд", product.brand))
-        if (product.weight.isNotEmpty()) add(Pair("Масса / Объём", product.weight))
-        add(Pair("Единица", product.unit))
-        add(Pair("В наличии", if (product.inStock) "Есть" else "Нет"))
-        if (product.categoryId > 0) {
-            val cat = tj.dastras.data.MockData.categories.find { it.id == product.categoryId }
-            if (cat != null) add(Pair("Категория", cat.name))
+private fun ProductTabs(product: Product, categoryName: String?) {
+    var activeTab by remember { mutableStateOf(0) }
+    val tabLabels = listOf(
+        stringResource(R.string.product_tab_description),
+        stringResource(R.string.product_tab_composition),
+        stringResource(R.string.product_tab_reviews),
+    )
+    Row(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(RelaxSurfaceAlt).padding(4.dp)) {
+        tabLabels.forEachIndexed { idx, label ->
+            Box(
+                modifier = Modifier.weight(1f).clip(RoundedCornerShape(10.dp))
+                    .background(if (activeTab == idx) RelaxWhite else Color.Transparent)
+                    .clickable { activeTab = idx }.padding(vertical = 10.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Text(label, fontSize = 13.sp, fontWeight = if (activeTab == idx) FontWeight.Bold else FontWeight.Normal, color = if (activeTab == idx) RelaxTextPrimary else RelaxTextSecondary)
+            }
         }
+    }
+    Spacer(Modifier.height(20.dp))
+    when (activeTab) {
+        0 -> {
+            Text(product.description.orEmpty().ifEmpty { stringResource(R.string.product_default_description) }, style = MaterialTheme.typography.bodyLarge, color = RelaxTextSecondary, lineHeight = 26.sp)
+            Spacer(Modifier.height(16.dp))
+            CharacteristicsTable(product = product, categoryName = categoryName)
+        }
+        1 -> Text(product.composition.orEmpty().ifEmpty { stringResource(R.string.product_no_composition_info) }, style = MaterialTheme.typography.bodyLarge, color = RelaxTextSecondary, lineHeight = 26.sp)
+        2 -> ReviewsSection(product.rating, product.reviewCount)
+    }
+}
+
+@Composable
+private fun CharacteristicsTable(product: Product, categoryName: String?) {
+    val brandLabel    = stringResource(R.string.product_char_brand)
+    val weightLabel   = stringResource(R.string.product_char_weight)
+    val unitLabel     = stringResource(R.string.product_char_unit)
+    val inStockLabel  = stringResource(R.string.product_char_in_stock)
+    val categoryLabel = stringResource(R.string.product_char_category)
+    val inStockYes    = stringResource(R.string.product_in_stock_yes)
+    val inStockNo     = stringResource(R.string.product_in_stock_no)
+    val rows = buildList {
+        if (!product.brand.isNullOrEmpty())  add(Pair(brandLabel, product.brand ?: ""))
+        if (!product.weight.isNullOrEmpty()) add(Pair(weightLabel, product.weight ?: ""))
+        if (!product.unit.isNullOrEmpty()) add(Pair(unitLabel, product.unit ?: ""))
+        add(Pair(inStockLabel, if (product.inStock) inStockYes else inStockNo))
+        if (categoryName != null) add(Pair(categoryLabel, categoryName))
     }
     Column(verticalArrangement = Arrangement.spacedBy(0.dp)) {
         rows.forEachIndexed { idx, (key, value) ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(if (idx % 2 == 0) RelaxSurfaceAlt else RelaxWhite)
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                modifier              = Modifier.fillMaxWidth().background(if (idx % 2 == 0) RelaxSurfaceAlt else RelaxWhite).padding(horizontal = 16.dp, vertical = 12.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(key,   color = RelaxTextSecondary, style = MaterialTheme.typography.bodyMedium)
@@ -336,39 +239,42 @@ private fun CharacteristicsTable(product: tj.dastras.data.Product) {
 }
 
 @Composable
-private fun ReviewsSection(rating: Float, count: Int) {
+private fun ReviewsSection(rating: Double, count: Int) {
     if (count == 0) {
         Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-            Text("Отзывов пока нет", color = RelaxTextSecondary)
+            Text(stringResource(R.string.product_no_reviews), color = RelaxTextSecondary)
         }
         return
     }
+    val reviewNames = listOf(
+        stringResource(R.string.product_review_name_1),
+        stringResource(R.string.product_review_name_2),
+        stringResource(R.string.product_review_name_3),
+    )
+    val reviewTexts = listOf(
+        stringResource(R.string.product_review_text_1),
+        stringResource(R.string.product_review_text_2),
+        stringResource(R.string.product_review_text_3),
+    )
+    val reviewDates = listOf(
+        stringResource(R.string.product_review_date_1),
+        stringResource(R.string.product_review_date_2),
+        stringResource(R.string.product_review_date_3),
+    )
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        // Summary
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(rating.toString(), fontSize = 48.sp, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
-                Row {
-                    repeat(5) { i ->
-                        Icon(
-                            imageVector = if (i < rating.toInt()) Icons.Rounded.Star else Icons.Rounded.StarBorder,
-                            contentDescription = null,
-                            tint     = Color(0xFFFBBC04),
-                            modifier = Modifier.size(18.dp),
-                        )
-                    }
-                }
-                Text("$count отзывов", style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                Row { repeat(5) { i -> Icon(if (i < rating.toInt()) Icons.Rounded.Star else Icons.Rounded.StarBorder, null, tint = Color(0xFFFBBC04), modifier = Modifier.size(18.dp)) } }
+                Text(stringResource(R.string.product_reviews_count, count), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
             }
         }
-
-        // Sample reviews
         repeat(3) { idx ->
             ReviewItem(
-                name    = listOf("Анна К.", "Михаил П.", "Ольга С.")[idx],
-                rating  = listOf(5, 4, 5)[idx],
-                text    = listOf("Отличный продукт, покупаю регулярно!", "Хорошее качество, буду брать ещё.", "Свежий, вкусный, рекомендую!")[idx],
-                date    = listOf("2 июня", "28 мая", "20 мая")[idx],
+                name   = reviewNames[idx],
+                rating = listOf(5, 4, 5)[idx],
+                text   = reviewTexts[idx],
+                date   = reviewDates[idx],
             )
         }
     }
@@ -376,22 +282,10 @@ private fun ReviewsSection(rating: Float, count: Int) {
 
 @Composable
 private fun ReviewItem(name: String, rating: Int, text: String, date: String) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
-            .background(RelaxWhite)
-            .padding(16.dp)
-    ) {
+    Column(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(RelaxWhite).padding(16.dp)) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(RelaxDark),
-                    contentAlignment = Alignment.Center,
-                ) {
+                Box(modifier = Modifier.size(36.dp).clip(CircleShape).background(RelaxDark), contentAlignment = Alignment.Center) {
                     Text(name.first().toString(), color = RelaxWhite, fontWeight = FontWeight.Bold)
                 }
                 Text(name, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
@@ -399,16 +293,7 @@ private fun ReviewItem(name: String, rating: Int, text: String, date: String) {
             Text(date, style = MaterialTheme.typography.bodySmall, color = RelaxTextHint)
         }
         Spacer(Modifier.height(6.dp))
-        Row {
-            repeat(5) { i ->
-                Icon(
-                    imageVector = if (i < rating) Icons.Rounded.Star else Icons.Rounded.StarBorder,
-                    contentDescription = null,
-                    tint     = Color(0xFFFBBC04),
-                    modifier = Modifier.size(14.dp),
-                )
-            }
-        }
+        Row { repeat(5) { i -> Icon(if (i < rating) Icons.Rounded.Star else Icons.Rounded.StarBorder, null, tint = Color(0xFFFBBC04), modifier = Modifier.size(14.dp)) } }
         Spacer(Modifier.height(8.dp))
         Text(text, style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary, lineHeight = 20.sp)
     }
