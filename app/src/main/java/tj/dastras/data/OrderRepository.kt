@@ -18,8 +18,8 @@ class OrderRepository @Inject constructor(
             response.body()?.data?.map { it.toOrder() } ?: emptyList()
         }
 
-    suspend fun createOrder(address: String, items: List<OrderItemRequest>): Order? =
-        api.createOrder(CreateOrderRequest(address, items)).let { response ->
+    suspend fun createOrder(address: String, items: List<OrderItemRequest>, branchId: Int? = null): Order? =
+        api.createOrder(CreateOrderRequest(address, items, branchId)).let { response ->
             if (!response.isSuccessful) Log.w(TAG, "createOrder: failed code=${response.code()}")
             response.body()?.data?.toOrder()
         }

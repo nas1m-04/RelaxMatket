@@ -183,6 +183,8 @@
     <string name="checkout_delivery_address_value">кӯчаи Ленин, 45, хонаи 12</string>
     <string name="checkout_pickup_store_label">Мағозаи RELAX</string>
     <string name="checkout_pickup_store_value">кӯчаи Марказӣ, 1</string>
+    <string name="checkout_branch_title">Филиал</string>
+    <string name="checkout_branch_empty">Филиалҳо ёфт нашуданд</string>
     <string name="checkout_time_slot_title">Вақти гирифтан</string>
     <string name="checkout_slot_today_1">Имрӯз 18:00 – 20:00</string>
     <string name="checkout_slot_today_2">Имрӯз 20:00 – 22:00</string>

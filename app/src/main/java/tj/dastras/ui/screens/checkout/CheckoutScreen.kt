@@ -14,17 +14,24 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
 import tj.dastras.ui.components.RelaxTopBar
 import tj.dastras.ui.theme.*
 
 @Composable
-fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
+fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: CheckoutViewModel = hiltViewModel()) {
     var deliveryType    by remember { mutableStateOf(0) } // 0=delivery, 1=pickup
     var selectedSlot    by remember { mutableStateOf(0) }
     var selectedPayment by remember { mutableStateOf(0) }
     var comment         by remember { mutableStateOf("") }
     var showSuccess     by remember { mutableStateOf(false) }
+
+    val uiState = viewModel.uiState
+
+    LaunchedEffect(uiState.orderPlaced) {
+        if (uiState.orderPlaced) showSuccess = true
+    }
 
     val timeSlots = listOf(
         stringResource(R.string.checkout_slot_today_1),
@@ -117,6 +124,49 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
                         Column {
                             Text(stringResource(R.string.checkout_pickup_store_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
                             Text(stringResource(R.string.checkout_pickup_store_value), style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                        }
+                    }
+                }
+            }
+
+            // Branch (filial) where the order will be processed
+            SectionCard(title = stringResource(R.string.checkout_branch_title)) {
+                if (uiState.isLoading) {
+                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = RelaxDark, modifier = Modifier.size(24.dp))
+                    }
+                } else if (uiState.branches.isEmpty()) {
+                    Text(stringResource(R.string.checkout_branch_empty), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                } else {
+                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                        uiState.branches.forEach { branch ->
+                            val selected = uiState.selectedBranchId == branch.id
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(if (selected) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
+                                    .border(
+                                        width = 1.5.dp,
+                                        color = if (selected) RelaxDark else RelaxDivider,
+                                        shape = RoundedCornerShape(12.dp),
+                                    )
+                                    .clickable { viewModel.selectBranch(branch.id) }
+                                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                RadioButton(
+                                    selected = selected,
+                                    onClick  = { viewModel.selectBranch(branch.id) },
+                                    colors   = RadioButtonDefaults.colors(selectedColor = RelaxDark),
+                                    modifier = Modifier.size(20.dp),
+                                )
+                                Spacer(Modifier.width(10.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(branch.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
+                                    Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                }
+                            }
                         }
                     }
                 }
@@ -225,13 +275,26 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit) {
                     Text(stringResource(R.string.checkout_total_label), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                     Text("2 687 TJS", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                 }
+                uiState.error?.let {
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = RelaxRed)
+                }
+                val deliveryAddress = stringResource(R.string.checkout_delivery_address_value)
                 Button(
-                    onClick   = { showSuccess = true },
+                    onClick   = {
+                        val selectedBranch = uiState.branches.find { it.id == uiState.selectedBranchId }
+                        val address = if (deliveryType == 0) deliveryAddress else (selectedBranch?.address ?: deliveryAddress)
+                        viewModel.placeOrder(address)
+                    },
+                    enabled   = !uiState.isPlacingOrder,
                     modifier  = Modifier.fillMaxWidth().height(56.dp),
                     shape     = RoundedCornerShape(16.dp),
                     colors    = ButtonDefaults.buttonColors(containerColor = RelaxRed),
                 ) {
-                    Text(stringResource(R.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    if (uiState.isPlacingOrder) {
+                        CircularProgressIndicator(color = RelaxWhite, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    } else {
+                        Text(stringResource(R.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    }
                 }
             }
         }

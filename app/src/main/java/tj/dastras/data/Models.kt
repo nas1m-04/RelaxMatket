@@ -59,6 +59,14 @@ enum class OrderStatus(val label: String, val color: Long) {
     CANCELLED  ("Отменён",         0xFFEF4444L),
 }
 
+data class Branch(
+    val id: Int = 0,
+    val name: String = "",
+    val address: String = "",
+    val phone: String? = null,
+    val isActive: Boolean = true,
+)
+
 data class Promotion(
     val id: Int = 0,
     val title: String = "",
@@ -124,6 +132,7 @@ data class AddToCartRequest(
 data class CreateOrderRequest(
     val address: String,
     val items: List<OrderItemRequest>,
+    val branchId: Int? = null,
 )
 
 data class OrderItemRequest(

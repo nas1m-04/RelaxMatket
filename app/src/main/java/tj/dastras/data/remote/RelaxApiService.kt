@@ -42,6 +42,10 @@ interface RelaxApiService {
     @GET("banners")
     suspend fun getBanners(): Response<ApiResponse<List<Banner>>>
 
+    // ── Branches (public) ────────────────────────────────────────────────
+    @GET("branches")
+    suspend fun getBranches(): Response<ApiResponse<List<Branch>>>
+
     // ── Cart (auth required) ──────────────────────────────────────────────
     @GET("cart")
     suspend fun getCart(): Response<ApiResponse<List<CartItemResponse>>>
