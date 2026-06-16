@@ -8,6 +8,7 @@ sealed class Screen(val route: String) {
     object Main          : Screen("main")
     object Home          : Screen("home")
     object Catalog       : Screen("catalog")
+    object Search        : Screen("search")
     object LoyaltyCard   : Screen("loyalty_card")
     object Bonuses       : Screen("bonuses")
     object Profile       : Screen("profile")
@@ -20,4 +21,7 @@ sealed class Screen(val route: String) {
     object Favorites     : Screen("favorites")
     object OrderHistory  : Screen("order_history")
     object Notifications : Screen("notifications")
+    object SelectBranch  : Screen("select_branch/{mode}") {
+        fun createRoute(mode: String) = "select_branch/$mode"
+    }
 }

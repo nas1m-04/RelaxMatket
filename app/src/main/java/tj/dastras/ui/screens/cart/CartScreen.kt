@@ -36,7 +36,8 @@ fun CartScreen(
     val subtotal      = state.items.sumOf { it.product.price * it.quantity }
     val savings       = state.items.sumOf { ((it.product.oldPrice ?: it.product.price) - it.product.price) * it.quantity }
     val promoDiscount = if (state.promoApplied) subtotal * 0.05 else 0.0
-    val bonusDiscount = if (state.useBonuses) minOf(state.bonusBalance, subtotal * 0.5) else 0.0
+    val maxBonusDiscount = minOf(state.bonusBalance * state.bonusToCurrencyRate, subtotal * state.maxBonusPaymentPercent / 100.0, subtotal)
+    val bonusDiscount = if (state.useBonuses) maxBonusDiscount else 0.0
     val total         = subtotal - promoDiscount - bonusDiscount
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {

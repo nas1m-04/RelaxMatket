@@ -1,19 +1,21 @@
 package tj.dastras.data
 
-import android.util.Log
 import tj.dastras.data.remote.RelaxApiService
+import tj.dastras.data.remote.dataOrThrow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val TAG = "BranchRepository"
 
 @Singleton
 class BranchRepository @Inject constructor(
     private val api: RelaxApiService,
 ) {
-    suspend fun getAll(): List<Branch> =
-        api.getBranches().let { response ->
-            if (!response.isSuccessful) Log.w(TAG, "getAll: failed code=${response.code()}")
-            response.body()?.data?.filter { it.isActive } ?: emptyList()
-        }
+    @Volatile private var cached: List<Branch>? = null
+
+    suspend fun getAll(forceRefresh: Boolean = false): List<Branch> {
+        cached?.let { if (!forceRefresh) return it }
+        val branches = api.getBranches().dataOrThrow()
+        cached = branches
+        return branches
+    }
 }

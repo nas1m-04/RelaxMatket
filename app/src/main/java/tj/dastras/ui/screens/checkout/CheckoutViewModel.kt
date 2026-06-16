@@ -10,79 +10,99 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.dastras.data.Branch
 import tj.dastras.data.BranchRepository
-import tj.dastras.data.CartItem
-import tj.dastras.data.CartRepository
+import tj.dastras.data.CreateOrderRequest
+import tj.dastras.data.Order
 import tj.dastras.data.OrderItemRequest
 import tj.dastras.data.OrderRepository
+import tj.dastras.data.UserRepository
+import tj.dastras.data.remote.ErrorPresenter
 import tj.dastras.data.remote.friendlyErrorMessage
 import javax.inject.Inject
 
 private const val TAG = "CheckoutViewModel"
 
 data class CheckoutUiState(
-    val items: List<CartItem> = emptyList(),
+    val deliveryType: String = "delivery",
+    val address: String = "",
+    val timeSlot: String? = null,
+    val paymentMethod: String = "card_on_delivery",
+    val comment: String = "",
     val branches: List<Branch> = emptyList(),
     val selectedBranchId: Int? = null,
-    val isLoading: Boolean = false,
-    val isPlacingOrder: Boolean = false,
-    val orderPlaced: Boolean = false,
+    val isSubmitting: Boolean = false,
     val error: String? = null,
+    val order: Order? = null,
 )
 
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
-    private val branchRepository: BranchRepository,
-    private val cartRepository: CartRepository,
     private val orderRepository: OrderRepository,
+    private val branchRepository: BranchRepository,
+    private val userRepository: UserRepository,
 ) : ViewModel() {
 
     var uiState by mutableStateOf(CheckoutUiState())
         private set
 
-    init { load() }
+    init {
+        loadBranches()
+    }
 
-    fun load() {
+    private fun loadBranches() {
         viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, error = null)
             try {
                 val branches = branchRepository.getAll()
-                val items    = cartRepository.getItems()
-                uiState = uiState.copy(
-                    items            = items,
-                    branches         = branches,
-                    selectedBranchId = uiState.selectedBranchId ?: branches.firstOrNull()?.id,
-                    isLoading        = false,
-                )
+                val preferredId = userRepository.getCachedLocal()?.preferredBranchId
+                val defaultId = uiState.selectedBranchId
+                    ?: preferredId?.takeIf { id -> branches.any { it.id == id } }
+                    ?: branches.firstOrNull()?.id
+                uiState = uiState.copy(branches = branches, selectedBranchId = defaultId)
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
-                uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                Log.e(TAG, "loadBranches: error", e)
             }
         }
     }
 
-    fun selectBranch(branchId: Int) {
-        uiState = uiState.copy(selectedBranchId = branchId)
+    fun setDeliveryType(type: String) { uiState = uiState.copy(deliveryType = type) }
+    fun setAddress(address: String) { uiState = uiState.copy(address = address) }
+    fun setTimeSlot(slot: String?) { uiState = uiState.copy(timeSlot = slot) }
+    fun setPaymentMethod(method: String) { uiState = uiState.copy(paymentMethod = method) }
+    fun setComment(comment: String) { uiState = uiState.copy(comment = comment) }
+    fun setBranch(branchId: Int) {
+        val branch = uiState.branches.firstOrNull { it.id == branchId }
+        uiState = uiState.copy(
+            selectedBranchId = branchId,
+            address = if (uiState.deliveryType == "delivery" && branch != null) branch.address else uiState.address,
+        )
     }
+    fun clearError() { uiState = uiState.copy(error = null) }
 
-    fun placeOrder(address: String) {
-        if (uiState.isPlacingOrder) return
+    fun submitOrder(items: List<OrderItemRequest>, useBonuses: Boolean, promoCode: String?) {
+        if (items.isEmpty() || uiState.isSubmitting) return
         viewModelScope.launch {
-            uiState = uiState.copy(isPlacingOrder = true, error = null)
+            uiState = uiState.copy(isSubmitting = true, error = null)
             try {
-                val items = uiState.items.map { item ->
-                    OrderItemRequest(productId = item.product.id, quantity = item.quantity, price = item.product.price)
-                }
-                val order = orderRepository.createOrder(address, items, uiState.selectedBranchId)
-                if (order != null) {
-                    cartRepository.clear()
-                    uiState = uiState.copy(isPlacingOrder = false, orderPlaced = true)
-                } else {
-                    uiState = uiState.copy(isPlacingOrder = false, error = "Не удалось оформить заказ")
-                }
+                val order = orderRepository.createOrder(
+                    CreateOrderRequest(
+                        deliveryType  = uiState.deliveryType,
+                        address       = if (uiState.deliveryType == "delivery") uiState.address.ifBlank { null } else null,
+                        timeSlot      = uiState.timeSlot,
+                        paymentMethod = uiState.paymentMethod,
+                        comment       = uiState.comment.ifBlank { null },
+                        promoCode     = promoCode,
+                        useBonuses    = useBonuses,
+                        branchId      = uiState.selectedBranchId,
+                        items         = items,
+                    )
+                )
+                uiState = uiState.copy(isSubmitting = false, order = order)
             } catch (e: Exception) {
-                Log.e(TAG, "placeOrder: error", e)
-                uiState = uiState.copy(isPlacingOrder = false, error = friendlyErrorMessage(e))
+                Log.e(TAG, "submitOrder: error", e)
+                uiState = uiState.copy(isSubmitting = false, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
             }
         }
     }
+
+    fun reset() { uiState = CheckoutUiState() }
 }

@@ -14,24 +14,30 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
+import tj.dastras.data.OrderItemRequest
 import tj.dastras.ui.components.RelaxTopBar
+import tj.dastras.ui.components.activityViewModel
+import tj.dastras.ui.screens.cart.CartViewModel
 import tj.dastras.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: CheckoutViewModel = hiltViewModel()) {
-    var deliveryType    by remember { mutableStateOf(0) } // 0=delivery, 1=pickup
-    var selectedSlot    by remember { mutableStateOf(0) }
-    var selectedPayment by remember { mutableStateOf(0) }
-    var comment         by remember { mutableStateOf("") }
-    var showSuccess     by remember { mutableStateOf(false) }
+fun CheckoutScreen(
+    onBack: () -> Unit,
+    onSuccess: () -> Unit,
+    cartViewModel: CartViewModel = activityViewModel(),
+    viewModel: CheckoutViewModel = activityViewModel(),
+) {
+    val cartState = cartViewModel.uiState
+    val state     = viewModel.uiState
 
-    val uiState = viewModel.uiState
-
-    LaunchedEffect(uiState.orderPlaced) {
-        if (uiState.orderPlaced) showSuccess = true
-    }
+    val subtotal      = cartState.items.sumOf { it.product.price * it.quantity }
+    val promoDiscount = if (cartState.promoApplied) subtotal * 0.05 else 0.0
+    val bonusDiscount = if (cartState.useBonuses) {
+        minOf(cartState.bonusBalance * cartState.bonusToCurrencyRate, subtotal * cartState.maxBonusPaymentPercent / 100.0, subtotal)
+    } else 0.0
+    val total = subtotal - promoDiscount - bonusDiscount
 
     val timeSlots = listOf(
         stringResource(R.string.checkout_slot_today_1),
@@ -39,14 +45,31 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
         stringResource(R.string.checkout_slot_tomorrow_1),
         stringResource(R.string.checkout_slot_tomorrow_2),
     )
-    val payments  = listOf(
-        Triple(Icons.Rounded.CreditCard, stringResource(R.string.checkout_payment_card_title), stringResource(R.string.checkout_payment_card_sub)),
-        Triple(Icons.Rounded.Phone,      stringResource(R.string.checkout_payment_online_title), stringResource(R.string.checkout_payment_online_sub)),
-        Triple(Icons.Rounded.Money,      stringResource(R.string.checkout_payment_cash_title), stringResource(R.string.checkout_payment_cash_sub)),
+    val payments = listOf(
+        Triple("card_on_delivery", Icons.Rounded.CreditCard, stringResource(R.string.checkout_payment_card_title) to stringResource(R.string.checkout_payment_card_sub)),
+        Triple("cash", Icons.Rounded.Money,       stringResource(R.string.checkout_payment_cash_title) to stringResource(R.string.checkout_payment_cash_sub)),
     )
+    val defaultAddress = stringResource(R.string.checkout_delivery_address_value)
 
-    if (showSuccess) {
-        OrderSuccessScreen(onDone = onSuccess)
+    LaunchedEffect(Unit) {
+        if (state.timeSlot == null) viewModel.setTimeSlot(timeSlots.first())
+    }
+    LaunchedEffect(state.branches) {
+        if (state.address.isBlank()) {
+            val branchAddress = state.branches.firstOrNull { it.id == state.selectedBranchId }?.address
+            viewModel.setAddress(branchAddress ?: defaultAddress)
+        }
+    }
+
+    if (state.order != null) {
+        OrderSuccessScreen(
+            bonusEarned = state.order.bonusEarned.toInt(),
+            onDone = {
+                cartViewModel.clear()
+                viewModel.reset()
+                onSuccess()
+            },
+        )
         return
     }
 
@@ -71,20 +94,23 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
                         .background(RelaxSurfaceAlt)
                         .padding(4.dp),
                 ) {
-                    listOf(stringResource(R.string.checkout_delivery_option), stringResource(R.string.checkout_pickup_option)).forEachIndexed { idx, label ->
+                    listOf(
+                        "delivery" to stringResource(R.string.checkout_delivery_option),
+                        "pickup"   to stringResource(R.string.checkout_pickup_option),
+                    ).forEach { (type, label) ->
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(10.dp))
-                                .background(if (deliveryType == idx) RelaxDark else Color.Transparent)
-                                .clickable { deliveryType = idx }
+                                .background(if (state.deliveryType == type) RelaxDark else Color.Transparent)
+                                .clickable { viewModel.setDeliveryType(type) }
                                 .padding(vertical = 12.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
                                 label,
-                                color      = if (deliveryType == idx) RelaxWhite else RelaxTextSecondary,
-                                fontWeight = if (deliveryType == idx) FontWeight.Bold else FontWeight.Normal,
+                                color      = if (state.deliveryType == type) RelaxWhite else RelaxTextSecondary,
+                                fontWeight = if (state.deliveryType == type) FontWeight.Bold else FontWeight.Normal,
                                 fontSize   = 14.sp,
                             )
                         }
@@ -92,38 +118,104 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
                 }
                 Spacer(Modifier.height(14.dp))
 
-                if (deliveryType == 0) {
-                    // Address
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(RelaxInputBg)
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                if (state.deliveryType == "delivery") {
+                    var branchMenuExpanded by remember { mutableStateOf(false) }
+                    ExposedDropdownMenuBox(
+                        expanded         = branchMenuExpanded,
+                        onExpandedChange = { if (state.branches.isNotEmpty()) branchMenuExpanded = it },
                     ) {
-                        Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed, modifier = Modifier.size(22.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.checkout_delivery_address_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
-                            Text(stringResource(R.string.checkout_delivery_address_value), style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                        OutlinedTextField(
+                            value         = state.address,
+                            onValueChange = { viewModel.setAddress(it) },
+                            label         = { Text(stringResource(R.string.checkout_delivery_address_label), color = RelaxTextSecondary) },
+                            leadingIcon   = { Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed) },
+                            trailingIcon  = {
+                                if (state.branches.isNotEmpty()) {
+                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = branchMenuExpanded)
+                                }
+                            },
+                            singleLine    = true,
+                            modifier      = Modifier.fillMaxWidth().menuAnchor(),
+                            shape         = RoundedCornerShape(14.dp),
+                            colors        = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor      = RelaxDark,
+                                unfocusedBorderColor    = RelaxDivider,
+                                focusedContainerColor   = RelaxWhite,
+                                unfocusedContainerColor = RelaxInputBg,
+                            ),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = RelaxTextPrimary, fontWeight = FontWeight.Medium),
+                        )
+                        ExposedDropdownMenu(
+                            expanded         = branchMenuExpanded,
+                            onDismissRequest = { branchMenuExpanded = false },
+                        ) {
+                            state.branches.forEach { branch ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Column {
+                                            Text(branch.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                                            Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                        }
+                                    },
+                                    onClick = {
+                                        viewModel.setBranch(branch.id)
+                                        branchMenuExpanded = false
+                                    },
+                                )
+                            }
                         }
-                        Icon(Icons.Rounded.Edit, null, tint = RelaxTextSecondary, modifier = Modifier.size(16.dp))
                     }
                 } else {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(14.dp))
-                            .background(RelaxInputBg)
-                            .padding(14.dp),
-                        verticalAlignment = Alignment.CenterVertically,
+                    var branchMenuExpanded by remember { mutableStateOf(false) }
+                    val selectedBranch = state.branches.firstOrNull { it.id == state.selectedBranchId }
+                    ExposedDropdownMenuBox(
+                        expanded         = branchMenuExpanded,
+                        onExpandedChange = { if (state.branches.isNotEmpty()) branchMenuExpanded = it },
                     ) {
-                        Icon(Icons.Rounded.Store, null, tint = RelaxDark, modifier = Modifier.size(22.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Column {
-                            Text(stringResource(R.string.checkout_pickup_store_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
-                            Text(stringResource(R.string.checkout_pickup_store_value), style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .menuAnchor()
+                                .clip(RoundedCornerShape(14.dp))
+                                .background(RelaxInputBg)
+                                .clickable(enabled = state.branches.isNotEmpty()) { branchMenuExpanded = true }
+                                .padding(14.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            Icon(Icons.Rounded.Store, null, tint = RelaxDark, modifier = Modifier.size(22.dp))
+                            Spacer(Modifier.width(10.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(stringResource(R.string.checkout_pickup_store_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
+                                Text(
+                                    selectedBranch?.name ?: stringResource(R.string.checkout_pickup_store_value),
+                                    style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium,
+                                )
+                                selectedBranch?.let {
+                                    Text(it.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                }
+                            }
+                            if (state.branches.isNotEmpty()) {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = branchMenuExpanded)
+                            }
+                        }
+                        ExposedDropdownMenu(
+                            expanded         = branchMenuExpanded,
+                            onDismissRequest = { branchMenuExpanded = false },
+                        ) {
+                            state.branches.forEach { branch ->
+                                DropdownMenuItem(
+                                    text = {
+                                        Column {
+                                            Text(branch.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
+                                            Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                        }
+                                    },
+                                    onClick = {
+                                        viewModel.setBranch(branch.id)
+                                        branchMenuExpanded = false
+                                    },
+                                )
+                            }
                         }
                     }
                 }
@@ -131,16 +223,12 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
 
             // Branch (filial) where the order will be processed
             SectionCard(title = stringResource(R.string.checkout_branch_title)) {
-                if (uiState.isLoading) {
-                    Box(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(color = RelaxDark, modifier = Modifier.size(24.dp))
-                    }
-                } else if (uiState.branches.isEmpty()) {
+                if (state.branches.isEmpty()) {
                     Text(stringResource(R.string.checkout_branch_empty), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                 } else {
                     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        uiState.branches.forEach { branch ->
-                            val selected = uiState.selectedBranchId == branch.id
+                        state.branches.forEach { branch ->
+                            val selected = state.selectedBranchId == branch.id
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
@@ -151,13 +239,13 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
                                         color = if (selected) RelaxDark else RelaxDivider,
                                         shape = RoundedCornerShape(12.dp),
                                     )
-                                    .clickable { viewModel.selectBranch(branch.id) }
+                                    .clickable { viewModel.setBranch(branch.id) }
                                     .padding(horizontal = 14.dp, vertical = 12.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                             ) {
                                 RadioButton(
                                     selected = selected,
-                                    onClick  = { viewModel.selectBranch(branch.id) },
+                                    onClick  = { viewModel.setBranch(branch.id) },
                                     colors   = RadioButtonDefaults.colors(selectedColor = RelaxDark),
                                     modifier = Modifier.size(20.dp),
                                 )
@@ -175,29 +263,29 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
             // Time slot
             SectionCard(title = stringResource(R.string.checkout_time_slot_title)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    timeSlots.forEachIndexed { idx, slot ->
+                    timeSlots.forEach { slot ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(if (selectedSlot == idx) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
+                                .background(if (state.timeSlot == slot) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
                                 .border(
                                     width = 1.5.dp,
-                                    color = if (selectedSlot == idx) RelaxDark else RelaxDivider,
+                                    color = if (state.timeSlot == slot) RelaxDark else RelaxDivider,
                                     shape = RoundedCornerShape(12.dp),
                                 )
-                                .clickable { selectedSlot = idx }
+                                .clickable { viewModel.setTimeSlot(slot) }
                                 .padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             RadioButton(
-                                selected = selectedSlot == idx,
-                                onClick  = { selectedSlot = idx },
+                                selected = state.timeSlot == slot,
+                                onClick  = { viewModel.setTimeSlot(slot) },
                                 colors   = RadioButtonDefaults.colors(selectedColor = RelaxDark),
                                 modifier = Modifier.size(20.dp),
                             )
                             Spacer(Modifier.width(10.dp))
-                            Text(slot, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = if (selectedSlot == idx) FontWeight.SemiBold else FontWeight.Normal)
+                            Text(slot, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = if (state.timeSlot == slot) FontWeight.SemiBold else FontWeight.Normal)
                         }
                     }
                 }
@@ -206,18 +294,20 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
             // Payment method
             SectionCard(title = stringResource(R.string.checkout_payment_method_title)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    payments.forEachIndexed { idx, (icon, title, sub) ->
+                    payments.forEach { (value, icon, texts) ->
+                        val (title, sub) = texts
+                        val selected = state.paymentMethod == value
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
-                                .background(if (selectedPayment == idx) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
+                                .background(if (selected) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
                                 .border(
                                     width = 1.5.dp,
-                                    color = if (selectedPayment == idx) RelaxDark else RelaxDivider,
+                                    color = if (selected) RelaxDark else RelaxDivider,
                                     shape = RoundedCornerShape(12.dp),
                                 )
-                                .clickable { selectedPayment = idx }
+                                .clickable { viewModel.setPaymentMethod(value) }
                                 .padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
@@ -225,17 +315,17 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
                                 modifier = Modifier
                                     .size(40.dp)
                                     .clip(RoundedCornerShape(10.dp))
-                                    .background(if (selectedPayment == idx) RelaxDark else RelaxSurfaceAlt),
+                                    .background(if (selected) RelaxDark else RelaxSurfaceAlt),
                                 contentAlignment = Alignment.Center,
                             ) {
-                                Icon(icon, null, tint = if (selectedPayment == idx) RelaxWhite else RelaxTextSecondary, modifier = Modifier.size(20.dp))
+                                Icon(icon, null, tint = if (selected) RelaxWhite else RelaxTextSecondary, modifier = Modifier.size(20.dp))
                             }
                             Spacer(Modifier.width(12.dp))
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(title, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
                                 Text(sub,   style = MaterialTheme.typography.bodySmall,  color = RelaxTextSecondary)
                             }
-                            if (selectedPayment == idx) {
+                            if (selected) {
                                 Icon(Icons.Rounded.CheckCircle, null, tint = RelaxDark, modifier = Modifier.size(20.dp))
                             }
                         }
@@ -246,8 +336,8 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
             // Comment
             SectionCard(title = stringResource(R.string.checkout_comment_title)) {
                 OutlinedTextField(
-                    value         = comment,
-                    onValueChange = { comment = it },
+                    value         = state.comment,
+                    onValueChange = { viewModel.setComment(it) },
                     placeholder   = { Text(stringResource(R.string.checkout_comment_placeholder), color = RelaxTextHint, fontSize = 14.sp) },
                     modifier      = Modifier.fillMaxWidth().height(100.dp),
                     shape         = RoundedCornerShape(12.dp),
@@ -273,25 +363,25 @@ fun CheckoutScreen(onBack: () -> Unit, onSuccess: () -> Unit, viewModel: Checkou
             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                     Text(stringResource(R.string.checkout_total_label), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
-                    Text("2 687 TJS", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                    Text("${total.toInt()} TJS", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                 }
-                uiState.error?.let {
+                state.error?.let {
                     Text(it, style = MaterialTheme.typography.bodySmall, color = RelaxRed)
                 }
                 val deliveryAddress = stringResource(R.string.checkout_delivery_address_value)
                 Button(
-                    onClick   = {
-                        val selectedBranch = uiState.branches.find { it.id == uiState.selectedBranchId }
-                        val address = if (deliveryType == 0) deliveryAddress else (selectedBranch?.address ?: deliveryAddress)
-                        viewModel.placeOrder(address)
+                    onClick  = {
+                        val items = cartState.items.map { OrderItemRequest(productId = it.product.id, quantity = it.quantity) }
+                        val promoCode = if (cartState.promoApplied) cartState.promoCode else null
+                        viewModel.submitOrder(items, cartState.useBonuses, promoCode)
                     },
-                    enabled   = !uiState.isPlacingOrder,
+                    enabled   = !state.isSubmitting && cartState.items.isNotEmpty(),
                     modifier  = Modifier.fillMaxWidth().height(56.dp),
                     shape     = RoundedCornerShape(16.dp),
                     colors    = ButtonDefaults.buttonColors(containerColor = RelaxRed),
                 ) {
-                    if (uiState.isPlacingOrder) {
-                        CircularProgressIndicator(color = RelaxWhite, modifier = Modifier.size(20.dp), strokeWidth = 2.dp)
+                    if (state.isSubmitting) {
+                        CircularProgressIndicator(modifier = Modifier.size(22.dp), color = RelaxWhite, strokeWidth = 2.dp)
                     } else {
                         Text(stringResource(R.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
@@ -318,7 +408,7 @@ private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Un
 }
 
 @Composable
-private fun OrderSuccessScreen(onDone: () -> Unit) {
+private fun OrderSuccessScreen(bonusEarned: Int, onDone: () -> Unit) {
     Box(
         modifier          = Modifier.fillMaxSize().background(RelaxBackground),
         contentAlignment  = Alignment.Center,
@@ -338,8 +428,10 @@ private fun OrderSuccessScreen(onDone: () -> Unit) {
             Spacer(Modifier.height(8.dp))
             Text(stringResource(R.string.checkout_success_subtitle), color = RelaxTextSecondary, style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 24.sp)
             Spacer(Modifier.height(32.dp))
-            Text(stringResource(R.string.checkout_bonus_earned, 350), color = Color(0xFFD4AF37), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(32.dp))
+            if (bonusEarned > 0) {
+                Text(stringResource(R.string.checkout_bonus_earned, bonusEarned), color = Color(0xFFD4AF37), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+                Spacer(Modifier.height(32.dp))
+            }
             Button(
                 onClick  = onDone,
                 modifier = Modifier.fillMaxWidth().height(56.dp),

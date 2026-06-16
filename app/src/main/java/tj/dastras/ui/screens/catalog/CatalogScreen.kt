@@ -18,7 +18,6 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
 import tj.dastras.ui.components.*
 import tj.dastras.ui.screens.cart.CartViewModel
@@ -30,7 +29,7 @@ import tj.dastras.ui.theme.*
 fun CatalogScreen(
     onProduct: (Int) -> Unit,
     onCart: () -> Unit,
-    viewModel: CatalogViewModel = hiltViewModel(),
+    viewModel: CatalogViewModel = activityViewModel(),
     cartViewModel: CartViewModel = activityViewModel(),
     favoritesViewModel: FavoritesViewModel = activityViewModel(),
 ) {
@@ -99,6 +98,25 @@ fun CatalogScreen(
                         .padding(horizontal = 16.dp, vertical = 8.dp),
                 ) {
                     Text(name, fontSize = 13.sp, fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal, color = if (isSelected) RelaxWhite else RelaxTextSecondary)
+                }
+            }
+        }
+
+        if (state.showNewOnly) {
+            Row(
+                modifier              = Modifier.fillMaxWidth().background(RelaxWhite).padding(horizontal = 20.dp, vertical = 8.dp),
+                verticalAlignment     = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                Row(
+                    modifier              = Modifier.clip(RoundedCornerShape(20.dp)).background(RelaxDark)
+                        .clickable { viewModel.setNewOnly(false) }
+                        .padding(horizontal = 14.dp, vertical = 8.dp),
+                    verticalAlignment     = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp),
+                ) {
+                    Text(stringResource(R.string.home_section_new), fontSize = 13.sp, fontWeight = FontWeight.Bold, color = RelaxWhite)
+                    Icon(Icons.Rounded.Close, null, tint = RelaxWhite, modifier = Modifier.size(16.dp))
                 }
             }
         }

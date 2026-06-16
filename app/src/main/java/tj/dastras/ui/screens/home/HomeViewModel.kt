@@ -15,6 +15,7 @@ import tj.dastras.data.CategoryRepository
 import tj.dastras.data.MockData
 import tj.dastras.data.Product
 import tj.dastras.data.ProductRepository
+import tj.dastras.data.remote.ErrorPresenter
 import tj.dastras.data.remote.friendlyErrorMessage
 import javax.inject.Inject
 
@@ -62,6 +63,7 @@ class HomeViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(TAG, "load: error", e)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
             }
         }
     }

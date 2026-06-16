@@ -30,6 +30,8 @@
     <string name="menu_not_specified">Зикр нашудааст</string>
     <string name="menu_addresses">Суроғаҳои ман</string>
     <string name="menu_addresses_count">1 суроға</string>
+    <string name="menu_branch">Филиали ман</string>
+    <string name="menu_branch_not_selected">Интихоб нашудааст</string>
     <string name="menu_notifications">Огоҳиномаҳо</string>
     <string name="menu_notifications_on">Фаъол</string>
     <string name="menu_language">Забон</string>
@@ -46,6 +48,18 @@
     <string name="logout_dialog_text">Шумо мутмаин ҳастед, ки мехоҳед аз барнома хориҷ шавед?</string>
     <string name="logout_confirm">Баромадан</string>
     <string name="logout_cancel">Бекор кардан</string>
+
+    <!-- Error dialog -->
+    <string name="error_dialog_title">Хатогӣ</string>
+    <string name="error_generic_message">Хатогӣ рух дод, лутфан баъдтар кӯшиш кунед</string>
+    <string name="error_details_show">Нишон додани тафсилот</string>
+    <string name="error_details_hide">Пинҳон кардани тафсилот</string>
+    <string name="error_trace_id_label">Рамзи хатогӣ</string>
+    <string name="error_trace_id_copied">Рамзи хатогӣ нусхабардорӣ шуд</string>
+    <string name="error_validation_title">Маълумотро тафтиш кунед</string>
+    <string name="error_dialog_ok">ХУБ</string>
+    <string name="error_server_updating_title">Сервер навсозӣ мешавад</string>
+    <string name="error_server_updating_message">Сервер ҳоло навсозӣ мешавад. Лутфан каме сабр кунед ва дубора кӯшиш кунед</string>
 
     <!-- Avatar picker -->
     <string name="avatar_sheet_title">Акси профил</string>
@@ -125,6 +139,11 @@
     <string name="catalog_empty_title">Ҳеҷ чиз ёфт нашуд</string>
     <string name="catalog_empty_subtitle">Филтрҳоро тағйир диҳед</string>
 
+    <!-- Search screen -->
+    <string name="search_hint_title">Чизи лозимаро ёбед</string>
+    <string name="search_hint_subtitle">Номи молро ворид кунед</string>
+    <string name="search_empty_subtitle">Дархости дигарро санҷед</string>
+
     <!-- Product detail screen -->
     <string name="product_added_to_cart">Маҷулот ба сабад илова шуд</string>
     <string name="product_add_to_cart_price">Ба сабад · %1$d TJS</string>
@@ -182,10 +201,15 @@
     <string name="checkout_delivery_address_label">Суроғаи расонидан</string>
     <string name="checkout_delivery_address_value">кӯчаи Ленин, 45, хонаи 12</string>
     <string name="checkout_pickup_store_label">Мағозаи RELAX</string>
-    <string name="checkout_pickup_store_value">кӯчаи Марказӣ, 1</string>
+    <string name="checkout_pickup_store_value">Филиалро интихоб кунед</string>
     <string name="checkout_branch_title">Филиал</string>
     <string name="checkout_branch_empty">Филиалҳо ёфт нашуданд</string>
     <string name="checkout_time_slot_title">Вақти гирифтан</string>
+    <string name="select_branch_title">Интихоби филиал</string>
+    <string name="select_branch_subtitle">Филиалеро интихоб кунед, ки мағозаи асосии шумо мешавад</string>
+    <string name="select_branch_confirm">Захира кардан</string>
+    <string name="select_branch_skip">Гузаштан</string>
+    <string name="select_branch_empty">Филиалҳо ҳанӯз илова нашудаанд</string>
     <string name="checkout_slot_today_1">Имрӯз 18:00 – 20:00</string>
     <string name="checkout_slot_today_2">Имрӯз 20:00 – 22:00</string>
     <string name="checkout_slot_tomorrow_1">Пагоҳ 10:00 – 12:00</string>
@@ -193,8 +217,6 @@
     <string name="checkout_payment_method_title">Тарзи пардохт</string>
     <string name="checkout_payment_card_title">Бо корт ҳангоми гирифтан</string>
     <string name="checkout_payment_card_sub">Ҳар корт</string>
-    <string name="checkout_payment_online_title">Пардохти онлайн</string>
-    <string name="checkout_payment_online_sub">Visa, Mastercard, СБП</string>
     <string name="checkout_payment_cash_title">Пул нақд</string>
     <string name="checkout_payment_cash_sub">Ҳангоми гирифтан</string>
     <string name="checkout_comment_title">Шарҳ ба фармоиш</string>
@@ -247,6 +269,7 @@
 
     <!-- Order history screen -->
     <string name="order_history_title">Таърихи фармоишҳо</string>
+    <string name="order_number_label">Фармоиши №%1$s</string>
     <string name="order_empty_title">Ҳанӯз фармоиш нест</string>
     <string name="order_empty_subtitle">Фармоишҳои шумо дар ин ҷо нишон дода мешаванд</string>
     <string name="order_total_label">Ҳамагӣ: %1$d TJS</string>

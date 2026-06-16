@@ -17,16 +17,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
-import tj.dastras.data.MockData
+import tj.dastras.data.remote.BonusTransactionApiResponse
 import tj.dastras.ui.components.RelaxDivider
+import tj.dastras.ui.screens.loyalty.LoyaltyViewModel
+import tj.dastras.ui.screens.loyalty.formatTransactionDate
 import tj.dastras.ui.theme.*
 
 @Composable
-fun BonusesScreen() {
-    val user         = MockData.currentUser
-    val transactions = MockData.bonusTransactions
-    var activeTab    by remember { mutableStateOf(0) }
+fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
+    val state = viewModel.uiState
+    val summary = state.summary
+    var activeTab by remember { mutableStateOf(0) }
+
+    if (state.isLoading || summary == null) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(RelaxBackground),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(color = RelaxDark)
+        }
+        return
+    }
+
+    val transactions = state.transactions
+    val level = summary.level
 
     Column(
         modifier = Modifier
@@ -56,7 +72,7 @@ fun BonusesScreen() {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("⭐", fontSize = 28.sp)
-                        Text("${user.bonusBalance.toInt()}", color = RelaxWhite, fontSize = 36.sp, fontWeight = FontWeight.Black)
+                        Text("${summary.bonusBalance.toInt()}", color = RelaxWhite, fontSize = 36.sp, fontWeight = FontWeight.Black)
                         Text(stringResource(R.string.bonuses_points), color = RelaxTextOnDarkSub, fontSize = 12.sp)
                     }
                 }
@@ -68,8 +84,8 @@ fun BonusesScreen() {
                     modifier              = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
-                    BonusStatChip("${user.level.cashbackPercent.toInt()}%", stringResource(R.string.bonuses_cashback), RelaxOrange)
-                    BonusStatChip(user.level.name, stringResource(R.string.bonuses_level), RelaxGold)
+                    BonusStatChip("${level.cashbackPercent.toInt()}%", stringResource(R.string.bonuses_cashback), RelaxOrange)
+                    BonusStatChip(level.name, stringResource(R.string.bonuses_level), RelaxGold)
                     BonusStatChip("∞", stringResource(R.string.bonuses_days_to_expire), RelaxSuccess)
                 }
             }
@@ -91,14 +107,13 @@ fun BonusesScreen() {
                         .padding(horizontal = 20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp),
                 ) {
-                    MockData.loyaltyLevels.forEach { lvl ->
-                        val isCurrentLevel = lvl.name == user.level.name
+                    state.levels.forEach { lvl ->
                         LevelCard(
                             name       = lvl.name,
                             cashback   = lvl.cashbackPercent,
-                            minPoints  = lvl.minPoints,
+                            minSpent   = lvl.minSpent,
                             color      = Color(lvl.color),
-                            isCurrent  = isCurrentLevel,
+                            isCurrent  = lvl.isCurrent,
                         )
                     }
                 }
@@ -177,7 +192,7 @@ private fun BonusStatChip(value: String, label: String, color: Color) {
 }
 
 @Composable
-private fun LevelCard(name: String, cashback: Float, minPoints: Int, color: Color, isCurrent: Boolean) {
+private fun LevelCard(name: String, cashback: Double, minSpent: Double, color: Color, isCurrent: Boolean) {
     Box(
         modifier = Modifier
             .width(130.dp)
@@ -209,10 +224,10 @@ private fun LevelCard(name: String, cashback: Float, minPoints: Int, color: Colo
                 color = if (isCurrent) RelaxWhite.copy(alpha = 0.7f) else RelaxTextSecondary,
                 fontSize = 11.sp,
             )
-            if (minPoints > 0) {
+            if (minSpent > 0) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    stringResource(R.string.bonuses_min_points_from, minPoints),
+                    stringResource(R.string.bonuses_min_points_from, minSpent.toInt()),
                     color    = if (isCurrent) RelaxWhite.copy(alpha = 0.6f) else RelaxTextHint,
                     fontSize = 10.sp,
                 )
@@ -250,7 +265,7 @@ private fun AchievementChip(emoji: String, label: String, unlocked: Boolean) {
 }
 
 @Composable
-private fun BonusTransactionItem(tx: tj.dastras.data.BonusTransaction) {
+private fun BonusTransactionItem(tx: BonusTransactionApiResponse) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -275,10 +290,10 @@ private fun BonusTransactionItem(tx: tj.dastras.data.BonusTransaction) {
         Spacer(Modifier.width(14.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(tx.description, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
-            Text(tx.date, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+            Text(formatTransactionDate(tx.createdAt), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
         }
         Text(
-            text       = "${if (tx.isCredit) "+" else "−"}${tx.amount}",
+            text       = "${if (tx.isCredit) "+" else "−"}${tx.amount.toInt()}",
             fontSize   = 16.sp,
             fontWeight = FontWeight.Bold,
             color      = if (tx.isCredit) RelaxSuccess else RelaxError,

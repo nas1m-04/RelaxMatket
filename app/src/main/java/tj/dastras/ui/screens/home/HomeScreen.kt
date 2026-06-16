@@ -49,6 +49,11 @@ fun HomeScreen(
     onNotifications: () -> Unit,
     onPromotions: () -> Unit,
     onFavorites: () -> Unit,
+    onSearch: () -> Unit,
+    onCategory: (Int) -> Unit,
+    onSeeAllPopular: () -> Unit,
+    onSeeAllNew: () -> Unit,
+    onSeeAllBestOffers: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel(),
     cartViewModel: CartViewModel = activityViewModel(),
     favoritesViewModel: FavoritesViewModel = activityViewModel(),
@@ -97,6 +102,7 @@ fun HomeScreen(
                         .padding(bottom = 20.dp)
                 ) {
                     Card(
+                        onClick   = onSearch,
                         modifier  = Modifier.fillMaxWidth(),
                         shape     = RoundedCornerShape(16.dp),
                         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -150,7 +156,7 @@ fun HomeScreen(
                             contentPadding        = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
-                            items(state.categories) { cat -> CategoryChip(category = cat, onClick = {}) }
+                            items(state.categories) { cat -> CategoryChip(category = cat, onClick = { onCategory(cat.id) }) }
                         }
                     }
                 }
@@ -159,7 +165,7 @@ fun HomeScreen(
             if (state.products.isNotEmpty()) {
                 item {
                     Column(modifier = Modifier.padding(top = 28.dp)) {
-                        SectionHeader(title = stringResource(R.string.home_section_popular), onSeeAll = {}, modifier = Modifier.padding(horizontal = 20.dp))
+                        SectionHeader(title = stringResource(R.string.home_section_popular), onSeeAll = onSeeAllPopular, modifier = Modifier.padding(horizontal = 20.dp))
                         Spacer(Modifier.height(14.dp))
                         LazyHorizontalGrid(
                             rows                  = GridCells.Fixed(1),
@@ -192,7 +198,7 @@ fun HomeScreen(
             if (state.newProducts.isNotEmpty()) {
                 item {
                     Column(modifier = Modifier.padding(top = 28.dp)) {
-                        SectionHeader(title = stringResource(R.string.home_section_new), onSeeAll = {}, modifier = Modifier.padding(horizontal = 20.dp))
+                        SectionHeader(title = stringResource(R.string.home_section_new), onSeeAll = onSeeAllNew, modifier = Modifier.padding(horizontal = 20.dp))
                         Spacer(Modifier.height(14.dp))
                         LazyRow(
                             contentPadding        = PaddingValues(horizontal = 20.dp),
@@ -226,7 +232,7 @@ fun HomeScreen(
             if (state.products.size > 6) {
                 item {
                     Spacer(Modifier.height(28.dp))
-                    SectionHeader(title = stringResource(R.string.home_section_best_offers), onSeeAll = {}, modifier = Modifier.padding(horizontal = 20.dp))
+                    SectionHeader(title = stringResource(R.string.home_section_best_offers), onSeeAll = onSeeAllBestOffers, modifier = Modifier.padding(horizontal = 20.dp))
                     Spacer(Modifier.height(14.dp))
                 }
                 item {

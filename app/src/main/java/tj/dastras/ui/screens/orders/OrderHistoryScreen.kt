@@ -24,6 +24,7 @@ import tj.dastras.data.Order
 import tj.dastras.data.OrderStatus
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.components.RelaxTopBar
+import tj.dastras.ui.screens.loyalty.formatTransactionDate
 import tj.dastras.ui.theme.*
 
 @Composable
@@ -63,8 +64,12 @@ private fun OrderCard(order: Order) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                 Column {
-                    Text(order.id, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
-                    Text(order.date, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                    Text(
+                        stringResource(R.string.order_number_label, order.id.take(8).uppercase()),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = RelaxTextPrimary,
+                    )
+                    Text(formatTransactionDate(order.date), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                 }
                 StatusBadge(order.status)
             }

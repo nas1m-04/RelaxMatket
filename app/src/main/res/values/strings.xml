@@ -30,6 +30,8 @@
     <string name="menu_not_specified">Не указан</string>
     <string name="menu_addresses">Мои адреса</string>
     <string name="menu_addresses_count">1 адрес</string>
+    <string name="menu_branch">Мой филиал</string>
+    <string name="menu_branch_not_selected">Не выбран</string>
     <string name="menu_notifications">Уведомления</string>
     <string name="menu_notifications_on">Включены</string>
     <string name="menu_language">Язык</string>
@@ -46,6 +48,18 @@
     <string name="logout_dialog_text">Вы действительно хотите выйти из приложения?</string>
     <string name="logout_confirm">Выйти</string>
     <string name="logout_cancel">Отмена</string>
+
+    <!-- Error dialog -->
+    <string name="error_dialog_title">Ошибка</string>
+    <string name="error_generic_message">Произошла ошибка, попробуйте позже</string>
+    <string name="error_details_show">Показать подробности</string>
+    <string name="error_details_hide">Скрыть подробности</string>
+    <string name="error_trace_id_label">Код ошибки</string>
+    <string name="error_trace_id_copied">Код ошибки скопирован</string>
+    <string name="error_validation_title">Проверьте данные</string>
+    <string name="error_dialog_ok">ОК</string>
+    <string name="error_server_updating_title">Сервер обновляется</string>
+    <string name="error_server_updating_message">Сервер сейчас обновляется. Пожалуйста, подождите немного и попробуйте снова</string>
 
     <!-- Avatar picker -->
     <string name="avatar_sheet_title">Фото профиля</string>
@@ -125,6 +139,11 @@
     <string name="catalog_empty_title">Ничего не найдено</string>
     <string name="catalog_empty_subtitle">Попробуйте изменить фильтры</string>
 
+    <!-- Search screen -->
+    <string name="search_hint_title">Найдите то, что нужно</string>
+    <string name="search_hint_subtitle">Начните вводить название товара</string>
+    <string name="search_empty_subtitle">Попробуйте изменить запрос</string>
+
     <!-- Product detail screen -->
     <string name="product_added_to_cart">Товар добавлен в корзину</string>
     <string name="product_add_to_cart_price">В корзину · %1$d TJS</string>
@@ -182,10 +201,15 @@
     <string name="checkout_delivery_address_label">Адрес доставки</string>
     <string name="checkout_delivery_address_value">ул. Ленина, 45, кв. 12</string>
     <string name="checkout_pickup_store_label">Магазин RELAX</string>
-    <string name="checkout_pickup_store_value">ул. Центральная, 1</string>
+    <string name="checkout_pickup_store_value">Выберите филиал</string>
     <string name="checkout_branch_title">Филиал</string>
     <string name="checkout_branch_empty">Филиалы не найдены</string>
     <string name="checkout_time_slot_title">Время получения</string>
+    <string name="select_branch_title">Выбор филиала</string>
+    <string name="select_branch_subtitle">Выберите филиал, который будет вашим основным магазином</string>
+    <string name="select_branch_confirm">Сохранить</string>
+    <string name="select_branch_skip">Пропустить</string>
+    <string name="select_branch_empty">Филиалы пока не добавлены</string>
     <string name="checkout_slot_today_1">Сегодня 18:00 – 20:00</string>
     <string name="checkout_slot_today_2">Сегодня 20:00 – 22:00</string>
     <string name="checkout_slot_tomorrow_1">Завтра 10:00 – 12:00</string>
@@ -193,8 +217,6 @@
     <string name="checkout_payment_method_title">Способ оплаты</string>
     <string name="checkout_payment_card_title">Картой при получении</string>
     <string name="checkout_payment_card_sub">Любая карта</string>
-    <string name="checkout_payment_online_title">Онлайн-оплата</string>
-    <string name="checkout_payment_online_sub">Visa, Mastercard, СБП</string>
     <string name="checkout_payment_cash_title">Наличными</string>
     <string name="checkout_payment_cash_sub">При получении</string>
     <string name="checkout_comment_title">Комментарий к заказу</string>
@@ -247,6 +269,7 @@
 
     <!-- Order history screen -->
     <string name="order_history_title">История заказов</string>
+    <string name="order_number_label">Заказ №%1$s</string>
     <string name="order_empty_title">Заказов пока нет</string>
     <string name="order_empty_subtitle">Ваши заказы появятся здесь</string>
     <string name="order_total_label">Итого: %1$d TJS</string>
