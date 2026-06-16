@@ -5,6 +5,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import tj.dastras.data.remote.RelaxApiService
+import tj.dastras.data.remote.dataOrThrow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -21,21 +22,21 @@ class UserRepository @Inject constructor(
         cached?.let { if (!forceRefresh) return it }
         val response = api.getProfile()
         if (!response.isSuccessful) {
-            Log.w(TAG, "getOrCreate: failed code=${response.code()}")
-            localUserStore.get()?.let { return it }
+            localUserStore.get()?.let {
+                Log.w(TAG, "getOrCreate: failed code=${response.code()}, using cached profile")
+                return it
+            }
         }
-        val profile = response.body()?.data ?: UserProfile()
-        val result = profile.copy(level = computeLevel(profile.bonusBalance))
+        val profile = response.dataOrThrow()
+        val result = profile.copy(level = computeLevel(profile.totalSpent))
         cached = result
         localUserStore.save(result)
         return result
     }
 
     suspend fun updateProfile(request: UpdateProfileRequest): UserProfile {
-        val response = api.updateProfile(request)
-        if (!response.isSuccessful) Log.w(TAG, "updateProfile: failed code=${response.code()}")
-        val profile = response.body()?.data ?: UserProfile()
-        val result = profile.copy(level = computeLevel(profile.bonusBalance))
+        val profile = api.updateProfile(request).dataOrThrow()
+        val result = profile.copy(level = computeLevel(profile.totalSpent))
         cached = result
         localUserStore.save(result)
         return result
@@ -45,13 +46,17 @@ class UserRepository @Inject constructor(
     fun getCachedLocal(): UserProfile? = cached ?: localUserStore.get()
 
     /** Uploads the avatar image bytes via the backend and returns the updated profile. */
-    suspend fun uploadAvatar(bytes: ByteArray): UserProfile {
-        val body = bytes.toRequestBody("image/jpeg".toMediaType())
-        val part = MultipartBody.Part.createFormData("avatar", "avatar.jpg", body)
-        val response = api.uploadAvatar(part)
-        if (!response.isSuccessful) Log.w(TAG, "uploadAvatar: failed code=${response.code()}")
-        val profile = response.body()?.data ?: UserProfile()
-        val result = profile.copy(level = computeLevel(profile.bonusBalance))
+    suspend fun uploadAvatar(bytes: ByteArray, mimeType: String = "image/jpeg"): UserProfile {
+        val safeMimeType = mimeType.takeIf { it.startsWith("image/") } ?: "image/jpeg"
+        val extension = when (safeMimeType) {
+            "image/png"  -> "png"
+            "image/webp" -> "webp"
+            else         -> "jpg"
+        }
+        val body = bytes.toRequestBody(safeMimeType.toMediaType())
+        val part = MultipartBody.Part.createFormData("avatar", "avatar.$extension", body)
+        val profile = api.uploadAvatar(part).dataOrThrow()
+        val result = profile.copy(level = computeLevel(profile.totalSpent))
         cached = result
         localUserStore.save(result)
         return result
@@ -59,10 +64,8 @@ class UserRepository @Inject constructor(
 
     /** Removes the avatar via the backend and returns the updated profile. */
     suspend fun removeAvatar(): UserProfile {
-        val response = api.deleteAvatar()
-        if (!response.isSuccessful) Log.w(TAG, "removeAvatar: failed code=${response.code()}")
-        val profile = response.body()?.data ?: UserProfile()
-        val result = profile.copy(level = computeLevel(profile.bonusBalance))
+        val profile = api.deleteAvatar().dataOrThrow()
+        val result = profile.copy(level = computeLevel(profile.totalSpent))
         cached = result
         localUserStore.save(result)
         return result
@@ -73,7 +76,7 @@ class UserRepository @Inject constructor(
         localUserStore.clear()
     }
 
-    private fun computeLevel(bonusBalance: Double): LoyaltyLevel =
-        MockData.loyaltyLevels.lastOrNull { it.minPoints <= bonusBalance }
+    private fun computeLevel(totalSpent: Double): LoyaltyLevel =
+        MockData.loyaltyLevels.lastOrNull { it.minPoints <= totalSpent }
             ?: MockData.loyaltyLevels.first()
 }

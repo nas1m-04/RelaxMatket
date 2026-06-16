@@ -20,8 +20,10 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import tj.dastras.R
 import tj.dastras.navigation.Screen
+import tj.dastras.ui.components.activityViewModel
 import tj.dastras.ui.screens.bonuses.BonusesScreen
 import tj.dastras.ui.screens.catalog.CatalogScreen
+import tj.dastras.ui.screens.catalog.CatalogViewModel
 import tj.dastras.ui.screens.home.HomeScreen
 import tj.dastras.ui.screens.loyaltycard.LoyaltyCardScreen
 import tj.dastras.ui.screens.profile.ProfileScreen
@@ -70,12 +72,25 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
             modifier         = Modifier.padding(innerPadding),
         ) {
             composable(Screen.Home.route) {
+                val catalogViewModel: CatalogViewModel = activityViewModel()
+                val goToCatalog: () -> Unit = {
+                    bottomNavController.navigate(Screen.Catalog.route) {
+                        popUpTo(Screen.Home.route) { saveState = true }
+                        launchSingleTop = true
+                        restoreState    = true
+                    }
+                }
                 HomeScreen(
                     onProduct     = { id -> rootNavController.navigate(Screen.ProductDetail.createRoute(id)) },
                     onCart        = { rootNavController.navigate(Screen.Cart.route) },
                     onNotifications = { rootNavController.navigate(Screen.Notifications.route) },
                     onPromotions  = { rootNavController.navigate(Screen.Promotions.route) },
                     onFavorites   = { rootNavController.navigate(Screen.Favorites.route) },
+                    onSearch      = { rootNavController.navigate(Screen.Search.route) },
+                    onCategory    = { categoryId -> catalogViewModel.applyQuickFilter(categoryId = categoryId); goToCatalog() },
+                    onSeeAllPopular    = { catalogViewModel.applyQuickFilter(sortBy = "rating"); goToCatalog() },
+                    onSeeAllNew        = { catalogViewModel.applyQuickFilter(newOnly = true); goToCatalog() },
+                    onSeeAllBestOffers = { catalogViewModel.applyQuickFilter(); goToCatalog() },
                 )
             }
             composable(Screen.Catalog.route) {
@@ -95,6 +110,7 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
                     onOrders       = { rootNavController.navigate(Screen.OrderHistory.route) },
                     onFavorites    = { rootNavController.navigate(Screen.Favorites.route) },
                     onNotifications = { rootNavController.navigate(Screen.Notifications.route) },
+                    onSelectBranch = { rootNavController.navigate(Screen.SelectBranch.createRoute("settings")) },
                     onLoggedOut    = onLoggedOut,
                 )
             }

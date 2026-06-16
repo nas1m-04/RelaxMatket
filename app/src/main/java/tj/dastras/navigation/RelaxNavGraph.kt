@@ -12,6 +12,7 @@ import tj.dastras.ui.screens.splash.SplashViewModel
 import tj.dastras.ui.screens.auth.LoginScreen
 import tj.dastras.ui.screens.auth.RegisterScreen
 import tj.dastras.ui.screens.bonuses.BonusesScreen
+import tj.dastras.ui.screens.branch.SelectBranchScreen
 import tj.dastras.ui.screens.cart.CartScreen
 import tj.dastras.ui.screens.catalog.CatalogScreen
 import tj.dastras.ui.screens.checkout.CheckoutScreen
@@ -25,7 +26,9 @@ import tj.dastras.ui.screens.orders.OrderHistoryScreen
 import tj.dastras.ui.screens.product.ProductDetailScreen
 import tj.dastras.ui.screens.profile.ProfileScreen
 import tj.dastras.ui.screens.promotions.PromotionsScreen
+import tj.dastras.ui.screens.search.SearchScreen
 import tj.dastras.ui.screens.splash.SplashScreen
+import tj.dastras.ui.components.ErrorAlertDialogHost
 
 @Composable
 fun RelaxNavGraph(navController: NavHostController) {
@@ -77,8 +80,29 @@ fun RelaxNavGraph(navController: NavHostController) {
             RegisterScreen(
                 onBack = { navController.popBackStack() },
                 onNavigateToMain = {
-                    navController.navigate(Screen.Main.route) {
+                    navController.navigate(Screen.SelectBranch.createRoute("onboarding")) {
                         popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(
+            route     = Screen.SelectBranch.route,
+            arguments = listOf(navArgument("mode") { type = NavType.StringType })
+        ) { backStack ->
+            val mode = backStack.arguments?.getString("mode") ?: "settings"
+            val isOnboarding = mode == "onboarding"
+            SelectBranchScreen(
+                isOnboarding = isOnboarding,
+                onBack = { navController.popBackStack() },
+                onDone = {
+                    if (isOnboarding) {
+                        navController.navigate(Screen.Main.route) {
+                            popUpTo(Screen.SelectBranch.createRoute(mode)) { inclusive = true }
+                        }
+                    } else {
+                        navController.popBackStack()
                     }
                 }
             )
@@ -141,5 +165,14 @@ fun RelaxNavGraph(navController: NavHostController) {
         composable(Screen.OrderHistory.route) {
             OrderHistoryScreen(onBack = { navController.popBackStack() })
         }
+
+        composable(Screen.Search.route) {
+            SearchScreen(
+                onBack    = { navController.popBackStack() },
+                onProduct = { id -> navController.navigate(Screen.ProductDetail.createRoute(id)) },
+            )
+        }
     }
+
+    ErrorAlertDialogHost()
 }

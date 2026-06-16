@@ -13,6 +13,7 @@ import tj.dastras.data.Category
 import tj.dastras.data.CategoryRepository
 import tj.dastras.data.Product
 import tj.dastras.data.ProductRepository
+import tj.dastras.data.remote.ErrorPresenter
 import tj.dastras.data.remote.friendlyErrorMessage
 import javax.inject.Inject
 
@@ -45,11 +46,12 @@ class ProductDetailViewModel @Inject constructor(
             try {
                 val product    = productRepository.getById(productId)
                 val categories = categoryRepository.getAll()
-                val category   = categories.find { it.id == product?.categoryId }
+                val category   = categories.find { it.id == product.categoryId }
                 uiState = uiState.copy(product = product, category = category, isLoading = false)
             } catch (e: Exception) {
                 Log.e(TAG, "load: error", e)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
             }
         }
     }

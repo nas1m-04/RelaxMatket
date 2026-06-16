@@ -38,6 +38,10 @@ interface RelaxApiService {
     @GET("categories")
     suspend fun getCategories(): Response<ApiResponse<List<Category>>>
 
+    // ── Branches (public) ─────────────────────────────────────────────────
+    @GET("branches")
+    suspend fun getBranches(): Response<ApiResponse<List<Branch>>>
+
     // ── Banners (public) ──────────────────────────────────────────────────
     @GET("banners")
     suspend fun getBanners(): Response<ApiResponse<List<Banner>>>
@@ -88,4 +92,17 @@ interface RelaxApiService {
 
     @DELETE("favorites/{productId}")
     suspend fun removeFavorite(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
+
+    // ── Loyalty (auth required) ───────────────────────────────────────────
+    @GET("loyalty")
+    suspend fun getLoyaltySummary(): Response<ApiResponse<LoyaltySummaryResponse>>
+
+    @GET("loyalty/levels")
+    suspend fun getLoyaltyLevels(): Response<ApiResponse<List<LoyaltyLevelResponse>>>
+
+    @GET("loyalty/transactions")
+    suspend fun getBonusTransactions(
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 20,
+    ): Response<ApiResponse<PagedResponse<BonusTransactionApiResponse>>>
 }

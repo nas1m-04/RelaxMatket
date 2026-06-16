@@ -19,18 +19,32 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
-import tj.dastras.data.MockData
+import tj.dastras.ui.screens.loyalty.LoyaltyViewModel
+import tj.dastras.ui.screens.loyalty.formatMemberSince
 import tj.dastras.ui.theme.*
 
 @Composable
-fun LoyaltyCardScreen() {
-    val user  = MockData.currentUser
-    val level = user.level
-    val nextLevel = MockData.loyaltyLevels.getOrNull(MockData.loyaltyLevels.indexOf(level) + 1)
-    val progress = if (nextLevel != null) {
-        (user.bonusBalance - level.minPoints).toFloat() / (level.maxPoints - level.minPoints).toFloat()
-    } else 1f
+fun LoyaltyCardScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
+    val state   = viewModel.uiState
+    val profile = state.profile
+    val summary = state.summary
+
+    if (state.isLoading || profile == null || summary == null) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(RelaxBackground),
+            contentAlignment = Alignment.Center,
+        ) {
+            CircularProgressIndicator(color = RelaxDark)
+        }
+        return
+    }
+
+    val level     = summary.level
+    val nextLevel = summary.nextLevel
+    val progress  = summary.progressToNextLevel.toFloat()
+    val cardNumber = summary.cardNumber ?: profile.cardNumber
 
     // Shimmer for card
     val shimmer = rememberInfiniteTransition(label = "card_shimmer")
@@ -170,7 +184,7 @@ fun LoyaltyCardScreen() {
                         Spacer(Modifier.height(2.dp))
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
-                                text       = "${user.bonusBalance.toInt()}",
+                                text       = "${summary.bonusBalance.toInt()}",
                                 color      = RelaxWhite,
                                 fontSize   = 42.sp,
                                 fontWeight = FontWeight.Black,
@@ -191,11 +205,11 @@ fun LoyaltyCardScreen() {
                     ) {
                         Column {
                             Text(stringResource(R.string.loyalty_owner_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
-                            Text(user.name.uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
+                            Text(profile.name.uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                         }
                         Column(horizontalAlignment = Alignment.End) {
                             Text(stringResource(R.string.loyalty_member_since_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
-                            Text(user.memberSince.uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
+                            Text(formatMemberSince(summary.memberSince).uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -215,7 +229,7 @@ fun LoyaltyCardScreen() {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.CreditCard, null, tint = RelaxTextSecondary, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(8.dp))
-                    Text(user.cardNumber, style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary, fontFamily = FontFamily.Monospace)
+                    Text(cardNumber, style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary, fontFamily = FontFamily.Monospace)
                     Spacer(Modifier.weight(1f))
                     IconButton(onClick = {}, modifier = Modifier.size(28.dp)) {
                         Icon(Icons.Rounded.ContentCopy, null, tint = RelaxTextHint, modifier = Modifier.size(16.dp))
@@ -259,7 +273,7 @@ fun LoyaltyCardScreen() {
                     Spacer(Modifier.height(8.dp))
                     BarcodeVisual(modifier = Modifier.fillMaxWidth().height(50.dp))
                     Spacer(Modifier.height(6.dp))
-                    Text(user.cardNumber.replace("RELAX ", ""), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary, fontFamily = FontFamily.Monospace, letterSpacing = 2.sp)
+                    Text(cardNumber.replace("RELAX ", ""), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary, fontFamily = FontFamily.Monospace, letterSpacing = 2.sp)
                 }
             }
 
@@ -306,7 +320,7 @@ fun LoyaltyCardScreen() {
                     if (nextLevel != null) {
                         Spacer(Modifier.height(8.dp))
                         Text(
-                            stringResource(R.string.loyalty_progress_to_level, nextLevel.name, (nextLevel.minPoints - user.bonusBalance).toInt()),
+                            stringResource(R.string.loyalty_progress_to_level, nextLevel.name, summary.amountToNextLevel.toInt()),
                             style = MaterialTheme.typography.bodySmall,
                             color = RelaxTextSecondary,
                         )
@@ -347,11 +361,11 @@ fun LoyaltyCardScreen() {
                     modifier = Modifier.padding(24.dp),
                     horizontalArrangement = Arrangement.SpaceAround,
                 ) {
-                    StatBlock("${user.bonusBalance.toInt()}", stringResource(R.string.loyalty_stat_bonuses), RelaxGold)
+                    StatBlock("${summary.bonusBalance.toInt()}", stringResource(R.string.loyalty_stat_bonuses), RelaxGold)
                     Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
-                    StatBlock("${user.totalSpent.toInt()} TJS", stringResource(R.string.loyalty_stat_spent), RelaxWhite)
+                    StatBlock("${summary.totalSpent.toInt()} TJS", stringResource(R.string.loyalty_stat_spent), RelaxWhite)
                     Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
-                    StatBlock("${(user.bonusBalance * (level.cashbackPercent / 100)).toInt()} TJS", stringResource(R.string.loyalty_stat_cashback), RelaxOrange)
+                    StatBlock("${(summary.bonusBalance * (level.cashbackPercent / 100)).toInt()} TJS", stringResource(R.string.loyalty_stat_cashback), RelaxOrange)
                 }
             }
 

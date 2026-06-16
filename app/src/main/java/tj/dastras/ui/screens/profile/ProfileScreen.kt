@@ -39,6 +39,7 @@ fun ProfileScreen(
     onOrders: () -> Unit,
     onFavorites: () -> Unit,
     onNotifications: () -> Unit,
+    onSelectBranch: () -> Unit,
     onLoggedOut: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
@@ -52,8 +53,9 @@ fun ProfileScreen(
 
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let {
+            val mimeType = context.contentResolver.getType(it) ?: "image/jpeg"
             context.contentResolver.openInputStream(it)?.use { input ->
-                viewModel.uploadAvatar(input.readBytes())
+                viewModel.uploadAvatar(input.readBytes(), mimeType)
             }
         }
         showAvatarSheet = false
@@ -63,7 +65,7 @@ fun ProfileScreen(
         bitmap?.let {
             val stream = ByteArrayOutputStream()
             it.compress(Bitmap.CompressFormat.JPEG, 85, stream)
-            viewModel.uploadAvatar(stream.toByteArray())
+            viewModel.uploadAvatar(stream.toByteArray(), "image/jpeg")
         }
         showAvatarSheet = false
     }
@@ -199,7 +201,7 @@ fun ProfileScreen(
 
             ProfileSection(title = stringResource(R.string.section_account)) {
                 ProfileMenuItem(Icons.Rounded.Person,        stringResource(R.string.menu_personal_data), user.email.ifEmpty { stringResource(R.string.menu_not_specified) }, onClick = {})
-                ProfileMenuItem(Icons.Rounded.Home,          stringResource(R.string.menu_addresses),      stringResource(R.string.menu_addresses_count), onClick = {})
+                ProfileMenuItem(Icons.Rounded.Store,         stringResource(R.string.menu_branch),         state.branchName ?: stringResource(R.string.menu_branch_not_selected), onClick = onSelectBranch)
                 ProfileMenuItem(Icons.Rounded.Notifications, stringResource(R.string.menu_notifications),  stringResource(R.string.menu_notifications_on), onClick = onNotifications)
             }
 

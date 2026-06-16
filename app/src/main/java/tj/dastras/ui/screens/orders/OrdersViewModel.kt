@@ -12,6 +12,7 @@ import tj.dastras.data.AuthRepository
 import tj.dastras.data.MockData
 import tj.dastras.data.Order
 import tj.dastras.data.OrderRepository
+import tj.dastras.data.remote.ErrorPresenter
 import tj.dastras.data.remote.friendlyErrorMessage
 import javax.inject.Inject
 
@@ -44,6 +45,7 @@ class OrdersViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(TAG, "load: error", e)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
             }
         }
     }

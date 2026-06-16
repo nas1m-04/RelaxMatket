@@ -50,6 +50,15 @@ data class Order(
     val address: String? = null,
     val date: String = "",
     val items: List<CartItem> = emptyList(),
+    val discount: Double = 0.0,
+    val bonusesUsed: Double = 0.0,
+    val bonusEarned: Double = 0.0,
+    val bonusBalance: Double = 0.0,
+    val deliveryType: String = "delivery",
+    val timeSlot: String? = null,
+    val paymentMethod: String = "cash",
+    val comment: String? = null,
+    val promoCode: String? = null,
 )
 
 enum class OrderStatus(val label: String, val color: Long) {
@@ -109,9 +118,19 @@ data class UserProfile(
     val totalSpent: Double = 0.0,
     val memberSince: String = "",
     val favoriteIds: List<Int> = emptyList(),
+    val preferredBranchId: Int? = null,
     @kotlin.jvm.Transient val level: LoyaltyLevel = LoyaltyLevel(
         "Старт", 0, 4999, 1f, 0xFFC0C0C0L, listOf("1% кэшбэк бонусами")
     ),
+)
+
+data class Branch(
+    val id: Int = 0,
+    val name: String = "",
+    val address: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
+    val phone: String? = null,
 )
 
 // ── Request DTOs ──────────────────────────────────────────────────────────────
@@ -122,18 +141,25 @@ data class AddToCartRequest(
 )
 
 data class CreateOrderRequest(
-    val address: String,
+    val deliveryType: String = "delivery",
+    val address: String? = null,
+    val timeSlot: String? = null,
+    val paymentMethod: String = "cash",
+    val comment: String? = null,
+    val promoCode: String? = null,
+    val useBonuses: Boolean = false,
+    val branchId: Int? = null,
     val items: List<OrderItemRequest>,
 )
 
 data class OrderItemRequest(
     val productId: Int,
     val quantity: Int,
-    val price: Double,
 )
 
 data class UpdateProfileRequest(
     val name: String? = null,
     val email: String? = null,
     val avatarUrl: String? = null,
+    val preferredBranchId: Int? = null,
 )

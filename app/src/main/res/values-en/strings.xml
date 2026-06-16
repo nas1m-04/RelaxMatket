@@ -30,6 +30,8 @@
     <string name="menu_not_specified">Not specified</string>
     <string name="menu_addresses">My addresses</string>
     <string name="menu_addresses_count">1 address</string>
+    <string name="menu_branch">My branch</string>
+    <string name="menu_branch_not_selected">Not selected</string>
     <string name="menu_notifications">Notifications</string>
     <string name="menu_notifications_on">Enabled</string>
     <string name="menu_language">Language</string>
@@ -46,6 +48,18 @@
     <string name="logout_dialog_text">Are you sure you want to exit the app?</string>
     <string name="logout_confirm">Log out</string>
     <string name="logout_cancel">Cancel</string>
+
+    <!-- Error dialog -->
+    <string name="error_dialog_title">Error</string>
+    <string name="error_generic_message">Something went wrong, please try again later</string>
+    <string name="error_details_show">Show details</string>
+    <string name="error_details_hide">Hide details</string>
+    <string name="error_trace_id_label">Error code</string>
+    <string name="error_trace_id_copied">Error code copied</string>
+    <string name="error_validation_title">Check your details</string>
+    <string name="error_dialog_ok">OK</string>
+    <string name="error_server_updating_title">Server is updating</string>
+    <string name="error_server_updating_message">The server is currently being updated. Please wait a moment and try again</string>
 
     <!-- Avatar picker -->
     <string name="avatar_sheet_title">Profile photo</string>
@@ -125,6 +139,11 @@
     <string name="catalog_empty_title">Nothing found</string>
     <string name="catalog_empty_subtitle">Try changing the filters</string>
 
+    <!-- Search screen -->
+    <string name="search_hint_title">Find what you need</string>
+    <string name="search_hint_subtitle">Start typing a product name</string>
+    <string name="search_empty_subtitle">Try a different search query</string>
+
     <!-- Product detail screen -->
     <string name="product_added_to_cart">Item added to cart</string>
     <string name="product_add_to_cart_price">Add to cart · %1$d TJS</string>
@@ -182,8 +201,13 @@
     <string name="checkout_delivery_address_label">Delivery address</string>
     <string name="checkout_delivery_address_value">45 Lenina St., apt. 12</string>
     <string name="checkout_pickup_store_label">RELAX Store</string>
-    <string name="checkout_pickup_store_value">1 Tsentralnaya St.</string>
+    <string name="checkout_pickup_store_value">Select a branch</string>
     <string name="checkout_time_slot_title">Pickup time</string>
+    <string name="select_branch_title">Select branch</string>
+    <string name="select_branch_subtitle">Choose the branch that will be your default store</string>
+    <string name="select_branch_confirm">Save</string>
+    <string name="select_branch_skip">Skip</string>
+    <string name="select_branch_empty">No branches available yet</string>
     <string name="checkout_slot_today_1">Today 18:00 – 20:00</string>
     <string name="checkout_slot_today_2">Today 20:00 – 22:00</string>
     <string name="checkout_slot_tomorrow_1">Tomorrow 10:00 – 12:00</string>
@@ -191,8 +215,6 @@
     <string name="checkout_payment_method_title">Payment method</string>
     <string name="checkout_payment_card_title">Card on delivery</string>
     <string name="checkout_payment_card_sub">Any card</string>
-    <string name="checkout_payment_online_title">Online payment</string>
-    <string name="checkout_payment_online_sub">Visa, Mastercard, SBP</string>
     <string name="checkout_payment_cash_title">Cash</string>
     <string name="checkout_payment_cash_sub">On delivery</string>
     <string name="checkout_comment_title">Order comment</string>
@@ -245,6 +267,7 @@
 
     <!-- Order history screen -->
     <string name="order_history_title">Order history</string>
+    <string name="order_number_label">Order #%1$s</string>
     <string name="order_empty_title">No orders yet</string>
     <string name="order_empty_subtitle">Your orders will appear here</string>
     <string name="order_total_label">Total: %1$d TJS</string>

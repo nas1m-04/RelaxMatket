@@ -11,6 +11,7 @@ import kotlinx.coroutines.launch
 import tj.dastras.data.AuthRepository
 import tj.dastras.data.FavoritesRepository
 import tj.dastras.data.Product
+import tj.dastras.data.remote.ErrorPresenter
 import tj.dastras.data.remote.friendlyErrorMessage
 import javax.inject.Inject
 
@@ -43,6 +44,7 @@ class FavoritesViewModel @Inject constructor(
             } catch (e: Exception) {
                 Log.e(TAG, "load: error", e)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
             }
         }
     }
@@ -55,10 +57,24 @@ class FavoritesViewModel @Inject constructor(
         val isFav = uiState.favorites.any { it.id == product.id }
         if (isFav) {
             uiState = uiState.copy(favorites = uiState.favorites.filter { it.id != product.id })
-            viewModelScope.launch { favoritesRepository.remove(product.id) }
+            viewModelScope.launch {
+                try {
+                    favoritesRepository.remove(product.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "toggle: remove error", e)
+                    ErrorPresenter.report(e)
+                }
+            }
         } else {
             uiState = uiState.copy(favorites = uiState.favorites + product)
-            viewModelScope.launch { favoritesRepository.add(product.id) }
+            viewModelScope.launch {
+                try {
+                    favoritesRepository.add(product.id)
+                } catch (e: Exception) {
+                    Log.e(TAG, "toggle: add error", e)
+                    ErrorPresenter.report(e)
+                }
+            }
         }
     }
 }
