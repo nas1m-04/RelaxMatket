@@ -116,8 +116,10 @@ private fun StatusBadge(status: OrderStatus) {
 }
 
 private fun orderStatusLabel(status: OrderStatus): Int = when (status) {
-    OrderStatus.DELIVERED   -> R.string.order_status_delivered
-    OrderStatus.IN_PROGRESS -> R.string.order_status_in_progress
-    OrderStatus.PROCESSING  -> R.string.order_status_processing
-    OrderStatus.CANCELLED   -> R.string.order_status_cancelled
+    OrderStatus.PENDING    -> R.string.order_status_pending
+    OrderStatus.CONFIRMED  -> R.string.order_status_confirmed
+    OrderStatus.PREPARING  -> R.string.order_status_preparing
+    OrderStatus.DELIVERING -> R.string.order_status_in_progress
+    OrderStatus.DELIVERED  -> R.string.order_status_delivered
+    OrderStatus.CANCELLED  -> R.string.order_status_cancelled
 }

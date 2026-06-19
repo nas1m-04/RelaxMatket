@@ -4,9 +4,9 @@ import androidx.compose.ui.graphics.Color
 
 // ── RELAX Brand Core ──────────────────────────────────────────
 val RelaxDark          = Color(0xFF0F172A)
-val RelaxDarkSecondary = Color(0xFF1E293B)
-val RelaxRed           = Color(0xFFE53935)
-val RelaxOrange        = Color(0xFFFF6B35)
+val RelaxDarkSecondary = Color(0xFF1E3050)
+val RelaxRed           = Color(0xFFE8393A)
+val RelaxOrange        = Color(0xFFFF6935)
 
 // ── Surface & Background ──────────────────────────────────────
 val RelaxWhite         = Color(0xFFFFFFFF)

@@ -14,8 +14,8 @@ import tj.dastras.data.CartRepository
 import tj.dastras.data.LoyaltyRepository
 import tj.dastras.data.Product
 import tj.dastras.data.UserRepository
-import tj.dastras.data.remote.ErrorPresenter
-import tj.dastras.data.remote.friendlyErrorMessage
+import tj.dastras.core.api.ErrorPresenter
+import tj.dastras.core.api.friendlyErrorMessage
 import javax.inject.Inject
 
 private const val TAG = "CartViewModel"

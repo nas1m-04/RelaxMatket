@@ -19,14 +19,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
+import tj.dastras.ui.components.activityViewModel
 import tj.dastras.ui.screens.loyalty.LoyaltyViewModel
 import tj.dastras.ui.screens.loyalty.formatMemberSince
 import tj.dastras.ui.theme.*
 
 @Composable
-fun LoyaltyCardScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
+fun LoyaltyCardScreen(viewModel: LoyaltyViewModel = activityViewModel()) {
     val state   = viewModel.uiState
     val profile = state.profile
     val summary = state.summary

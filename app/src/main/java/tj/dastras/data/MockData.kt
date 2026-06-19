@@ -239,7 +239,7 @@ object MockData {
             date = "Сегодня, 14:23",
             items = listOf(CartItem(products[0], 1), CartItem(products[4], 2)),
             total = 1687.0,
-            status = OrderStatus.PROCESSING,
+            status = OrderStatus.PENDING,
             address = "ул. Ленина, 45, кв. 12",
         ),
         Order(

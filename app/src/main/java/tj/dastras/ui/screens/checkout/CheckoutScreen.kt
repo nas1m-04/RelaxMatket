@@ -1,5 +1,8 @@
 package tj.dastras.ui.screens.checkout
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -13,8 +16,11 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.Dialog
 import tj.dastras.R
+import tj.dastras.data.Branch
 import tj.dastras.data.OrderItemRequest
 import tj.dastras.ui.components.RelaxTopBar
 import tj.dastras.ui.components.activityViewModel
@@ -37,7 +43,8 @@ fun CheckoutScreen(
     val bonusDiscount = if (cartState.useBonuses) {
         minOf(cartState.bonusBalance * cartState.bonusToCurrencyRate, subtotal * cartState.maxBonusPaymentPercent / 100.0, subtotal)
     } else 0.0
-    val total = subtotal - promoDiscount - bonusDiscount
+    val total          = subtotal - promoDiscount - bonusDiscount
+    val estimatedBonus = subtotal * state.cashbackPercent / 100.0
 
     val timeSlots = listOf(
         stringResource(R.string.checkout_slot_today_1),
@@ -46,24 +53,19 @@ fun CheckoutScreen(
         stringResource(R.string.checkout_slot_tomorrow_2),
     )
     val payments = listOf(
-        Triple("card_on_delivery", Icons.Rounded.CreditCard, stringResource(R.string.checkout_payment_card_title) to stringResource(R.string.checkout_payment_card_sub)),
-        Triple("cash", Icons.Rounded.Money,       stringResource(R.string.checkout_payment_cash_title) to stringResource(R.string.checkout_payment_cash_sub)),
+        Triple("card_on_delivery", Icons.Rounded.CreditCard,
+            stringResource(R.string.checkout_payment_card_title) to stringResource(R.string.checkout_payment_card_sub)),
+        Triple("cash", Icons.Rounded.Money,
+            stringResource(R.string.checkout_payment_cash_title) to stringResource(R.string.checkout_payment_cash_sub)),
     )
-    val defaultAddress = stringResource(R.string.checkout_delivery_address_value)
 
     LaunchedEffect(Unit) {
         if (state.timeSlot == null) viewModel.setTimeSlot(timeSlots.first())
     }
-    LaunchedEffect(state.branches) {
-        if (state.address.isBlank()) {
-            val branchAddress = state.branches.firstOrNull { it.id == state.selectedBranchId }?.address
-            viewModel.setAddress(branchAddress ?: defaultAddress)
-        }
-    }
 
     if (state.order != null) {
         OrderSuccessScreen(
-            bonusEarned = state.order.bonusEarned.toInt(),
+            bonusEarned = state.order.bonusEarned,
             onDone = {
                 cartViewModel.clear()
                 viewModel.reset()
@@ -71,6 +73,17 @@ fun CheckoutScreen(
             },
         )
         return
+    }
+
+    if (state.showAddressPrompt) {
+        AddressPromptDialog(
+            onConfirm = { addr ->
+                val items = cartState.items.map { OrderItemRequest(productId = it.product.id, quantity = it.quantity) }
+                val promoCode = if (cartState.promoApplied) cartState.promoCode else null
+                viewModel.confirmAddressAndSubmit(addr, items, cartState.useBonuses, promoCode)
+            },
+            onDismiss = { viewModel.dismissAddressPrompt() },
+        )
     }
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
@@ -85,7 +98,8 @@ fun CheckoutScreen(
                 .padding(20.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            // Delivery type toggle
+
+            // ── 1. Delivery method ──────────────────────────────────────────
             SectionCard(title = stringResource(R.string.checkout_delivery_method_title)) {
                 Row(
                     modifier = Modifier
@@ -116,26 +130,23 @@ fun CheckoutScreen(
                         }
                     }
                 }
-                Spacer(Modifier.height(14.dp))
 
-                if (state.deliveryType == "delivery") {
-                    var branchMenuExpanded by remember { mutableStateOf(false) }
-                    ExposedDropdownMenuBox(
-                        expanded         = branchMenuExpanded,
-                        onExpandedChange = { if (state.branches.isNotEmpty()) branchMenuExpanded = it },
-                    ) {
+                // Delivery address — free text, shown only for delivery
+                AnimatedVisibility(
+                    visible = state.deliveryType == "delivery",
+                    enter   = expandVertically(),
+                    exit    = shrinkVertically(),
+                ) {
+                    Column {
+                        Spacer(Modifier.height(14.dp))
                         OutlinedTextField(
                             value         = state.address,
                             onValueChange = { viewModel.setAddress(it) },
                             label         = { Text(stringResource(R.string.checkout_delivery_address_label), color = RelaxTextSecondary) },
+                            placeholder   = { Text(stringResource(R.string.checkout_address_placeholder), color = RelaxTextHint, fontSize = 13.sp) },
                             leadingIcon   = { Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed) },
-                            trailingIcon  = {
-                                if (state.branches.isNotEmpty()) {
-                                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = branchMenuExpanded)
-                                }
-                            },
                             singleLine    = true,
-                            modifier      = Modifier.fillMaxWidth().menuAnchor(),
+                            modifier      = Modifier.fillMaxWidth(),
                             shape         = RoundedCornerShape(14.dp),
                             colors        = OutlinedTextFieldDefaults.colors(
                                 focusedBorderColor      = RelaxDark,
@@ -143,170 +154,85 @@ fun CheckoutScreen(
                                 focusedContainerColor   = RelaxWhite,
                                 unfocusedContainerColor = RelaxInputBg,
                             ),
-                            textStyle = MaterialTheme.typography.bodyMedium.copy(color = RelaxTextPrimary, fontWeight = FontWeight.Medium),
+                            textStyle = MaterialTheme.typography.bodyMedium.copy(
+                                color      = RelaxTextPrimary,
+                                fontWeight = FontWeight.Medium,
+                            ),
                         )
-                        ExposedDropdownMenu(
-                            expanded         = branchMenuExpanded,
-                            onDismissRequest = { branchMenuExpanded = false },
-                        ) {
-                            state.branches.forEach { branch ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Column {
-                                            Text(branch.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
-                                            Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
-                                        }
-                                    },
-                                    onClick = {
-                                        viewModel.setBranch(branch.id)
-                                        branchMenuExpanded = false
-                                    },
-                                )
-                            }
-                        }
-                    }
-                } else {
-                    var branchMenuExpanded by remember { mutableStateOf(false) }
-                    val selectedBranch = state.branches.firstOrNull { it.id == state.selectedBranchId }
-                    ExposedDropdownMenuBox(
-                        expanded         = branchMenuExpanded,
-                        onExpandedChange = { if (state.branches.isNotEmpty()) branchMenuExpanded = it },
-                    ) {
+                        Spacer(Modifier.height(8.dp))
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .menuAnchor()
-                                .clip(RoundedCornerShape(14.dp))
-                                .background(RelaxInputBg)
-                                .clickable(enabled = state.branches.isNotEmpty()) { branchMenuExpanded = true }
-                                .padding(14.dp),
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable { viewModel.toggleSaveAddress() }
+                                .padding(vertical = 4.dp, horizontal = 2.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(Icons.Rounded.Store, null, tint = RelaxDark, modifier = Modifier.size(22.dp))
-                            Spacer(Modifier.width(10.dp))
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(stringResource(R.string.checkout_pickup_store_label), style = MaterialTheme.typography.labelSmall, color = RelaxTextSecondary)
-                                Text(
-                                    selectedBranch?.name ?: stringResource(R.string.checkout_pickup_store_value),
-                                    style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium,
-                                )
-                                selectedBranch?.let {
-                                    Text(it.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
-                                }
-                            }
-                            if (state.branches.isNotEmpty()) {
-                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = branchMenuExpanded)
-                            }
-                        }
-                        ExposedDropdownMenu(
-                            expanded         = branchMenuExpanded,
-                            onDismissRequest = { branchMenuExpanded = false },
-                        ) {
-                            state.branches.forEach { branch ->
-                                DropdownMenuItem(
-                                    text = {
-                                        Column {
-                                            Text(branch.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Medium)
-                                            Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
-                                        }
-                                    },
-                                    onClick = {
-                                        viewModel.setBranch(branch.id)
-                                        branchMenuExpanded = false
-                                    },
-                                )
-                            }
+                            Checkbox(
+                                checked        = state.saveAddress,
+                                onCheckedChange = { viewModel.toggleSaveAddress() },
+                                colors         = CheckboxDefaults.colors(
+                                    checkedColor   = RelaxDark,
+                                    uncheckedColor = RelaxTextHint,
+                                ),
+                                modifier = Modifier.size(20.dp),
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                stringResource(R.string.checkout_save_address),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = RelaxTextSecondary,
+                            )
                         }
                     }
                 }
             }
 
-            // Branch (filial) where the order will be processed
-            SectionCard(title = stringResource(R.string.checkout_branch_title)) {
-                if (state.branches.isEmpty()) {
-                    Text(stringResource(R.string.checkout_branch_empty), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
-                } else {
-                    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                        state.branches.forEach { branch ->
-                            val selected = state.selectedBranchId == branch.id
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(if (selected) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
-                                    .border(
-                                        width = 1.5.dp,
-                                        color = if (selected) RelaxDark else RelaxDivider,
-                                        shape = RoundedCornerShape(12.dp),
-                                    )
-                                    .clickable { viewModel.setBranch(branch.id) }
-                                    .padding(horizontal = 14.dp, vertical = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically,
-                            ) {
-                                RadioButton(
-                                    selected = selected,
-                                    onClick  = { viewModel.setBranch(branch.id) },
-                                    colors   = RadioButtonDefaults.colors(selectedColor = RelaxDark),
-                                    modifier = Modifier.size(20.dp),
-                                )
-                                Spacer(Modifier.width(10.dp))
-                                Column(modifier = Modifier.weight(1f)) {
-                                    Text(branch.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal)
-                                    Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // Time slot
+            // ── 2. Time slot ────────────────────────────────────────────────
             SectionCard(title = stringResource(R.string.checkout_time_slot_title)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     timeSlots.forEach { slot ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clip(RoundedCornerShape(12.dp))
-                                .background(if (state.timeSlot == slot) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
-                                .border(
-                                    width = 1.5.dp,
-                                    color = if (state.timeSlot == slot) RelaxDark else RelaxDivider,
-                                    shape = RoundedCornerShape(12.dp),
-                                )
-                                .clickable { viewModel.setTimeSlot(slot) }
-                                .padding(horizontal = 14.dp, vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            RadioButton(
-                                selected = state.timeSlot == slot,
-                                onClick  = { viewModel.setTimeSlot(slot) },
-                                colors   = RadioButtonDefaults.colors(selectedColor = RelaxDark),
-                                modifier = Modifier.size(20.dp),
-                            )
-                            Spacer(Modifier.width(10.dp))
-                            Text(slot, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = if (state.timeSlot == slot) FontWeight.SemiBold else FontWeight.Normal)
-                        }
-                    }
-                }
-            }
-
-            // Payment method
-            SectionCard(title = stringResource(R.string.checkout_payment_method_title)) {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    payments.forEach { (value, icon, texts) ->
-                        val (title, sub) = texts
-                        val selected = state.paymentMethod == value
+                        val selected = state.timeSlot == slot
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clip(RoundedCornerShape(12.dp))
                                 .background(if (selected) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
-                                .border(
-                                    width = 1.5.dp,
-                                    color = if (selected) RelaxDark else RelaxDivider,
-                                    shape = RoundedCornerShape(12.dp),
-                                )
+                                .border(1.5.dp, if (selected) RelaxDark else RelaxDivider, RoundedCornerShape(12.dp))
+                                .clickable { viewModel.setTimeSlot(slot) }
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            RadioButton(
+                                selected = selected,
+                                onClick  = { viewModel.setTimeSlot(slot) },
+                                colors   = RadioButtonDefaults.colors(selectedColor = RelaxDark),
+                                modifier = Modifier.size(20.dp),
+                            )
+                            Spacer(Modifier.width(10.dp))
+                            Text(
+                                slot,
+                                style      = MaterialTheme.typography.bodyMedium,
+                                color      = RelaxTextPrimary,
+                                fontWeight = if (selected) FontWeight.SemiBold else FontWeight.Normal,
+                            )
+                        }
+                    }
+                }
+            }
+
+            // ── 3. Payment ──────────────────────────────────────────────────
+            SectionCard(title = stringResource(R.string.checkout_payment_method_title)) {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    payments.forEach { (value, icon, texts) ->
+                        val (title, sub) = texts
+                        val selected     = state.paymentMethod == value
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(if (selected) RelaxDark.copy(alpha = 0.06f) else Color.Transparent)
+                                .border(1.5.dp, if (selected) RelaxDark else RelaxDivider, RoundedCornerShape(12.dp))
                                 .clickable { viewModel.setPaymentMethod(value) }
                                 .padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -333,52 +259,103 @@ fun CheckoutScreen(
                 }
             }
 
-            // Comment
+            // ── 4. Comment ──────────────────────────────────────────────────
             SectionCard(title = stringResource(R.string.checkout_comment_title)) {
                 OutlinedTextField(
                     value         = state.comment,
                     onValueChange = { viewModel.setComment(it) },
-                    placeholder   = { Text(stringResource(R.string.checkout_comment_placeholder), color = RelaxTextHint, fontSize = 14.sp) },
-                    modifier      = Modifier.fillMaxWidth().height(100.dp),
+                    placeholder   = { Text(stringResource(R.string.checkout_comment_placeholder), color = RelaxTextHint, fontSize = 13.sp) },
+                    modifier      = Modifier.fillMaxWidth().height(96.dp),
                     shape         = RoundedCornerShape(12.dp),
                     colors        = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor       = RelaxDark,
-                        unfocusedBorderColor     = RelaxDivider,
-                        focusedContainerColor    = RelaxWhite,
-                        unfocusedContainerColor  = RelaxInputBg,
+                        focusedBorderColor      = RelaxDark,
+                        unfocusedBorderColor    = RelaxDivider,
+                        focusedContainerColor   = RelaxWhite,
+                        unfocusedContainerColor = RelaxInputBg,
                     ),
                     textStyle = MaterialTheme.typography.bodyMedium.copy(color = RelaxTextPrimary),
                 )
             }
+
+            // ── 5. Branch selection (bottom, beautiful dropdown) ────────────
+            val branchTitle = if (state.deliveryType == "pickup")
+                stringResource(R.string.checkout_branch_pickup_title)
+            else
+                stringResource(R.string.checkout_branch_delivery_title)
+
+            SectionCard(title = branchTitle) {
+                BranchDropdown(
+                    branches         = state.branches,
+                    selectedBranchId = state.selectedBranchId,
+                    onSelect         = { viewModel.setBranch(it) },
+                )
+            }
         }
 
-        // Confirm button
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(RelaxWhite)
-                .navigationBarsPadding()
-                .padding(horizontal = 20.dp, vertical = 16.dp)
+        // ── Bottom bar ──────────────────────────────────────────────────────
+        Surface(
+            modifier   = Modifier.fillMaxWidth(),
+            color      = RelaxWhite,
+            shadowElevation = 12.dp,
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Column(
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+            ) {
+                // Bonus preview
+                if (estimatedBonus > 0.0) {
+                    Row(
+                        modifier              = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment     = Alignment.CenterVertically,
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Rounded.Stars, null, tint = Color(0xFFD4AF37), modifier = Modifier.size(15.dp))
+                            Spacer(Modifier.width(4.dp))
+                            Text(
+                                stringResource(R.string.checkout_bonus_preview_label),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = RelaxTextSecondary,
+                            )
+                        }
+                        Text(
+                            stringResource(R.string.checkout_bonus_preview_value, "%.2f".format(estimatedBonus)),
+                            style      = MaterialTheme.typography.bodySmall,
+                            color      = Color(0xFFD4AF37),
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                    HorizontalDivider(color = RelaxDivider)
+                }
+
+                // Total
+                Row(
+                    modifier              = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment     = Alignment.CenterVertically,
+                ) {
                     Text(stringResource(R.string.checkout_total_label), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                     Text("${total.toInt()} TJS", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                 }
+
+                // Error
                 state.error?.let {
-                    Text(it, style = MaterialTheme.typography.bodySmall, color = RelaxRed)
+                    Text(it, style = MaterialTheme.typography.bodySmall, color = RelaxRed, textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
                 }
-                val deliveryAddress = stringResource(R.string.checkout_delivery_address_value)
+
+                // Confirm button
                 Button(
                     onClick  = {
-                        val items = cartState.items.map { OrderItemRequest(productId = it.product.id, quantity = it.quantity) }
+                        val items     = cartState.items.map { OrderItemRequest(productId = it.product.id, quantity = it.quantity) }
                         val promoCode = if (cartState.promoApplied) cartState.promoCode else null
                         viewModel.submitOrder(items, cartState.useBonuses, promoCode)
                     },
-                    enabled   = !state.isSubmitting && cartState.items.isNotEmpty(),
-                    modifier  = Modifier.fillMaxWidth().height(56.dp),
-                    shape     = RoundedCornerShape(16.dp),
-                    colors    = ButtonDefaults.buttonColors(containerColor = RelaxRed),
+                    enabled  = !state.isSubmitting && cartState.items.isNotEmpty(),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape    = RoundedCornerShape(16.dp),
+                    colors   = ButtonDefaults.buttonColors(containerColor = RelaxRed),
                 ) {
                     if (state.isSubmitting) {
                         CircularProgressIndicator(modifier = Modifier.size(22.dp), color = RelaxWhite, strokeWidth = 2.dp)
@@ -386,6 +363,126 @@ fun CheckoutScreen(
                         Text(stringResource(R.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun BranchDropdown(
+    branches: List<Branch>,
+    selectedBranchId: Int?,
+    onSelect: (Int) -> Unit,
+) {
+    var expanded by remember { mutableStateOf(false) }
+    val selectedBranch = branches.firstOrNull { it.id == selectedBranchId }
+
+    ExposedDropdownMenuBox(
+        expanded         = expanded,
+        onExpandedChange = { if (branches.isNotEmpty()) expanded = it },
+    ) {
+        // Trigger row
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+                .clip(RoundedCornerShape(14.dp))
+                .border(
+                    width = 1.5.dp,
+                    color = if (expanded) RelaxDark else RelaxDivider,
+                    shape = RoundedCornerShape(14.dp),
+                )
+                .background(RelaxInputBg)
+                .clickable(enabled = branches.isNotEmpty()) { expanded = true }
+                .padding(14.dp),
+        ) {
+            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(44.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(if (selectedBranch != null) RelaxDark else RelaxSurfaceAlt),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        Icons.Rounded.Store, null,
+                        tint     = if (selectedBranch != null) RelaxWhite else RelaxTextSecondary,
+                        modifier = Modifier.size(22.dp),
+                    )
+                }
+                Spacer(Modifier.width(12.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    if (selectedBranch != null) {
+                        Text(
+                            selectedBranch.name,
+                            style      = MaterialTheme.typography.bodyMedium,
+                            color      = RelaxTextPrimary,
+                            fontWeight = FontWeight.SemiBold,
+                        )
+                        Text(selectedBranch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                    } else {
+                        Text(
+                            text  = if (branches.isEmpty()) "Загрузка..." else stringResource(R.string.checkout_pickup_store_value),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = RelaxTextHint,
+                        )
+                    }
+                }
+                if (branches.isNotEmpty()) {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                }
+            }
+        }
+
+        // Dropdown list
+        ExposedDropdownMenu(
+            expanded         = expanded,
+            onDismissRequest = { expanded = false },
+            modifier         = Modifier.background(RelaxWhite),
+        ) {
+            branches.forEachIndexed { index, branch ->
+                val isSelected = branch.id == selectedBranchId
+                if (index > 0) {
+                    HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp), color = RelaxDivider, thickness = 0.5.dp)
+                }
+                DropdownMenuItem(
+                    text = {
+                        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+                            Box(
+                                modifier = Modifier
+                                    .size(38.dp)
+                                    .clip(RoundedCornerShape(10.dp))
+                                    .background(if (isSelected) RelaxDark else RelaxSurfaceAlt),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    if (isSelected) Icons.Rounded.CheckCircle else Icons.Rounded.Store,
+                                    null,
+                                    tint     = if (isSelected) RelaxWhite else RelaxTextSecondary,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
+                            Spacer(Modifier.width(12.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    branch.name,
+                                    style      = MaterialTheme.typography.bodyMedium,
+                                    color      = RelaxTextPrimary,
+                                    fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Medium,
+                                )
+                                Text(branch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                            }
+                            if (isSelected) {
+                                Spacer(Modifier.width(6.dp))
+                                Icon(Icons.Rounded.RadioButtonChecked, null, tint = RelaxDark, modifier = Modifier.size(18.dp))
+                            }
+                        }
+                    },
+                    onClick          = { onSelect(branch.id); expanded = false },
+                    modifier         = Modifier.background(if (isSelected) RelaxDark.copy(alpha = 0.05f) else Color.Transparent),
+                    contentPadding   = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+                )
             }
         }
     }
@@ -408,12 +505,15 @@ private fun SectionCard(title: String, content: @Composable ColumnScope.() -> Un
 }
 
 @Composable
-private fun OrderSuccessScreen(bonusEarned: Int, onDone: () -> Unit) {
+private fun OrderSuccessScreen(bonusEarned: Double, onDone: () -> Unit) {
     Box(
-        modifier          = Modifier.fillMaxSize().background(RelaxBackground),
-        contentAlignment  = Alignment.Center,
+        modifier         = Modifier.fillMaxSize().background(RelaxBackground),
+        contentAlignment = Alignment.Center,
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(32.dp)) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier            = Modifier.padding(32.dp),
+        ) {
             Box(
                 modifier = Modifier
                     .size(120.dp)
@@ -424,12 +524,40 @@ private fun OrderSuccessScreen(bonusEarned: Int, onDone: () -> Unit) {
                 Text("✅", fontSize = 56.sp)
             }
             Spacer(Modifier.height(24.dp))
-            Text(stringResource(R.string.checkout_success_title), style = MaterialTheme.typography.displaySmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+            Text(
+                stringResource(R.string.checkout_success_title),
+                style      = MaterialTheme.typography.displaySmall,
+                color      = RelaxTextPrimary,
+                fontWeight = FontWeight.Bold,
+            )
             Spacer(Modifier.height(8.dp))
-            Text(stringResource(R.string.checkout_success_subtitle), color = RelaxTextSecondary, style = MaterialTheme.typography.bodyLarge, textAlign = androidx.compose.ui.text.style.TextAlign.Center, lineHeight = 24.sp)
+            Text(
+                stringResource(R.string.checkout_success_subtitle),
+                color     = RelaxTextSecondary,
+                style     = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+            )
             Spacer(Modifier.height(32.dp))
-            if (bonusEarned > 0) {
-                Text(stringResource(R.string.checkout_bonus_earned, bonusEarned), color = Color(0xFFD4AF37), style = MaterialTheme.typography.titleSmall, fontWeight = FontWeight.Bold)
+            if (bonusEarned > 0.0) {
+                val bonusDisplay = "%.2f".format(bonusEarned)
+                Box(
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color(0xFFFFFBEB))
+                        .padding(horizontal = 20.dp, vertical = 10.dp),
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Rounded.Stars, null, tint = Color(0xFFD4AF37), modifier = Modifier.size(20.dp))
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            stringResource(R.string.checkout_bonus_earned, bonusDisplay),
+                            color      = Color(0xFFD4AF37),
+                            style      = MaterialTheme.typography.titleSmall,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
                 Spacer(Modifier.height(32.dp))
             }
             Button(
@@ -439,6 +567,79 @@ private fun OrderSuccessScreen(bonusEarned: Int, onDone: () -> Unit) {
                 colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
             ) {
                 Text(stringResource(R.string.checkout_go_home), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+            }
+        }
+    }
+}
+
+@Composable
+private fun AddressPromptDialog(
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
+    var address by remember { mutableStateOf("") }
+
+    Dialog(onDismissRequest = onDismiss) {
+        Card(
+            shape     = RoundedCornerShape(24.dp),
+            colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
+            elevation = CardDefaults.cardElevation(8.dp),
+        ) {
+            Column(modifier = Modifier.padding(24.dp)) {
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Brush.linearGradient(listOf(RelaxRed, RelaxOrange))),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(Icons.Rounded.LocationOn, null, tint = RelaxWhite, modifier = Modifier.size(32.dp))
+                }
+                Spacer(Modifier.height(16.dp))
+                Text(
+                    stringResource(R.string.checkout_address_prompt_title),
+                    style      = MaterialTheme.typography.titleLarge,
+                    color      = RelaxTextPrimary,
+                    fontWeight = FontWeight.Bold,
+                )
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    stringResource(R.string.checkout_address_prompt_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = RelaxTextSecondary,
+                )
+                Spacer(Modifier.height(20.dp))
+                OutlinedTextField(
+                    value         = address,
+                    onValueChange = { address = it },
+                    label         = { Text(stringResource(R.string.checkout_delivery_address_label)) },
+                    placeholder   = { Text(stringResource(R.string.checkout_address_placeholder), fontSize = 13.sp) },
+                    leadingIcon   = { Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed) },
+                    singleLine    = true,
+                    modifier      = Modifier.fillMaxWidth(),
+                    shape         = RoundedCornerShape(14.dp),
+                    colors        = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor      = RelaxDark,
+                        unfocusedBorderColor    = RelaxDivider,
+                        focusedContainerColor   = RelaxWhite,
+                        unfocusedContainerColor = RelaxInputBg,
+                    ),
+                )
+                Spacer(Modifier.height(20.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(R.string.cancel), color = RelaxTextSecondary)
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick  = { if (address.isNotBlank()) onConfirm(address) },
+                        enabled  = address.isNotBlank(),
+                        shape    = RoundedCornerShape(12.dp),
+                        colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
+                    ) {
+                        Text(stringResource(R.string.checkout_address_prompt_confirm), fontWeight = FontWeight.Bold)
+                    }
+                }
             }
         }
     }

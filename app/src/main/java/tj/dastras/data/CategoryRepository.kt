@@ -1,7 +1,7 @@
 package tj.dastras.data
 
-import tj.dastras.data.remote.RelaxApiService
-import tj.dastras.data.remote.dataOrThrow
+import tj.dastras.core.api.RelaxApiService
+import tj.dastras.core.api.dataOrThrow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -9,6 +9,10 @@ import javax.inject.Singleton
 class CategoryRepository @Inject constructor(
     private val api: RelaxApiService,
 ) {
-    suspend fun getAll(): List<Category> =
-        api.getCategories().dataOrThrow()
+    @Volatile private var cached: List<Category>? = null
+
+    suspend fun getAll(): List<Category> {
+        cached?.let { return it }
+        return api.getCategories().dataOrThrow().also { cached = it }
+    }
 }

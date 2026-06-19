@@ -4,10 +4,12 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -19,12 +21,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import tj.dastras.R
-import tj.dastras.data.remote.BonusTransactionApiResponse
+import tj.dastras.core.api.AchievementApiResponse
+import tj.dastras.core.api.BonusTransactionApiResponse
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.screens.loyalty.LoyaltyViewModel
 import tj.dastras.ui.screens.loyalty.formatTransactionDate
 import tj.dastras.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
     val state = viewModel.uiState
@@ -41,8 +45,27 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
         return
     }
 
-    val transactions = state.transactions
-    val level = summary.level
+    val transactions  = state.transactions
+    val achievements  = state.achievements
+    val level         = summary.level
+    val listState     = rememberLazyListState()
+    val refreshing = state.isLoading
+    val pullState = rememberPullToRefreshState()
+    // Auto-load next page when user scrolls near the bottom
+    val shouldLoadMore = remember {
+        derivedStateOf {
+            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+            val total       = listState.layoutInfo.totalItemsCount
+            total > 0 && lastVisible >= total - 3
+        }
+    }
+    LaunchedEffect(shouldLoadMore.value) {
+        if (shouldLoadMore.value) viewModel.loadMoreTransactions()
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.onScreenVisible()
+    }
 
     Column(
         modifier = Modifier
@@ -72,7 +95,7 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("⭐", fontSize = 28.sp)
-                        Text("${summary.bonusBalance.toInt()}", color = RelaxWhite, fontSize = 36.sp, fontWeight = FontWeight.Black)
+                        Text(formatBonus(summary.bonusBalance), color = RelaxWhite, fontSize = 36.sp, fontWeight = FontWeight.Black)
                         Text(stringResource(R.string.bonuses_points), color = RelaxTextOnDarkSub, fontSize = 12.sp)
                     }
                 }
@@ -93,6 +116,7 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
 
         // Levels carousel
         LazyColumn(
+            state           = listState,
             modifier        = Modifier.fillMaxSize(),
             contentPadding  = PaddingValues(bottom = 24.dp),
         ) {
@@ -120,20 +144,26 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
             }
 
             // Achievements
-            item {
-                Spacer(Modifier.height(24.dp))
-                Text(stringResource(R.string.bonuses_achievements_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary, modifier = Modifier.padding(horizontal = 20.dp))
-                Spacer(Modifier.height(12.dp))
-                Row(
-                    modifier        = Modifier
-                        .horizontalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                ) {
-                    AchievementChip("🛒", stringResource(R.string.bonuses_achievement_first_purchase), true)
-                    AchievementChip("🔥", stringResource(R.string.bonuses_achievement_10_purchases), true)
-                    AchievementChip("💎", stringResource(R.string.bonuses_achievement_50_purchases), false)
-                    AchievementChip("👑", stringResource(R.string.bonuses_achievement_vip), false)
+            if (achievements.isNotEmpty()) {
+                item {
+                    Spacer(Modifier.height(24.dp))
+                    Text(
+                        stringResource(R.string.bonuses_achievements_title),
+                        style    = MaterialTheme.typography.headlineSmall,
+                        color    = RelaxTextPrimary,
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                    )
+                    Spacer(Modifier.height(12.dp))
+                    Row(
+                        modifier              = Modifier
+                            .horizontalScroll(rememberScrollState())
+                            .padding(horizontal = 20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        achievements.forEach { achievement ->
+                            AchievementCard(achievement)
+                        }
+                    }
                 }
             }
 
@@ -176,8 +206,73 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
             else
                 transactions.filter { !it.isCredit }
 
-            items(filtered) { tx ->
+            // Count badge
+            if (state.transactionTotal > 0) {
+                item {
+                    val typeLabel = if (activeTab == 0)
+                        "начислений"
+                    else
+                        "списаний"
+                    Text(
+                        "Всего ${filtered.size} $typeLabel из ${state.transactionTotal}",
+                        style    = MaterialTheme.typography.bodySmall,
+                        color    = RelaxTextHint,
+                        modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
+                    )
+                }
+            }
+
+            items(filtered, key = { it.id }) { tx ->
                 BonusTransactionItem(tx)
+            }
+
+            // Empty state for the current tab
+            if (filtered.isEmpty() && !state.isLoading) {
+                item {
+                    Column(
+                        modifier            = Modifier.fillMaxWidth().padding(40.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(if (activeTab == 0) "💰" else "💸", fontSize = 40.sp)
+                        Spacer(Modifier.height(12.dp))
+                        Text(
+                            if (activeTab == 0) "Начислений пока нет" else "Списаний пока нет",
+                            style      = MaterialTheme.typography.titleMedium,
+                            color      = RelaxTextPrimary,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Spacer(Modifier.height(4.dp))
+                        Text(
+                            if (activeTab == 0) "Бонусы начислятся после первого заказа" else "Здесь появятся ваши траты бонусов",
+                            style     = MaterialTheme.typography.bodySmall,
+                            color     = RelaxTextSecondary,
+                            textAlign = TextAlign.Center,
+                        )
+                    }
+                }
+            }
+
+            // Load-more footer
+            if (state.isLoadingMore) {
+                item {
+                    Box(
+                        modifier         = Modifier.fillMaxWidth().padding(16.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        CircularProgressIndicator(modifier = Modifier.size(24.dp), color = RelaxDark, strokeWidth = 2.dp)
+                    }
+                }
+            } else if (state.hasMoreTransactions && filtered.isNotEmpty()) {
+                item {
+                    Box(
+                        modifier         = Modifier.fillMaxWidth().padding(12.dp),
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        TextButton(onClick = { viewModel.loadMoreTransactions() }) {
+                            Text("Показать ещё", color = RelaxDark, fontWeight = FontWeight.SemiBold)
+                        }
+                    }
+                }
             }
         }
     }
@@ -248,19 +343,49 @@ private fun LevelCard(name: String, cashback: Double, minSpent: Double, color: C
 }
 
 @Composable
-private fun AchievementChip(emoji: String, label: String, unlocked: Boolean) {
+private fun AchievementCard(achievement: AchievementApiResponse) {
+    val unlocked = achievement.unlocked
+
     Column(
         modifier = Modifier
-            .width(80.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .width(96.dp)
+            .clip(RoundedCornerShape(18.dp))
             .background(if (unlocked) RelaxDark else RelaxSurfaceAlt)
-            .padding(12.dp)
-            .alpha(if (unlocked) 1f else 0.5f),
+            .alpha(if (unlocked) 1f else 0.85f)
+            .padding(12.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(emoji, fontSize = 28.sp)
-        Spacer(Modifier.height(6.dp))
-        Text(label, color = if (unlocked) RelaxWhite else RelaxTextSecondary, fontSize = 9.sp, textAlign = TextAlign.Center, lineHeight = 12.sp)
+        Box(
+            modifier = Modifier
+                .size(48.dp)
+                .clip(RoundedCornerShape(14.dp))
+                .background(if (unlocked) RelaxWhite.copy(alpha = 0.15f) else RelaxWhite.copy(alpha = 0.6f)),
+            contentAlignment = Alignment.Center,
+        ) {
+            Text(achievement.emoji, fontSize = 24.sp)
+        }
+        Spacer(Modifier.height(8.dp))
+        Text(
+            achievement.title,
+            color      = if (unlocked) RelaxWhite else RelaxTextPrimary,
+            fontSize   = 10.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign  = TextAlign.Center,
+            lineHeight = 13.sp,
+        )
+        if (achievement.bonusReward > 0) {
+            Spacer(Modifier.height(4.dp))
+            Text(
+                "+${achievement.bonusReward}",
+                color      = if (unlocked) RelaxGold else RelaxTextHint,
+                fontSize   = 10.sp,
+                fontWeight = FontWeight.Bold,
+            )
+        }
+        if (unlocked) {
+            Spacer(Modifier.height(4.dp))
+            Text("✓ Выполнено", color = RelaxWhite.copy(alpha = 0.7f), fontSize = 9.sp)
+        }
     }
 }
 
@@ -293,7 +418,7 @@ private fun BonusTransactionItem(tx: BonusTransactionApiResponse) {
             Text(formatTransactionDate(tx.createdAt), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
         }
         Text(
-            text       = "${if (tx.isCredit) "+" else "−"}${tx.amount.toInt()}",
+            text       = "${if (tx.isCredit) "+" else "−"}${formatBonus(tx.amount)}",
             fontSize   = 16.sp,
             fontWeight = FontWeight.Bold,
             color      = if (tx.isCredit) RelaxSuccess else RelaxError,
@@ -301,6 +426,8 @@ private fun BonusTransactionItem(tx: BonusTransactionApiResponse) {
     }
     RelaxDivider(modifier = Modifier.padding(horizontal = 20.dp))
 }
+
+private fun formatBonus(amount: Double): String = "%.2f".format(amount)
 
 private val CircleShape    = RoundedCornerShape(50)
 private val RelaxSuccessBg = Color(0xFFDCFCE7)

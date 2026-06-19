@@ -1,8 +1,8 @@
 package tj.dastras.data
 
-import tj.dastras.data.remote.OrderApiResponse
-import tj.dastras.data.remote.RelaxApiService
-import tj.dastras.data.remote.dataOrThrow
+import tj.dastras.core.api.OrderApiResponse
+import tj.dastras.core.api.RelaxApiService
+import tj.dastras.core.api.dataOrThrow
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -23,8 +23,17 @@ class OrderRepository @Inject constructor(
 private fun OrderApiResponse.toOrder() = Order(
     id            = id,
     userUid       = userUid,
+    subtotal      = if (subtotal > 0) subtotal else total,
     total         = total,
-    status        = runCatching { OrderStatus.valueOf(status) }.getOrDefault(OrderStatus.PROCESSING),
+    status        = when (status.lowercase()) {
+        "pending"    -> OrderStatus.PENDING
+        "confirmed"  -> OrderStatus.CONFIRMED
+        "preparing"  -> OrderStatus.PREPARING
+        "delivering" -> OrderStatus.DELIVERING
+        "delivered"  -> OrderStatus.DELIVERED
+        "cancelled"  -> OrderStatus.CANCELLED
+        else         -> OrderStatus.PENDING
+    },
     address       = address,
     date          = createdAt,
     items         = items.mapNotNull { item ->
@@ -34,6 +43,7 @@ private fun OrderApiResponse.toOrder() = Order(
     bonusesUsed   = bonusesUsed,
     bonusEarned   = bonusEarned,
     bonusBalance  = bonusBalance,
+    bonusSettled  = bonusSettled,
     deliveryType  = deliveryType,
     timeSlot      = timeSlot,
     paymentMethod = paymentMethod,

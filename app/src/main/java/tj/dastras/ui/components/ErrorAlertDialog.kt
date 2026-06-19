@@ -37,8 +37,8 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import tj.dastras.BuildConfig
 import tj.dastras.R
-import tj.dastras.data.remote.ApiException
-import tj.dastras.data.remote.ErrorPresenter
+import tj.dastras.core.api.ApiException
+import tj.dastras.core.api.ErrorPresenter
 import tj.dastras.ui.theme.RelaxError
 import tj.dastras.ui.theme.RelaxSurfaceAlt
 import tj.dastras.ui.theme.RelaxTextPrimary

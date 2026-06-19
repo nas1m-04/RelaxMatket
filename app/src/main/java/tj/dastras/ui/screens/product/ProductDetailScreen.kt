@@ -50,8 +50,8 @@ fun ProductDetailScreen(
         return
     }
 
-    val images     = listOf(product.imageUrl, "https://picsum.photos/seed/${product.id}a/400/400", "https://picsum.photos/seed/${product.id}b/400/400")
-    val pagerState = rememberPagerState(pageCount = { images.size })
+    val images = product.images.ifEmpty { listOfNotNull(product.imageUrl) }
+    val pagerState = rememberPagerState(pageCount = { images.size.coerceAtLeast(1) })
     val discount   = if (product.oldPrice != null) ((1 - product.price / product.oldPrice) * 100).toInt() else 0
 
     Box(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
@@ -59,7 +59,12 @@ fun ProductDetailScreen(
 
             Box(modifier = Modifier.fillMaxWidth().height(340.dp)) {
                 HorizontalPager(state = pagerState) { page ->
-                    AsyncImage(model = images[page], contentDescription = product.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                    AsyncImage(
+                        model              = images.getOrNull(page),
+                        contentDescription = product.name,
+                        contentScale       = ContentScale.Crop,
+                        modifier           = Modifier.fillMaxSize(),
+                    )
                 }
                 Box(modifier = Modifier.fillMaxWidth().height(120.dp).align(Alignment.BottomCenter).background(Brush.verticalGradient(listOf(Color.Transparent, RelaxBackground))))
                 Row(
@@ -92,9 +97,11 @@ fun ProductDetailScreen(
                         Text(stringResource(R.string.product_discount_badge, discount), color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
                     }
                 }
-                Row(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
-                    repeat(images.size) { idx ->
-                        Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(if (idx == pagerState.currentPage) RelaxDark else RelaxDivider))
+                if (images.size > 1) {
+                    Row(modifier = Modifier.align(Alignment.BottomCenter).padding(bottom = 16.dp), horizontalArrangement = Arrangement.spacedBy(4.dp)) {
+                        repeat(images.size) { idx ->
+                            Box(modifier = Modifier.size(6.dp).clip(CircleShape).background(if (idx == pagerState.currentPage) RelaxDark else RelaxDivider))
+                        }
                     }
                 }
             }

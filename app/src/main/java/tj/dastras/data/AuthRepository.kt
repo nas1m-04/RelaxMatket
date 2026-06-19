@@ -1,11 +1,11 @@
 package tj.dastras.data
 
 import android.util.Log
-import tj.dastras.data.remote.LoginRequest
-import tj.dastras.data.remote.RegisterRequest
-import tj.dastras.data.remote.RelaxApiService
-import tj.dastras.data.remote.apiErrorMessage
-import tj.dastras.data.remote.friendlyErrorMessage
+import tj.dastras.core.api.LoginRequest
+import tj.dastras.core.api.RegisterRequest
+import tj.dastras.core.api.RelaxApiService
+import tj.dastras.core.api.apiErrorMessage
+import tj.dastras.core.api.friendlyErrorMessage
 import javax.inject.Inject
 import javax.inject.Singleton
 

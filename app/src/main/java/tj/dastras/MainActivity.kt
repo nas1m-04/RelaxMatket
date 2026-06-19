@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
-import tj.dastras.navigation.RelaxNavGraph
+import tj.dastras.core.navigation.RelaxNavGraph
 import tj.dastras.ui.theme.DastrasTheme
 import tj.dastras.ui.theme.RelaxBackground
 

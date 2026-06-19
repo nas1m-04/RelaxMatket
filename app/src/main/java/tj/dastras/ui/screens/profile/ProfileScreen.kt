@@ -27,10 +27,9 @@ import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import tj.dastras.R
-import tj.dastras.data.UserProfile
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.theme.*
-import tj.dastras.util.LocaleManager
+import tj.dastras.core.util.LocaleManager
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -128,6 +128,11 @@
     <string name="home_section_sale_week">Аксияҳои ҳафта</string>
     <string name="home_section_best_offers">Беҳтарин пешниҳодҳо</string>
     <string name="home_address">кӯчаи Ленин, 45</string>
+    <string name="home_address_not_set">Суроғаи дарёфтро муайян кунед</string>
+    <string name="home_address_sheet_title">Суроғаи дарёфт</string>
+    <string name="home_address_sheet_subtitle">Муайян кунед, ки фармоиш куҷо расонида шавад</string>
+    <string name="home_address_save">Суроғаро захира кунед</string>
+    <string name="home_address_hint">Суроға ҳангоми расмикунонии фармоишҳо истифода мешавад</string>
     <string name="home_promo_title">🔥 Аксияҳои ҳафта</string>
     <string name="home_promo_subtitle">Тахфиф то 40% барои садҳо маҷулот</string>
 
@@ -204,6 +209,16 @@
     <string name="checkout_pickup_store_value">Филиалро интихоб кунед</string>
     <string name="checkout_branch_title">Филиал</string>
     <string name="checkout_branch_empty">Филиалҳо ёфт нашуданд</string>
+    <string name="checkout_address_placeholder">Масалан: кӯчаи Ленин, 45, хонаи 12</string>
+    <string name="checkout_save_address">Суроғаро барои фармоишҳои баъдӣ дар хотир нигоҳ доред</string>
+    <string name="checkout_branch_delivery_title">Аз кадом филиал мефиристем</string>
+    <string name="checkout_branch_pickup_title">Суроғаи гирифтани мустақим</string>
+    <string name="checkout_bonus_preview_label">Бонус ҳисоб карда мешавад</string>
+    <string name="checkout_bonus_preview_value">~%1$s бонус</string>
+    <string name="checkout_address_prompt_title">Суроғаи дарёфтро нишон диҳед</string>
+    <string name="checkout_address_prompt_subtitle">Барои расонидани фармоиш суроғаи худро ворид кунед</string>
+    <string name="checkout_address_prompt_confirm">Идома додан</string>
+    <string name="cancel">Бекор кардан</string>
     <string name="checkout_time_slot_title">Вақти гирифтан</string>
     <string name="select_branch_title">Интихоби филиал</string>
     <string name="select_branch_subtitle">Филиалеро интихоб кунед, ки мағозаи асосии шумо мешавад</string>
@@ -225,7 +240,7 @@
     <string name="checkout_confirm_button">Тасдиқи фармоиш</string>
     <string name="checkout_success_title">Фармоиш қабул шуд!</string>
     <string name="checkout_success_subtitle">Мо аллакай фармоиши шуморо тайёр мекунем. Расониданро дар вақти интихобшуда интизор шавед.</string>
-    <string name="checkout_bonus_earned">🎁 %1$d бонус ҳисоб карда шуд</string>
+    <string name="checkout_bonus_earned">🎁 %1$s бонус ҳисоб карда шуд</string>
     <string name="checkout_go_home">Ба саҳифаи асосӣ</string>
 
     <!-- Favorites screen -->
@@ -275,6 +290,9 @@
     <string name="order_total_label">Ҳамагӣ: %1$d TJS</string>
     <string name="order_repeat_button">Такрор кардан</string>
     <string name="order_more_items">+%1$d</string>
+    <string name="order_status_pending">Интизор</string>
+    <string name="order_status_confirmed">Тасдиқшуда</string>
+    <string name="order_status_preparing">Омода мешавад</string>
     <string name="order_status_delivered">Расонида шуд</string>
     <string name="order_status_in_progress">Дар роҳ</string>
     <string name="order_status_processing">Дар ҷараён</string>

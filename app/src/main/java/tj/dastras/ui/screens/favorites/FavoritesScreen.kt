@@ -25,10 +25,6 @@ fun FavoritesScreen(
     val state     = viewModel.uiState
     val cartState = cartViewModel.uiState
 
-    LaunchedEffect(Unit) {
-        viewModel.load()
-    }
-
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
             RelaxTopBar(title = stringResource(R.string.menu_favorites), onBack = onBack)

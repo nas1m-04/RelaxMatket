@@ -11,12 +11,13 @@ import kotlinx.coroutines.launch
 import tj.dastras.data.Branch
 import tj.dastras.data.BranchRepository
 import tj.dastras.data.CreateOrderRequest
+import tj.dastras.data.LocalUserStore
 import tj.dastras.data.Order
 import tj.dastras.data.OrderItemRequest
 import tj.dastras.data.OrderRepository
 import tj.dastras.data.UserRepository
-import tj.dastras.data.remote.ErrorPresenter
-import tj.dastras.data.remote.friendlyErrorMessage
+import tj.dastras.core.api.ErrorPresenter
+import tj.dastras.core.api.friendlyErrorMessage
 import javax.inject.Inject
 
 private const val TAG = "CheckoutViewModel"
@@ -32,6 +33,9 @@ data class CheckoutUiState(
     val isSubmitting: Boolean = false,
     val error: String? = null,
     val order: Order? = null,
+    val cashbackPercent: Float = 0f,
+    val saveAddress: Boolean = false,
+    val showAddressPrompt: Boolean = false,
 )
 
 @HiltViewModel
@@ -39,49 +43,60 @@ class CheckoutViewModel @Inject constructor(
     private val orderRepository: OrderRepository,
     private val branchRepository: BranchRepository,
     private val userRepository: UserRepository,
+    private val localUserStore: LocalUserStore,
 ) : ViewModel() {
 
     var uiState by mutableStateOf(CheckoutUiState())
         private set
 
     init {
-        loadBranches()
+        load()
     }
 
-    private fun loadBranches() {
+    private fun load() {
         viewModelScope.launch {
             try {
-                val branches = branchRepository.getAll()
-                val preferredId = userRepository.getCachedLocal()?.preferredBranchId
-                val defaultId = uiState.selectedBranchId
+                val branches     = branchRepository.getAll()
+                val profile      = userRepository.getCachedLocal()
+                val preferredId  = profile?.preferredBranchId
+                val cashback     = profile?.level?.cashbackPercent ?: 0f
+                val savedAddress = localUserStore.getDeliveryAddress()
+                val defaultId    = uiState.selectedBranchId
                     ?: preferredId?.takeIf { id -> branches.any { it.id == id } }
                     ?: branches.firstOrNull()?.id
-                uiState = uiState.copy(branches = branches, selectedBranchId = defaultId)
+                uiState = uiState.copy(
+                    branches         = branches,
+                    selectedBranchId = defaultId,
+                    cashbackPercent  = cashback,
+                    address          = if (uiState.address.isBlank()) savedAddress else uiState.address,
+                )
             } catch (e: Exception) {
-                Log.e(TAG, "loadBranches: error", e)
+                Log.e(TAG, "load: error", e)
             }
         }
     }
 
     fun setDeliveryType(type: String) { uiState = uiState.copy(deliveryType = type) }
-    fun setAddress(address: String) { uiState = uiState.copy(address = address) }
-    fun setTimeSlot(slot: String?) { uiState = uiState.copy(timeSlot = slot) }
+    fun setAddress(address: String)   { uiState = uiState.copy(address = address) }
+    fun setTimeSlot(slot: String?)    { uiState = uiState.copy(timeSlot = slot) }
     fun setPaymentMethod(method: String) { uiState = uiState.copy(paymentMethod = method) }
-    fun setComment(comment: String) { uiState = uiState.copy(comment = comment) }
-    fun setBranch(branchId: Int) {
-        val branch = uiState.branches.firstOrNull { it.id == branchId }
-        uiState = uiState.copy(
-            selectedBranchId = branchId,
-            address = if (uiState.deliveryType == "delivery" && branch != null) branch.address else uiState.address,
-        )
-    }
-    fun clearError() { uiState = uiState.copy(error = null) }
+    fun setComment(comment: String)   { uiState = uiState.copy(comment = comment) }
+    fun setBranch(branchId: Int)      { uiState = uiState.copy(selectedBranchId = branchId) }
+    fun toggleSaveAddress()           { uiState = uiState.copy(saveAddress = !uiState.saveAddress) }
+    fun clearError()                  { uiState = uiState.copy(error = null) }
 
     fun submitOrder(items: List<OrderItemRequest>, useBonuses: Boolean, promoCode: String?) {
         if (items.isEmpty() || uiState.isSubmitting) return
+        if (uiState.deliveryType == "delivery" && uiState.address.isBlank()) {
+            uiState = uiState.copy(showAddressPrompt = true)
+            return
+        }
         viewModelScope.launch {
             uiState = uiState.copy(isSubmitting = true, error = null)
             try {
+                if (uiState.saveAddress && uiState.address.isNotBlank()) {
+                    localUserStore.saveDeliveryAddress(uiState.address)
+                }
                 val order = orderRepository.createOrder(
                     CreateOrderRequest(
                         deliveryType  = uiState.deliveryType,
@@ -104,5 +119,23 @@ class CheckoutViewModel @Inject constructor(
         }
     }
 
-    fun reset() { uiState = CheckoutUiState() }
+    fun dismissAddressPrompt() { uiState = uiState.copy(showAddressPrompt = false) }
+
+    fun confirmAddressAndSubmit(address: String, items: List<OrderItemRequest>, useBonuses: Boolean, promoCode: String?) {
+        localUserStore.saveDeliveryAddress(address)
+        uiState = uiState.copy(address = address, showAddressPrompt = false)
+        submitOrder(items, useBonuses, promoCode)
+    }
+
+    fun reset() {
+        uiState = uiState.copy(
+            isSubmitting      = false,
+            error             = null,
+            order             = null,
+            showAddressPrompt = false,
+            comment           = "",
+            timeSlot          = null,
+        )
+        load()
+    }
 }

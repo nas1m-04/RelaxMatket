@@ -28,7 +28,14 @@ class LocalUserStore @Inject constructor(
         prefs.edit { remove(KEY_PROFILE) }
     }
 
+    fun saveDeliveryAddress(address: String) {
+        prefs.edit { putString(KEY_DELIVERY_ADDRESS, address) }
+    }
+
+    fun getDeliveryAddress(): String = prefs.getString(KEY_DELIVERY_ADDRESS, "") ?: ""
+
     companion object {
-        private const val KEY_PROFILE = "profile"
+        private const val KEY_PROFILE          = "profile"
+        private const val KEY_DELIVERY_ADDRESS = "delivery_address"
     }
 }

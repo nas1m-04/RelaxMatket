@@ -13,8 +13,8 @@ import tj.dastras.data.BranchRepository
 import tj.dastras.data.MockData
 import tj.dastras.data.UserProfile
 import tj.dastras.data.UserRepository
-import tj.dastras.data.remote.ErrorPresenter
-import tj.dastras.data.remote.friendlyErrorMessage
+import tj.dastras.core.api.ErrorPresenter
+import tj.dastras.core.api.friendlyErrorMessage
 import javax.inject.Inject
 
 private const val TAG = "ProfileViewModel"

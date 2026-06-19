@@ -4,8 +4,8 @@ import android.util.Log
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
-import tj.dastras.data.remote.RelaxApiService
-import tj.dastras.data.remote.dataOrThrow
+import tj.dastras.core.api.RelaxApiService
+import tj.dastras.core.api.dataOrThrow
 import javax.inject.Inject
 import javax.inject.Singleton
 

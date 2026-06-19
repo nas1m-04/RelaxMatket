@@ -1,0 +1,131 @@
+package tj.dastras.core.api
+
+import okhttp3.MultipartBody
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.DELETE
+import retrofit2.http.GET
+import retrofit2.http.Multipart
+import retrofit2.http.PATCH
+import retrofit2.http.POST
+import retrofit2.http.Part
+import retrofit2.http.Path
+import retrofit2.http.Query
+import tj.dastras.data.AddToCartRequest
+import tj.dastras.data.Banner
+import tj.dastras.data.Branch
+import tj.dastras.data.Category
+import tj.dastras.data.CreateOrderRequest
+import tj.dastras.data.Product
+import tj.dastras.data.UpdateProfileRequest
+import tj.dastras.data.UserProfile
+
+interface RelaxApiService {
+
+    // ── Auth (public) ────────────────────────────────────────────────────
+    @POST("auth/register")
+    suspend fun register(@Body request: RegisterRequest): Response<ApiResponse<AuthResponse>>
+
+    @POST("auth/login")
+    suspend fun login(@Body request: LoginRequest): Response<ApiResponse<AuthResponse>>
+
+    @POST("auth/refresh")
+    suspend fun refresh(@Body request: RefreshRequest): Response<ApiResponse<AuthResponse>>
+
+    // ── Products (public) ─────────────────────────────────────────────────
+    @GET("products")
+    suspend fun getProducts(
+        @Query("category_id") categoryId: Int? = null,
+        @Query("search")      search: String? = null,
+        @Query("sort")        sort: String? = null,
+        @Query("page")        page: Int = 1,
+        @Query("pageSize")    pageSize: Int = 20,
+    ): Response<ApiResponse<PagedResponse<Product>>>
+
+    @GET("products/{id}")
+    suspend fun getProduct(@Path("id") id: Int): Response<ApiResponse<Product>>
+
+    @GET("products/new")
+    suspend fun getNewProducts(): Response<ApiResponse<List<Product>>>
+
+    @GET("products/popular")
+    suspend fun getPopularProducts(): Response<ApiResponse<List<Product>>>
+
+    @GET("products/sale")
+    suspend fun getSaleProducts(): Response<ApiResponse<List<Product>>>
+
+    // ── Categories (public) ───────────────────────────────────────────────
+    @GET("categories")
+    suspend fun getCategories(): Response<ApiResponse<List<Category>>>
+
+    // ── Branches (public) ─────────────────────────────────────────────────
+    @GET("branches")
+    suspend fun getBranches(): Response<ApiResponse<List<Branch>>>
+
+    // ── Banners (public) ──────────────────────────────────────────────────
+    @GET("banners")
+    suspend fun getBanners(): Response<ApiResponse<List<Banner>>>
+
+    // ── Cart (auth required) ──────────────────────────────────────────────
+    @GET("cart")
+    suspend fun getCart(): Response<ApiResponse<List<CartItemResponse>>>
+
+    @POST("cart")
+    suspend fun addToCart(@Body request: AddToCartRequest): Response<ApiResponse<Unit>>
+
+    @DELETE("cart/{productId}")
+    suspend fun removeFromCart(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
+
+    @DELETE("cart")
+    suspend fun clearCart(): Response<ApiResponse<Unit>>
+
+    // ── Orders (auth required) ────────────────────────────────────────────
+    @GET("orders")
+    suspend fun getOrders(): Response<ApiResponse<List<OrderApiResponse>>>
+
+    @POST("orders")
+    suspend fun createOrder(@Body request: CreateOrderRequest): Response<ApiResponse<OrderApiResponse>>
+
+    @GET("orders/{id}")
+    suspend fun getOrder(@Path("id") id: String): Response<ApiResponse<OrderApiResponse>>
+
+    // ── Profile (auth required) ───────────────────────────────────────────
+    @GET("profile")
+    suspend fun getProfile(): Response<ApiResponse<UserProfile>>
+
+    @PATCH("profile")
+    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<ApiResponse<UserProfile>>
+
+    @Multipart
+    @POST("profile/avatar")
+    suspend fun uploadAvatar(@Part avatar: MultipartBody.Part): Response<ApiResponse<UserProfile>>
+
+    @DELETE("profile/avatar")
+    suspend fun deleteAvatar(): Response<ApiResponse<UserProfile>>
+
+    // ── Favorites (auth required) ─────────────────────────────────────────
+    @GET("favorites")
+    suspend fun getFavorites(): Response<ApiResponse<List<Product>>>
+
+    @POST("favorites/{productId}")
+    suspend fun addFavorite(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
+
+    @DELETE("favorites/{productId}")
+    suspend fun removeFavorite(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
+
+    // ── Loyalty (auth required) ───────────────────────────────────────────
+    @GET("loyalty")
+    suspend fun getLoyaltySummary(): Response<ApiResponse<LoyaltySummaryResponse>>
+
+    @GET("loyalty/levels")
+    suspend fun getLoyaltyLevels(): Response<ApiResponse<List<LoyaltyLevelResponse>>>
+
+    @GET("loyalty/transactions")
+    suspend fun getBonusTransactions(
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 20,
+    ): Response<ApiResponse<PagedResponse<BonusTransactionApiResponse>>>
+
+    @GET("loyalty/achievements")
+    suspend fun getAchievements(): Response<ApiResponse<List<AchievementApiResponse>>>
+}

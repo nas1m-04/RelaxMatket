@@ -16,7 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import tj.dastras.R
-import tj.dastras.util.LocaleManager
+import tj.dastras.core.util.LocaleManager
 import tj.dastras.ui.theme.RelaxDark
 import tj.dastras.ui.theme.RelaxTextPrimary
 import tj.dastras.ui.theme.RelaxWhite

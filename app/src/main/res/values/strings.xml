@@ -128,6 +128,11 @@
     <string name="home_section_sale_week">Акции недели</string>
     <string name="home_section_best_offers">Лучшие предложения</string>
     <string name="home_address">ул. Ленина, 45</string>
+    <string name="home_address_not_set">Укажите адрес доставки</string>
+    <string name="home_address_sheet_title">Адрес доставки</string>
+    <string name="home_address_sheet_subtitle">Укажите куда доставить заказ</string>
+    <string name="home_address_save">Сохранить адрес</string>
+    <string name="home_address_hint">Адрес будет использован при оформлении заказов</string>
     <string name="home_promo_title">🔥 Акции недели</string>
     <string name="home_promo_subtitle">Скидки до 40% на сотни товаров</string>
 
@@ -204,6 +209,16 @@
     <string name="checkout_pickup_store_value">Выберите филиал</string>
     <string name="checkout_branch_title">Филиал</string>
     <string name="checkout_branch_empty">Филиалы не найдены</string>
+    <string name="checkout_address_placeholder">Напр.: ул. Ленина, 45, кв. 12</string>
+    <string name="checkout_save_address">Запомнить адрес для следующих заказов</string>
+    <string name="checkout_branch_delivery_title">Доставим из филиала</string>
+    <string name="checkout_branch_pickup_title">Адрес самовывоза</string>
+    <string name="checkout_bonus_preview_label">Начислим бонусов</string>
+    <string name="checkout_bonus_preview_value">~%1$s бонусов</string>
+    <string name="checkout_address_prompt_title">Укажите адрес доставки</string>
+    <string name="checkout_address_prompt_subtitle">Нам нужен ваш адрес, чтобы доставить заказ</string>
+    <string name="checkout_address_prompt_confirm">Продолжить</string>
+    <string name="cancel">Отмена</string>
     <string name="checkout_time_slot_title">Время получения</string>
     <string name="select_branch_title">Выбор филиала</string>
     <string name="select_branch_subtitle">Выберите филиал, который будет вашим основным магазином</string>
@@ -225,7 +240,7 @@
     <string name="checkout_confirm_button">Подтвердить заказ</string>
     <string name="checkout_success_title">Заказ оформлен!</string>
     <string name="checkout_success_subtitle">Мы уже готовим ваш заказ. Ожидайте доставку в выбранное время.</string>
-    <string name="checkout_bonus_earned">🎁 Начислено %1$d бонусов</string>
+    <string name="checkout_bonus_earned">🎁 Начислено %1$s бонусов</string>
     <string name="checkout_go_home">На главную</string>
 
     <!-- Favorites screen -->
@@ -275,8 +290,11 @@
     <string name="order_total_label">Итого: %1$d TJS</string>
     <string name="order_repeat_button">Повторить</string>
     <string name="order_more_items">+%1$d</string>
+    <string name="order_status_pending">Ожидает</string>
+    <string name="order_status_confirmed">Подтверждён</string>
+    <string name="order_status_preparing">Готовится</string>
     <string name="order_status_delivered">Доставлен</string>
-    <string name="order_status_in_progress">В пути</string>
+    <string name="order_status_in_progress">В доставке</string>
     <string name="order_status_processing">Обрабатывается</string>
     <string name="order_status_cancelled">Отменён</string>
 

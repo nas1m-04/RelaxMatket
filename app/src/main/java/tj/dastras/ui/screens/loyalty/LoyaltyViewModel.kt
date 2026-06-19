@@ -15,26 +15,36 @@ import tj.dastras.data.LoyaltyRepository
 import tj.dastras.data.MockData
 import tj.dastras.data.UserProfile
 import tj.dastras.data.UserRepository
-import tj.dastras.data.remote.BonusTransactionApiResponse
-import tj.dastras.data.remote.ErrorPresenter
-import tj.dastras.data.remote.LoyaltyLevelResponse
-import tj.dastras.data.remote.LoyaltySummaryResponse
-import tj.dastras.data.remote.friendlyErrorMessage
+import tj.dastras.core.api.AchievementApiResponse
+import tj.dastras.core.api.BonusTransactionApiResponse
+import tj.dastras.core.api.ErrorPresenter
+import tj.dastras.core.api.LoyaltyLevelResponse
+import tj.dastras.core.api.LoyaltySummaryResponse
+import tj.dastras.core.api.friendlyErrorMessage
 import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import javax.inject.Inject
 
 private const val TAG = "LoyaltyViewModel"
+private const val PAGE_SIZE = 20
 
 data class LoyaltyUiState(
     val profile: UserProfile? = null,
     val summary: LoyaltySummaryResponse? = null,
     val levels: List<LoyaltyLevelResponse> = emptyList(),
     val transactions: List<BonusTransactionApiResponse> = emptyList(),
+    val transactionPage: Int = 1,
+    val transactionTotal: Int = 0,
+    val isLoadingMore: Boolean = false,
+    val achievements: List<AchievementApiResponse> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-)
+    val isRefreshing: Boolean = false,
+) {
+    val hasMoreTransactions: Boolean get() = transactions.size < transactionTotal
+}
 
 @HiltViewModel
 class LoyaltyViewModel @Inject constructor(
@@ -48,6 +58,57 @@ class LoyaltyViewModel @Inject constructor(
 
     init { load() }
 
+    fun loadMoreTransactions() {
+        if (!uiState.hasMoreTransactions || uiState.isLoadingMore || !authRepository.isLoggedIn) return
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoadingMore = true)
+            try {
+                val nextPage = uiState.transactionPage + 1
+                val paged    = loyaltyRepository.getTransactions(page = nextPage, pageSize = PAGE_SIZE)
+                uiState = uiState.copy(
+                    transactions     = uiState.transactions + paged.items,
+                    transactionPage  = nextPage,
+                    transactionTotal = paged.totalCount,
+                    isLoadingMore    = false,
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "loadMoreTransactions: error", e)
+                uiState = uiState.copy(isLoadingMore = false)
+            }
+        }
+    }
+    fun onScreenVisible() {
+        load()
+    }
+
+    fun refreshTransactions() {
+        if (uiState.isRefreshing || !authRepository.isLoggedIn) return
+
+        viewModelScope.launch {
+            uiState = uiState.copy(isRefreshing = true)
+
+            try {
+                val txPaged = loyaltyRepository.getTransactions(
+                    page = 1,
+                    pageSize = PAGE_SIZE
+                )
+
+                uiState = uiState.copy(
+                    transactions = txPaged.items,
+                    transactionPage = 1,
+                    transactionTotal = txPaged.totalCount,
+                    isRefreshing = false
+                )
+            } catch (e: Exception) {
+                Log.e(TAG, "refreshTransactions", e)
+
+                uiState = uiState.copy(
+                    isRefreshing = false,
+                    error = friendlyErrorMessage(e)
+                )
+            }
+        }
+    }
     fun load() {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = uiState.summary == null, error = null)
@@ -56,22 +117,32 @@ class LoyaltyViewModel @Inject constructor(
                     val profile = userRepository.getOrCreate()
                     val summary = loyaltyRepository.getSummary()
                     val levels = loyaltyRepository.getLevels()
-                    val transactions = loyaltyRepository.getTransactions(pageSize = 50).items
+                    val txPaged = loyaltyRepository.getTransactions(page = 1, pageSize = PAGE_SIZE)
+                    val achievements = try {
+                        loyaltyRepository.getAchievements()
+                    } catch (e: Exception) {
+                        Log.w(TAG, "achievements endpoint not available, using mock", e)
+                        mockAchievements()
+                    }
                     uiState = uiState.copy(
-                        profile = profile,
-                        summary = summary,
-                        levels = levels,
-                        transactions = transactions,
-                        isLoading = false,
+                        profile          = profile,
+                        summary          = summary,
+                        levels           = levels,
+                        transactions     = txPaged.items,
+                        transactionPage  = 1,
+                        transactionTotal = txPaged.totalCount,
+                        achievements     = achievements,
+                        isLoading        = false,
                     )
                 } else {
                     val user = MockData.currentUser
                     uiState = uiState.copy(
-                        profile = user,
-                        summary = mockSummary(user),
-                        levels = MockData.loyaltyLevels.map { it.toResponse(isCurrent = it.name == user.level.name) },
+                        profile      = user,
+                        summary      = mockSummary(user),
+                        levels       = MockData.loyaltyLevels.map { it.toResponse(isCurrent = it.name == user.level.name) },
                         transactions = MockData.bonusTransactions.map { it.toApiResponse() },
-                        isLoading = false,
+                        achievements = mockAchievements(),
+                        isLoading    = false,
                     )
                 }
             } catch (e: Exception) {
@@ -123,16 +194,29 @@ private fun BonusTransaction.toApiResponse(): BonusTransactionApiResponse = Bonu
     createdAt = date,
 )
 
-/** Formats an ISO-8601 timestamp into a human-friendly "1 июня, 14:23" string. Falls back to the raw value if it isn't an ISO date. */
+private fun mockAchievements(): List<AchievementApiResponse> = listOf(
+    AchievementApiResponse(id = "first_purchase",  title = "Первая покупка",    description = "Совершите первый заказ",    emoji = "🛒", unlocked = false, bonusReward = 50),
+    AchievementApiResponse(id = "ten_orders",      title = "10 покупок",        description = "Совершите 10 заказов",      emoji = "🔥", unlocked = false, bonusReward = 100),
+    AchievementApiResponse(id = "vip_level",       title = "VIP-покупатель",    description = "Достигните уровня VIP",     emoji = "👑", unlocked = false, bonusReward = 200),
+    AchievementApiResponse(id = "big_order",       title = "Большой заказ",     description = "Сделайте заказ на 500 TJS", emoji = "🎯", unlocked = false, bonusReward = 75),
+)
+
+private val localZone: ZoneId = ZoneId.systemDefault()
+
+/** Formats an ISO-8601 UTC timestamp into a human-friendly "1 июня, 14:23" string in the device's local timezone. */
 fun formatTransactionDate(raw: String): String = try {
-    OffsetDateTime.parse(raw).format(DateTimeFormatter.ofPattern("d MMMM, HH:mm", Locale("ru")))
+    OffsetDateTime.parse(raw)
+        .atZoneSameInstant(localZone)
+        .format(DateTimeFormatter.ofPattern("d MMMM, HH:mm", Locale("ru")))
 } catch (e: Exception) {
     raw
 }
 
-/** Formats an ISO-8601 timestamp into a "Март 2023"-style month/year string. Falls back to the raw value if it isn't an ISO date. */
+/** Formats an ISO-8601 UTC timestamp into a "Март 2023"-style month/year string in the device's local timezone. */
 fun formatMemberSince(raw: String): String = try {
-    OffsetDateTime.parse(raw).format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru")))
+    OffsetDateTime.parse(raw)
+        .atZoneSameInstant(localZone)
+        .format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru")))
         .replaceFirstChar { it.uppercase() }
 } catch (e: Exception) {
     raw

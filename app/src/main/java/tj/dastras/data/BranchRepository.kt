@@ -1,7 +1,7 @@
 package tj.dastras.data
 
-import tj.dastras.data.remote.RelaxApiService
-import tj.dastras.data.remote.dataOrThrow
+import tj.dastras.core.api.RelaxApiService
+import tj.dastras.core.api.dataOrThrow
 import javax.inject.Inject
 import javax.inject.Singleton
 

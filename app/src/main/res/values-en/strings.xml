@@ -128,6 +128,11 @@
     <string name="home_section_sale_week">Weekly deals</string>
     <string name="home_section_best_offers">Best offers</string>
     <string name="home_address">45 Lenina St.</string>
+    <string name="home_address_not_set">Set delivery address</string>
+    <string name="home_address_sheet_title">Delivery address</string>
+    <string name="home_address_sheet_subtitle">Enter where to deliver your order</string>
+    <string name="home_address_save">Save address</string>
+    <string name="home_address_hint">Address will be used for future orders</string>
     <string name="home_promo_title">🔥 Weekly deals</string>
     <string name="home_promo_subtitle">Up to 40% off hundreds of products</string>
 
@@ -204,6 +209,16 @@
     <string name="checkout_pickup_store_value">Select a branch</string>
     <string name="checkout_branch_title">Branch</string>
     <string name="checkout_branch_empty">No branches found</string>
+    <string name="checkout_address_placeholder">E.g.: 45 Lenina St., apt. 12</string>
+    <string name="checkout_save_address">Remember address for next orders</string>
+    <string name="checkout_branch_delivery_title">Delivered from branch</string>
+    <string name="checkout_branch_pickup_title">Pickup location</string>
+    <string name="checkout_bonus_preview_label">Bonus cashback</string>
+    <string name="checkout_bonus_preview_value">~%1$s points</string>
+    <string name="checkout_address_prompt_title">Delivery address required</string>
+    <string name="checkout_address_prompt_subtitle">Please enter your address so we can deliver your order</string>
+    <string name="checkout_address_prompt_confirm">Continue</string>
+    <string name="cancel">Cancel</string>
     <string name="checkout_time_slot_title">Pickup time</string>
     <string name="select_branch_title">Select branch</string>
     <string name="select_branch_subtitle">Choose the branch that will be your default store</string>
@@ -225,7 +240,7 @@
     <string name="checkout_confirm_button">Confirm order</string>
     <string name="checkout_success_title">Order placed!</string>
     <string name="checkout_success_subtitle">We are already preparing your order. Expect delivery at the selected time.</string>
-    <string name="checkout_bonus_earned">🎁 %1$d bonuses earned</string>
+    <string name="checkout_bonus_earned">🎁 %1$s bonuses earned</string>
     <string name="checkout_go_home">Go to home</string>
 
     <!-- Favorites screen -->
@@ -275,8 +290,11 @@
     <string name="order_total_label">Total: %1$d TJS</string>
     <string name="order_repeat_button">Reorder</string>
     <string name="order_more_items">+%1$d</string>
+    <string name="order_status_pending">Pending</string>
+    <string name="order_status_confirmed">Confirmed</string>
+    <string name="order_status_preparing">Preparing</string>
     <string name="order_status_delivered">Delivered</string>
-    <string name="order_status_in_progress">On the way</string>
+    <string name="order_status_in_progress">Delivering</string>
     <string name="order_status_processing">Processing</string>
     <string name="order_status_cancelled">Cancelled</string>
 

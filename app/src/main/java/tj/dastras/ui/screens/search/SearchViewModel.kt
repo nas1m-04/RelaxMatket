@@ -12,8 +12,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tj.dastras.data.Product
 import tj.dastras.data.ProductRepository
-import tj.dastras.data.remote.ErrorPresenter
-import tj.dastras.data.remote.friendlyErrorMessage
+import tj.dastras.core.api.ErrorPresenter
+import tj.dastras.core.api.friendlyErrorMessage
 import javax.inject.Inject
 
 private const val TAG = "SearchViewModel"
