@@ -202,20 +202,6 @@ fun LoginScreen(
                 Divider(modifier = Modifier.weight(1f), color = RelaxDivider)
             }
 
-            Spacer(Modifier.height(20.dp))
-
-            // Guest mode
-            OutlinedButton(
-                onClick  = onNavigateToMain,
-                modifier = Modifier.fillMaxWidth().height(52.dp),
-                shape    = RoundedCornerShape(14.dp),
-                border   = BorderStroke(1.5.dp, RelaxDivider),
-            ) {
-                Icon(Icons.Rounded.Person, null, tint = RelaxTextSecondary, modifier = Modifier.size(18.dp))
-                Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.login_guest_button), color = RelaxTextSecondary, style = MaterialTheme.typography.labelLarge)
-            }
-
             Spacer(Modifier.height(24.dp))
 
             Text(

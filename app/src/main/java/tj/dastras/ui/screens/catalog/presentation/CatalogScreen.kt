@@ -41,8 +41,14 @@ fun CatalogScreen(
     val cartState      = cartViewModel.uiState
     val favoritesState = favoritesViewModel.uiState
 
+    var showSortSheet   by remember { mutableStateOf(false) }
+    var showFilterSheet by remember { mutableStateOf(false) }
+
+
     val categories = listOf(Pair(0, stringResource(R.string.catalog_category_all))) +
             state.categories.map { Pair(it.id, it.name) }
+
+
 
     val gridState = rememberLazyGridState()
 
@@ -143,7 +149,10 @@ fun CatalogScreen(
                             .size(48.dp)
                             .clip(RoundedCornerShape(14.dp))
                             .background(if (state.showFilter) RelaxDark else RelaxInputBg)
-                            .clickable { viewModel.toggleFilter() },
+                            .clickable {
+                                showFilterSheet = true
+                                viewModel.toggleFilter()
+                            },
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -159,14 +168,14 @@ fun CatalogScreen(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(RoundedCornerShape(14.dp))
-                            .background(RelaxInputBg)
-                            .clickable { /* TODO: показать меню сортировки */ },
+                            .background(if (state.sortBy != null) RelaxDark else RelaxInputBg)
+                            .clickable { showSortSheet = true },
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector        = Icons.Rounded.Sort,
                             contentDescription = null,
-                            tint     = RelaxTextPrimary,
+                            tint     = if (state.sortBy != null) RelaxWhite else RelaxTextPrimary,
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -307,6 +316,27 @@ fun CatalogScreen(
             }
         }
     }
+
+    if (showFilterSheet) {
+        CatalogFilterSheet(
+            state     = state,
+            onDismiss = { showFilterSheet = false; viewModel.toggleFilter() },
+            onApply   = { newOnly, from, to ->
+                viewModel.setNewOnly(newOnly)
+                viewModel.applyPriceFilter(from, to)
+            }
+        )
+    }
+
+    if (showSortSheet) {
+        CatalogSortSheet(
+            current   = state.sortBy,
+            onDismiss = { showSortSheet = false },
+            onSelect  = { viewModel.sort(it) }
+        )
+    }
+
+
 }
 
 // ── Вспомогательные composable ────────────────────────────────────────────────

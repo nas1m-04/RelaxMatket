@@ -1,5 +1,6 @@
 package tj.dastras.ui.screens.home.Presentation
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -63,11 +64,11 @@ fun HomeScreen(
     cartViewModel: CartViewModel = activityViewModel(),
     favoritesViewModel: FavoritesViewModel = activityViewModel(),
 ) {
-    val state      = viewModel.uiState
-    val cartState  = cartViewModel.uiState
-    val favoritesState = favoritesViewModel.uiState
-    val bannerList = state.banners
-    val bannerPager = rememberPagerState(pageCount = { bannerList.size.coerceAtLeast(1) })
+    val state           = viewModel.uiState
+    val cartState       = cartViewModel.uiState
+    val favoritesState  = favoritesViewModel.uiState
+    val bannerList      = state.banners
+    val bannerPager     = rememberPagerState(pageCount = { bannerList.size.coerceAtLeast(1) })
 
     LaunchedEffect(bannerList.size) {
         if (bannerList.size > 1) {
@@ -80,7 +81,6 @@ fun HomeScreen(
     }
 
     var showAddressSheet by remember { mutableStateOf(false) }
-
     val pullState = rememberPullToRefreshState()
 
     PullToRefreshBox(
@@ -90,10 +90,14 @@ fun HomeScreen(
         modifier     = Modifier.fillMaxSize(),
     ) {
         LazyColumn(
-            modifier              = Modifier.fillMaxSize().background(RelaxBackground),
-            contentPadding        = PaddingValues(bottom = 24.dp),
-            verticalArrangement   = Arrangement.spacedBy(0.dp),
+            modifier            = Modifier
+                .fillMaxSize()
+                .background(RelaxBackground),
+            contentPadding      = PaddingValues(bottom = 32.dp),
+            verticalArrangement = Arrangement.spacedBy(0.dp),
         ) {
+
+            // ── TOP BAR ─────────────────────────────────────────────────────────
             item {
                 HomeTopBar(
                     address         = state.deliveryAddress,
@@ -104,40 +108,70 @@ fun HomeScreen(
                 )
             }
 
+            // ── SEARCH BAR ──────────────────────────────────────────────────────
             item {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(Brush.verticalGradient(listOf(RelaxDark, RelaxBackground), startY = 0f, endY = 60f))
+                        .background(
+                            Brush.verticalGradient(
+                                listOf(RelaxDark, RelaxBackground),
+                                startY = 0f,
+                                endY   = 80f,
+                            )
+                        )
                         .padding(horizontal = 20.dp)
-                        .padding(bottom = 20.dp)
+                        .padding(top = 4.dp, bottom = 24.dp)
                 ) {
                     Card(
                         onClick   = onSearch,
                         modifier  = Modifier.fillMaxWidth(),
-                        shape     = RoundedCornerShape(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape     = RoundedCornerShape(18.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                         colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
                     ) {
                         Row(
-                            modifier          = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 13.dp),
+                            modifier          = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 18.dp, vertical = 15.dp),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
-                            Icon(Icons.Rounded.Search, null, tint = RelaxTextSecondary, modifier = Modifier.size(22.dp))
+                            Box(
+                                modifier         = Modifier
+                                    .size(34.dp)
+                                    .background(RelaxBackground, RoundedCornerShape(10.dp)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    Icons.Rounded.Search,
+                                    contentDescription = null,
+                                    tint     = RelaxDark,
+                                    modifier = Modifier.size(18.dp),
+                                )
+                            }
                             Spacer(Modifier.width(12.dp))
-                            Text(stringResource(R.string.home_search_placeholder), color = RelaxTextHint, style = MaterialTheme.typography.bodyLarge)
+                            Text(
+                                text  = stringResource(R.string.home_search_placeholder),
+                                color = RelaxTextHint,
+                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp),
+                            )
                         }
                     }
                 }
             }
 
+            // ── BANNERS ─────────────────────────────────────────────────────────
             if (bannerList.isNotEmpty()) {
                 item {
                     Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                        HorizontalPager(state = bannerPager, pageSpacing = 12.dp) { page ->
+                        HorizontalPager(
+                            state       = bannerPager,
+                            pageSpacing = 14.dp,
+                        ) { page ->
                             BannerCard(banner = bannerList[page], onClick = onPromotions)
                         }
-                        Spacer(Modifier.height(12.dp))
+                        Spacer(Modifier.height(14.dp))
+                        // Indicator dots
                         Row(
                             modifier              = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center,
@@ -145,42 +179,64 @@ fun HomeScreen(
                         ) {
                             repeat(bannerList.size) { idx ->
                                 val isSelected = idx == bannerPager.currentPage
-                                val width by animateDpAsState(if (isSelected) 24.dp else 6.dp, label = "dot")
+                                val dotWidth by animateDpAsState(
+                                    targetValue = if (isSelected) 22.dp else 6.dp,
+                                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                                    label = "dot_width",
+                                )
+                                val dotColor by animateColorAsState(
+                                    targetValue = if (isSelected) RelaxDark else RelaxDivider,
+                                    label = "dot_color",
+                                )
+                                Spacer(Modifier.width(3.dp))
                                 Box(
                                     modifier = Modifier
-                                        .height(6.dp).width(width).padding(horizontal = 2.dp)
+                                        .height(6.dp)
+                                        .width(dotWidth)
                                         .clip(RoundedCornerShape(3.dp))
-                                        .background(if (isSelected) RelaxDark else RelaxDivider)
+                                        .background(dotColor)
                                 )
+                                Spacer(Modifier.width(3.dp))
                             }
                         }
                     }
                 }
             }
 
+            // ── CATEGORIES ──────────────────────────────────────────────────────
             if (state.categories.isNotEmpty()) {
                 item {
-                    Column(modifier = Modifier.padding(top = 24.dp)) {
-                        SectionHeader(title = stringResource(R.string.home_section_categories), modifier = Modifier.padding(horizontal = 20.dp))
-                        Spacer(Modifier.height(14.dp))
+                    Column(modifier = Modifier.padding(top = 28.dp)) {
+                        SectionHeader(
+                            title    = stringResource(R.string.home_section_categories),
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                        )
+                        Spacer(Modifier.height(16.dp))
                         LazyRow(
                             contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(10.dp),
                         ) {
-                            items(state.categories) { cat -> CategoryChip(category = cat, onClick = { onCategory(cat.id) }) }
+                            items(state.categories) { cat ->
+                                CategoryChip(category = cat, onClick = { onCategory(cat.id) })
+                            }
                         }
                     }
                 }
             }
 
+            // ── POPULAR PRODUCTS ────────────────────────────────────────────────
             if (state.products.isNotEmpty()) {
                 item {
-                    Column(modifier = Modifier.padding(top = 28.dp)) {
-                        SectionHeader(title = stringResource(R.string.home_section_popular), onSeeAll = onSeeAllPopular, modifier = Modifier.padding(horizontal = 20.dp))
-                        Spacer(Modifier.height(14.dp))
+                    Column(modifier = Modifier.padding(top = 32.dp)) {
+                        SectionHeader(
+                            title    = stringResource(R.string.home_section_popular),
+                            onSeeAll = onSeeAllPopular,
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                        )
+                        Spacer(Modifier.height(16.dp))
                         LazyHorizontalGrid(
                             rows                  = GridCells.Fixed(1),
-                            modifier              = Modifier.height(280.dp),
+                            modifier              = Modifier.height(290.dp),
                             contentPadding        = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
@@ -193,63 +249,90 @@ fun HomeScreen(
                                     onDecrease       = { cartViewModel.decrease(product.id) },
                                     isFavorite       = favoritesState.favorites.any { it.id == product.id },
                                     onToggleFavorite = { favoritesViewModel.toggle(product) },
-                                    modifier         = Modifier.width(175.dp),
+                                    modifier         = Modifier.width(178.dp),
                                 )
                             }
                         }
                     }
                 }
 
+                // Promo strip between sections
                 item {
-                    Spacer(Modifier.height(28.dp))
+                    Spacer(Modifier.height(32.dp))
                     PromoStrip(onClick = onPromotions)
                 }
             }
 
+            // ── NEW PRODUCTS ────────────────────────────────────────────────────
             if (state.newProducts.isNotEmpty()) {
                 item {
-                    Column(modifier = Modifier.padding(top = 28.dp)) {
-                        SectionHeader(title = stringResource(R.string.home_section_new), onSeeAll = onSeeAllNew, modifier = Modifier.padding(horizontal = 20.dp))
-                        Spacer(Modifier.height(14.dp))
+                    Column(modifier = Modifier.padding(top = 32.dp)) {
+                        SectionHeader(
+                            title    = stringResource(R.string.home_section_new),
+                            onSeeAll = onSeeAllNew,
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                        )
+                        Spacer(Modifier.height(16.dp))
                         LazyRow(
                             contentPadding        = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             items(state.newProducts) { product ->
-                                ProductCardHorizontal(product = product, onClick = { onProduct(product.id) }, onAddToCart = { cartViewModel.add(product) })
+                                ProductCardHorizontal(
+                                    product   = product,
+                                    onClick   = { onProduct(product.id) },
+                                    onAddToCart = { cartViewModel.add(product) },
+                                )
                             }
                         }
                     }
                 }
             }
 
+            // ── SALE PRODUCTS ───────────────────────────────────────────────────
             if (state.saleProducts.isNotEmpty()) {
                 item {
-                    Column(modifier = Modifier.padding(top = 28.dp)) {
-                        SectionHeader(title = stringResource(R.string.home_section_sale_week), onSeeAll = onPromotions, modifier = Modifier.padding(horizontal = 20.dp))
-                        Spacer(Modifier.height(14.dp))
+                    Column(modifier = Modifier.padding(top = 32.dp)) {
+                        SectionHeader(
+                            title    = stringResource(R.string.home_section_sale_week),
+                            onSeeAll = onPromotions,
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                        )
+                        Spacer(Modifier.height(16.dp))
                         LazyRow(
                             contentPadding        = PaddingValues(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
                         ) {
                             items(state.saleProducts) { product ->
-                                ProductCardHorizontal(product = product, onClick = { onProduct(product.id) }, onAddToCart = { cartViewModel.add(product) })
+                                ProductCardHorizontal(
+                                    product   = product,
+                                    onClick   = { onProduct(product.id) },
+                                    onAddToCart = { cartViewModel.add(product) },
+                                )
                             }
                         }
                     }
                 }
             }
 
+            // ── BEST OFFERS GRID ────────────────────────────────────────────────
             if (state.products.size > 6) {
                 item {
-                    Spacer(Modifier.height(28.dp))
-                    SectionHeader(title = stringResource(R.string.home_section_best_offers), onSeeAll = onSeeAllBestOffers, modifier = Modifier.padding(horizontal = 20.dp))
-                    Spacer(Modifier.height(14.dp))
+                    Spacer(Modifier.height(32.dp))
+                    SectionHeader(
+                        title    = stringResource(R.string.home_section_best_offers),
+                        onSeeAll = onSeeAllBestOffers,
+                        modifier = Modifier.padding(horizontal = 20.dp),
+                    )
+                    Spacer(Modifier.height(16.dp))
                 }
                 item {
                     LazyVerticalGrid(
                         columns               = GridCells.Fixed(2),
-                        modifier              = Modifier.fillMaxWidth().heightIn(max = 800.dp).padding(horizontal = 20.dp),
+                        modifier              = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 820.dp)
+                            .padding(horizontal = 20.dp),
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                         verticalArrangement   = Arrangement.spacedBy(12.dp),
                         userScrollEnabled     = false,
@@ -270,10 +353,12 @@ fun HomeScreen(
             }
         }
 
+        // Full-screen loading indicator (first load only)
         if (state.isLoading && state.products.isEmpty()) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center),
                 color    = RelaxDark,
+                strokeWidth = 3.dp,
             )
         }
     }
@@ -287,6 +372,9 @@ fun HomeScreen(
     }
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// TOP BAR
+// ────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HomeTopBar(
@@ -301,125 +389,296 @@ private fun HomeTopBar(
             .fillMaxWidth()
             .background(Brush.verticalGradient(listOf(RelaxDark, RelaxDarkSecondary)))
             .statusBarsPadding()
-            .padding(horizontal = 20.dp, vertical = 16.dp)
+            .padding(horizontal = 20.dp)
+            .padding(top = 14.dp, bottom = 18.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier          = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // Brand + Address
             Column(modifier = Modifier.weight(1f)) {
+                // Logo row
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
-                            .size(36.dp)
-                            .background(Brush.linearGradient(listOf(RelaxRed, RelaxOrange)), RoundedCornerShape(10.dp)),
+                            .size(38.dp)
+                            .background(
+                                Brush.linearGradient(listOf(RelaxRed, RelaxOrange)),
+                                RoundedCornerShape(11.dp),
+                            ),
                         contentAlignment = Alignment.Center,
                     ) {
-                        Text("R", color = RelaxWhite, fontSize = 20.sp, fontWeight = FontWeight.Black)
+                        Text(
+                            text       = "R",
+                            color      = RelaxWhite,
+                            fontSize   = 21.sp,
+                            fontWeight = FontWeight.Black,
+                        )
                     }
                     Spacer(Modifier.width(10.dp))
-                    Text("RELAX", color = RelaxWhite, fontSize = 18.sp, fontWeight = FontWeight.Black, letterSpacing = 3.sp)
+                    Text(
+                        text          = "RELAX",
+                        color         = RelaxWhite,
+                        fontSize      = 19.sp,
+                        fontWeight    = FontWeight.Black,
+                        letterSpacing = 3.sp,
+                    )
                 }
-                Spacer(Modifier.height(6.dp))
+                Spacer(Modifier.height(8.dp))
+                // Address chip
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
+                    modifier          = Modifier
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(RelaxWhite.copy(alpha = 0.10f))
                         .clickable(onClick = onAddressClick)
-                        .padding(horizontal = 4.dp, vertical = 2.dp),
+                        .padding(horizontal = 10.dp, vertical = 5.dp),
                 ) {
-                    Icon(Icons.Rounded.LocationOn, null, tint = RelaxOrange, modifier = Modifier.size(14.dp))
-                    Spacer(Modifier.width(4.dp))
+                    Icon(
+                        Icons.Rounded.LocationOn,
+                        contentDescription = null,
+                        tint     = RelaxOrange,
+                        modifier = Modifier.size(13.dp),
+                    )
+                    Spacer(Modifier.width(5.dp))
                     Text(
                         text     = address.ifBlank { stringResource(R.string.home_address_not_set) },
-                        color    = if (address.isBlank()) RelaxTextOnDarkSub.copy(alpha = 0.55f) else RelaxTextOnDarkSub,
+                        color    = if (address.isBlank()) RelaxTextOnDarkSub.copy(alpha = 0.5f) else RelaxTextOnDarkSub,
                         fontSize = 12.sp,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.widthIn(max = 180.dp),
+                        modifier = Modifier.widthIn(max = 170.dp),
                     )
-                    Icon(Icons.Rounded.KeyboardArrowDown, null, tint = RelaxTextOnDarkSub, modifier = Modifier.size(14.dp))
+                    Spacer(Modifier.width(2.dp))
+                    Icon(
+                        Icons.Rounded.KeyboardArrowDown,
+                        contentDescription = null,
+                        tint     = RelaxTextOnDarkSub.copy(alpha = 0.7f),
+                        modifier = Modifier.size(14.dp),
+                    )
                 }
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                HomeIconButton(icon = Icons.Rounded.FavoriteBorder, badge = false, onClick = onFavorites)
-                HomeIconButton(icon = Icons.Rounded.NotificationsNone, badge = true,  onClick = onNotifications)
-                HomeIconButton(icon = Icons.Rounded.ShoppingCart,      badge = false, onClick = onCart)
-            }
+
+            // Action buttons — separated by explicit spacing
+            Spacer(Modifier.width(12.dp))
+            HomeIconButton(
+                icon    = Icons.Rounded.FavoriteBorder,
+                badge   = false,
+                onClick = onFavorites,
+            )
+            Spacer(Modifier.width(8.dp))
+            HomeIconButton(
+                icon    = Icons.Rounded.NotificationsNone,
+                badge   = true,
+                onClick = onNotifications,
+            )
+            Spacer(Modifier.width(8.dp))
+            HomeIconButton(
+                icon    = Icons.Rounded.ShoppingCart,
+                badge   = false,
+                onClick = onCart,
+            )
         }
     }
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// ICON BUTTON
+// ────────────────────────────────────────────────────────────────────────────
 @Composable
-private fun HomeIconButton(icon: ImageVector, badge: Boolean, onClick: () -> Unit) {
+private fun HomeIconButton(
+    icon: ImageVector,
+    badge: Boolean,
+    onClick: () -> Unit,
+) {
     Box {
-        IconButton(
-            onClick  = onClick,
-            modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(RelaxWhite.copy(alpha = 0.12f))
+        Box(
+            modifier         = Modifier
+                .size(42.dp)
+                .clip(RoundedCornerShape(13.dp))
+                .background(RelaxWhite.copy(alpha = 0.13f))
+                .clickable(onClick = onClick),
+            contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, null, tint = RelaxWhite, modifier = Modifier.size(22.dp))
+            Icon(
+                imageVector        = icon,
+                contentDescription = null,
+                tint               = RelaxWhite,
+                modifier           = Modifier.size(22.dp),
+            )
         }
         if (badge) {
-            Box(modifier = Modifier.size(8.dp).align(Alignment.TopEnd).offset(x = (-4).dp, y = 4.dp).background(RelaxRed, CircleShape))
+            Box(
+                modifier = Modifier
+                    .size(9.dp)
+                    .align(Alignment.TopEnd)
+                    .offset(x = (-3).dp, y = 3.dp)
+                    .background(RelaxRed, CircleShape)
+                    .border(1.5.dp, RelaxDark, CircleShape)
+            )
         }
     }
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// BANNER CARD
+// ────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun BannerCard(banner: Banner, onClick: () -> Unit) {
     Card(
         onClick   = onClick,
-        modifier  = Modifier.fillMaxWidth().height(180.dp).shadow(8.dp, RoundedCornerShape(20.dp), spotColor = Color(0x1A000000)),
-        shape     = RoundedCornerShape(20.dp),
+        modifier  = Modifier
+            .fillMaxWidth()
+            .height(190.dp)
+            .shadow(10.dp, RoundedCornerShape(22.dp), spotColor = Color(0x22000000)),
+        shape     = RoundedCornerShape(22.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(model = banner.imageUrl, contentDescription = banner.title, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+            AsyncImage(
+                model              = banner.imageUrl,
+                contentDescription = banner.title,
+                contentScale       = ContentScale.Crop,
+                modifier           = Modifier.fillMaxSize(),
+            )
             val bannerColor = parseHexColor(banner.backgroundColor, default = Color(0xFF1C1C1E))
-            Box(modifier = Modifier.fillMaxSize().background(Brush.horizontalGradient(colors = listOf(bannerColor.copy(alpha = 0.92f), bannerColor.copy(alpha = 0.4f)))))
-            Column(modifier = Modifier.align(Alignment.CenterStart).padding(24.dp).fillMaxWidth(0.65f)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(
+                                bannerColor.copy(alpha = 0.94f),
+                                bannerColor.copy(alpha = 0.35f),
+                            )
+                        )
+                    )
+            )
+            Column(
+                modifier = Modifier
+                    .align(Alignment.CenterStart)
+                    .padding(start = 26.dp, end = 100.dp, top = 24.dp, bottom = 24.dp),
+            ) {
                 if (!banner.badgeText.isNullOrEmpty()) {
-                    Box(modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(RelaxWhite.copy(alpha = 0.22f)).padding(horizontal = 10.dp, vertical = 4.dp)) {
-                        Text(banner.badgeText, color = RelaxWhite, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = RelaxWhite.copy(alpha = 0.20f),
+                    ) {
+                        Text(
+                            text     = banner.badgeText,
+                            color    = RelaxWhite,
+                            style    = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                        )
                     }
                     Spacer(Modifier.height(10.dp))
                 }
-                Text(banner.title, color = RelaxWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold, lineHeight = 26.sp)
-                Spacer(Modifier.height(6.dp))
-                Text(banner.subtitle ?: "", color = RelaxWhite.copy(alpha = 0.85f), fontSize = 13.sp, lineHeight = 18.sp)
+                Text(
+                    text       = banner.title,
+                    color      = RelaxWhite,
+                    fontSize   = 21.sp,
+                    fontWeight = FontWeight.Bold,
+                    lineHeight = 27.sp,
+                )
+                if (!banner.subtitle.isNullOrEmpty()) {
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text       = banner.subtitle,
+                        color      = RelaxWhite.copy(alpha = 0.82f),
+                        fontSize   = 13.sp,
+                        lineHeight = 18.sp,
+                    )
+                }
             }
         }
     }
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// CATEGORY CHIP
+// ────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun CategoryChip(category: Category, onClick: () -> Unit) {
     Column(
-        modifier            = Modifier.clip(RoundedCornerShape(16.dp)).background(parseHexColor(category.color)).clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 14.dp),
+        modifier            = Modifier
+            .clip(RoundedCornerShape(18.dp))
+            .background(parseHexColor(category.color))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 18.dp, vertical = 15.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(category.icon ?: "", fontSize = 28.sp)
-        Spacer(Modifier.height(6.dp))
-        Text(category.name, fontSize = 11.sp, fontWeight = FontWeight.Medium, color = RelaxTextPrimary, textAlign = TextAlign.Center)
+        Text(
+            text     = category.icon ?: "",
+            fontSize = 30.sp,
+        )
+        Spacer(Modifier.height(7.dp))
+        Text(
+            text       = category.name,
+            fontSize   = 11.sp,
+            fontWeight = FontWeight.SemiBold,
+            color      = RelaxTextPrimary,
+            textAlign  = TextAlign.Center,
+        )
     }
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// PROMO STRIP
+// ────────────────────────────────────────────────────────────────────────────
 @Composable
 private fun PromoStrip(onClick: () -> Unit) {
     Box(
         modifier = Modifier
-            .fillMaxWidth().padding(horizontal = 20.dp).clip(RoundedCornerShape(20.dp))
-            .background(Brush.linearGradient(listOf(Color(0xFFE53935), Color(0xFFFF6B35))))
-            .clickable(onClick = onClick).padding(24.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp)
+            .clip(RoundedCornerShape(22.dp))
+            .background(
+                Brush.linearGradient(listOf(Color(0xFFE53935), Color(0xFFFF6B35)))
+            )
+            .clickable(onClick = onClick)
+            .padding(horizontal = 24.dp, vertical = 22.dp),
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier          = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(stringResource(R.string.home_promo_title), color = RelaxWhite, fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    text       = stringResource(R.string.home_promo_title),
+                    color      = RelaxWhite,
+                    fontSize   = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                )
                 Spacer(Modifier.height(4.dp))
-                Text(stringResource(R.string.home_promo_subtitle), color = RelaxWhite.copy(alpha = 0.88f), fontSize = 13.sp)
+                Text(
+                    text  = stringResource(R.string.home_promo_subtitle),
+                    color = RelaxWhite.copy(alpha = 0.88f),
+                    fontSize = 13.sp,
+                )
             }
-            Icon(Icons.Rounded.ArrowForwardIos, null, tint = RelaxWhite, modifier = Modifier.size(20.dp))
+            Spacer(Modifier.width(12.dp))
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .background(RelaxWhite.copy(alpha = 0.18f), RoundedCornerShape(12.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    Icons.Rounded.ArrowForwardIos,
+                    contentDescription = null,
+                    tint     = RelaxWhite,
+                    modifier = Modifier.size(18.dp),
+                )
+            }
         }
     }
 }
 
+// ────────────────────────────────────────────────────────────────────────────
+// ADDRESS BOTTOM SHEET
+// ────────────────────────────────────────────────────────────────────────────
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AddressBottomSheet(
@@ -434,56 +693,80 @@ private fun AddressBottomSheet(
         onDismissRequest = onDismiss,
         sheetState       = sheetState,
         containerColor   = RelaxWhite,
+        shape            = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
     ) {
         Column(
             modifier = Modifier
                 .padding(horizontal = 24.dp)
-                .padding(bottom = 32.dp)
+                .padding(top = 4.dp, bottom = 36.dp)
                 .navigationBarsPadding(),
         ) {
+            // Header
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(52.dp)
-                        .clip(RoundedCornerShape(16.dp))
+                        .size(54.dp)
+                        .clip(RoundedCornerShape(17.dp))
                         .background(Brush.linearGradient(listOf(RelaxRed, RelaxOrange))),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(Icons.Rounded.LocationOn, null, tint = RelaxWhite, modifier = Modifier.size(26.dp))
+                    Icon(
+                        Icons.Rounded.LocationOn,
+                        contentDescription = null,
+                        tint     = RelaxWhite,
+                        modifier = Modifier.size(26.dp),
+                    )
                 }
-                Spacer(Modifier.width(14.dp))
+                Spacer(Modifier.width(16.dp))
                 Column {
                     Text(
-                        stringResource(R.string.home_address_sheet_title),
+                        text       = stringResource(R.string.home_address_sheet_title),
                         fontSize   = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color      = RelaxTextPrimary,
                     )
+                    Spacer(Modifier.height(2.dp))
                     Text(
-                        stringResource(R.string.home_address_sheet_subtitle),
+                        text  = stringResource(R.string.home_address_sheet_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = RelaxTextSecondary,
                     )
                 }
             }
+
+            Spacer(Modifier.height(28.dp))
+            HorizontalDivider(color = RelaxDivider, thickness = 0.5.dp)
             Spacer(Modifier.height(24.dp))
 
+            // Text field
             OutlinedTextField(
                 value         = address,
                 onValueChange = { address = it },
                 label         = { Text(stringResource(R.string.checkout_delivery_address_label)) },
-                placeholder   = { Text(stringResource(R.string.checkout_address_placeholder), fontSize = 13.sp) },
-                leadingIcon   = { Icon(Icons.Rounded.Home, null, tint = RelaxRed) },
-                trailingIcon  = {
+                placeholder   = {
+                    Text(
+                        text     = stringResource(R.string.checkout_address_placeholder),
+                        fontSize = 13.sp,
+                    )
+                },
+                leadingIcon  = {
+                    Icon(Icons.Rounded.Home, contentDescription = null, tint = RelaxRed)
+                },
+                trailingIcon = {
                     if (address.isNotEmpty()) {
                         IconButton(onClick = { address = "" }) {
-                            Icon(Icons.Rounded.Close, null, tint = RelaxTextSecondary, modifier = Modifier.size(18.dp))
+                            Icon(
+                                Icons.Rounded.Close,
+                                contentDescription = null,
+                                tint     = RelaxTextSecondary,
+                                modifier = Modifier.size(18.dp),
+                            )
                         }
                     }
                 },
                 singleLine = true,
                 modifier   = Modifier.fillMaxWidth(),
-                shape      = RoundedCornerShape(14.dp),
+                shape      = RoundedCornerShape(16.dp),
                 colors     = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor      = RelaxDark,
                     unfocusedBorderColor    = RelaxDivider,
@@ -498,23 +781,39 @@ private fun AddressBottomSheet(
 
             Spacer(Modifier.height(8.dp))
             Text(
-                stringResource(R.string.home_address_hint),
-                style  = MaterialTheme.typography.bodySmall,
-                color  = RelaxTextHint,
+                text  = stringResource(R.string.home_address_hint),
+                style = MaterialTheme.typography.bodySmall,
+                color = RelaxTextHint,
             )
-            Spacer(Modifier.height(24.dp))
 
+            Spacer(Modifier.height(28.dp))
+
+            // Save button
             Button(
-                onClick  = { if (address.isNotBlank()) { onSave(address); onDismiss() } },
+                onClick  = {
+                    if (address.isNotBlank()) {
+                        onSave(address)
+                        onDismiss()
+                    }
+                },
                 enabled  = address.isNotBlank(),
-                modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape    = RoundedCornerShape(16.dp),
-                colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(58.dp),
+                shape  = RoundedCornerShape(18.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor         = RelaxDark,
+                    disabledContainerColor = RelaxDark.copy(alpha = 0.35f),
+                ),
             ) {
-                Icon(Icons.Rounded.Check, null, modifier = Modifier.size(20.dp))
-                Spacer(Modifier.width(8.dp))
+                Icon(
+                    Icons.Rounded.Check,
+                    contentDescription = null,
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(Modifier.width(10.dp))
                 Text(
-                    stringResource(R.string.home_address_save),
+                    text       = stringResource(R.string.home_address_save),
                     fontWeight = FontWeight.Bold,
                     fontSize   = 16.sp,
                 )

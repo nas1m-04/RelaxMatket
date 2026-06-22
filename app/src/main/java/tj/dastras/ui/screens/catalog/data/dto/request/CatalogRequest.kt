@@ -7,4 +7,6 @@ data class CatalogRequest(
     val categoryId: Int? = null,
     val search: String? = null,
     val sort: String? = null,
+    val priceFrom: Int? = null,
+    val priceTo: Int? = null,
 )

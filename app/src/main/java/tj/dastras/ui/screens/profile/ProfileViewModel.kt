@@ -15,6 +15,7 @@ import tj.dastras.data.UserProfile
 import tj.dastras.data.UserRepository
 import tj.dastras.core.api.ErrorPresenter
 import tj.dastras.core.api.friendlyErrorMessage
+import tj.dastras.data.UpdateProfileRequest
 import javax.inject.Inject
 
 private const val TAG = "ProfileViewModel"
@@ -93,6 +94,18 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun updateProfile(name: String, email: String) {
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoading = true, error = null)
+            try {
+                val updated = userRepository.updateProfile(UpdateProfileRequest(name = name, email = email))
+                uiState = uiState.copy(profile = updated, isLoading = false)
+            } catch (e: Exception) {
+                uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
+            }
+        }
+    }
     fun removeAvatar() {
         if (!authRepository.isLoggedIn) return
         viewModelScope.launch {

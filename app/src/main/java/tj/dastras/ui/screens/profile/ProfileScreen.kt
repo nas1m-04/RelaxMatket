@@ -30,6 +30,7 @@ import tj.dastras.R
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.theme.*
 import tj.dastras.core.util.LocaleManager
+import tj.dastras.core.util.formatMemberSince
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -49,7 +50,23 @@ fun ProfileScreen(
     var showAvatarSheet   by remember { mutableStateOf(false) }
     var showLanguageSheet by remember { mutableStateOf(false) }
     var currentLanguage   by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
+    var showEditProfile by remember { mutableStateOf(false) }
 
+    // Если показываем редактирование — рендерим поверх
+    if (showEditProfile) {
+        val profile = user ?: return
+        EditProfileScreen(
+            profile        = profile,
+            isSaving       = state.isLoading,
+            onBack         = { showEditProfile = false },
+            onSave         = { name, email ->
+                viewModel.updateProfile(name, email)
+                showEditProfile = false
+            },
+            onChangeAvatar = { showAvatarSheet = true },
+        )
+        return
+    }
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let {
             val mimeType = context.contentResolver.getType(it) ?: "image/jpeg"
@@ -186,7 +203,7 @@ fun ProfileScreen(
             Row(modifier = Modifier.padding(horizontal = 20.dp).fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 QuickStat("${user.bonusBalance.toInt()}", stringResource(R.string.profile_stat_bonuses), modifier = Modifier.weight(1f))
                 QuickStat("${user.totalSpent.toInt()} TJS", stringResource(R.string.profile_stat_spent), modifier = Modifier.weight(1f))
-                QuickStat(user.memberSince, stringResource(R.string.profile_stat_with_us), modifier = Modifier.weight(1f))
+                QuickStat(formatMemberSince(user.memberSince), stringResource(R.string.profile_stat_with_us), modifier = Modifier.weight(1f))
             }
 
             Spacer(Modifier.height(16.dp))
@@ -199,7 +216,7 @@ fun ProfileScreen(
             Spacer(Modifier.height(12.dp))
 
             ProfileSection(title = stringResource(R.string.section_account)) {
-                ProfileMenuItem(Icons.Rounded.Person,        stringResource(R.string.menu_personal_data), user.email.ifEmpty { stringResource(R.string.menu_not_specified) }, onClick = {})
+                ProfileMenuItem(Icons.Rounded.Person,        stringResource(R.string.menu_personal_data), user.email.ifEmpty { stringResource(R.string.menu_not_specified) }, onClick = {showEditProfile = true})
                 ProfileMenuItem(Icons.Rounded.Store,         stringResource(R.string.menu_branch),         state.branchName ?: stringResource(R.string.menu_branch_not_selected), onClick = onSelectBranch)
                 ProfileMenuItem(Icons.Rounded.Notifications, stringResource(R.string.menu_notifications),  stringResource(R.string.menu_notifications_on), onClick = onNotifications)
             }

@@ -19,4 +19,8 @@ data class CatalogUiState(
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val error: String? = null,
+    val priceFrom: Int? = null,
+    val priceTo: Int? = null,
+    val showSortSheet: Boolean = false,
+    val showFilterSheet : Boolean = false,
 )

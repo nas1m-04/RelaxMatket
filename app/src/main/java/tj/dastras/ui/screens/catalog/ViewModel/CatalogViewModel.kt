@@ -37,7 +37,9 @@ class CatalogViewModel @Inject constructor(
                         page       = 1,
                         categoryId = uiState.selectedCategoryId.takeIf { it != 0 },
                         search     = uiState.searchQuery.ifBlank { null },
-                        sort       = uiState.sortBy
+                        sort       = if (uiState.showNewOnly) "new" else uiState.sortBy,
+                        priceFrom  = uiState.priceFrom,
+                        priceTo    = uiState.priceTo,
                     )
                 )
                 val categories = categoryRepository.getAll()
@@ -64,10 +66,12 @@ class CatalogViewModel @Inject constructor(
             try {
                 val response = productRepository.getAll(
                     CatalogRequest(
-                        page       = uiState.page + 1,
+                        page       = 1,
                         categoryId = uiState.selectedCategoryId.takeIf { it != 0 },
                         search     = uiState.searchQuery.ifBlank { null },
-                        sort       = uiState.sortBy
+                        sort       = if (uiState.showNewOnly) "new" else uiState.sortBy,
+                        priceFrom  = uiState.priceFrom,
+                        priceTo    = uiState.priceTo,
                     )
                 )
 
@@ -93,7 +97,7 @@ class CatalogViewModel @Inject constructor(
         applyFilters()
     }
 
-    fun sort(sortBy: String) {
+    fun sort(sortBy: String?) {
         uiState = uiState.copy(sortBy = sortBy)
         applyFilters()
     }
@@ -117,7 +121,10 @@ class CatalogViewModel @Inject constructor(
         applyFilters()
     }
 
-    // Фильтры отправляются на бэк, не локально
+    fun applyPriceFilter(from: Int?, to: Int?) {
+        uiState = uiState.copy(priceFrom = from, priceTo = to)
+        applyFilters()
+    }
     private fun applyFilters() {
         load()
     }
