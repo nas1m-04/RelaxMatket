@@ -30,7 +30,7 @@ import tj.dastras.R
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.theme.*
 import tj.dastras.core.util.LocaleManager
-import tj.dastras.core.util.formatMemberSince
+import tj.dastras.ui.screens.loyalty.formatMemberSince
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)

@@ -60,112 +60,148 @@ fun ProductCardGrid(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        onClick   = onClick,
-        modifier  = modifier
+        onClick = onClick,
+        modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 6.dp, shape = RoundedCornerShape(20.dp), spotColor = Color(0x18000000), ambientColor = Color(0x08000000)),
-        shape     = RoundedCornerShape(20.dp),
-        colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
+            .shadow(
+                elevation = 10.dp,
+                shape = RoundedCornerShape(18.dp),
+                ambientColor = Color.Black.copy(alpha = 0.04f),
+                spotColor = Color.Black.copy(alpha = 0.08f)
+            ),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = RelaxWhite),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
+
         Column {
+
+            // ── IMAGE ─────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(150.dp)
-                    .clip(RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+                    .clip(RoundedCornerShape(topStart = 18.dp, topEnd = 18.dp))
             ) {
+
                 AsyncImage(
-                    model             = product.imageUrl,
+                    model = product.imageUrl,
                     contentDescription = product.name,
-                    contentScale      = ContentScale.Crop,
-                    modifier          = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize()
                 )
-                if (product.oldPrice != null) {
-                    val disc = ((1 - product.price / product.oldPrice) * 100).toInt()
+
+                // Discount badge (мягкий, не агрессивный)
+                product.oldPrice?.let {
+                    val disc = ((1 - product.price / it) * 100).toInt()
+
                     Box(
                         modifier = Modifier
                             .padding(10.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(RelaxRed)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(Color.Black.copy(alpha = 0.55f))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                             .align(Alignment.TopStart)
                     ) {
-                        Text("−$disc%", color = RelaxWhite, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            "−$disc%",
+                            color = RelaxWhite,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
+
+                // NEW badge (спокойный акцент)
                 if (product.isNew) {
                     Box(
                         modifier = Modifier
                             .padding(10.dp)
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(RelaxOrange)
+                            .clip(RoundedCornerShape(6.dp))
+                            .background(RelaxDark.copy(alpha = 0.8f))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                             .align(Alignment.TopEnd)
                     ) {
-                        Text("NEW", color = RelaxWhite, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold)
+                        Text(
+                            "NEW",
+                            color = RelaxWhite,
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 }
+
+                // Favorite
                 if (onToggleFavorite != null) {
                     Box(
                         modifier = Modifier
                             .padding(10.dp)
-                            .size(32.dp)
+                            .size(34.dp)
                             .clip(CircleShape)
-                            .background(RelaxWhite.copy(alpha = 0.85f))
+                            .background(Color.White.copy(alpha = 0.9f))
                             .align(Alignment.BottomEnd)
                             .clickable(onClick = onToggleFavorite),
-                        contentAlignment = Alignment.Center,
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = if (isFavorite) Icons.Rounded.Favorite else Icons.Rounded.FavoriteBorder,
+                            imageVector = if (isFavorite)
+                                Icons.Rounded.Favorite
+                            else
+                                Icons.Rounded.FavoriteBorder,
                             contentDescription = null,
-                            tint     = if (isFavorite) RelaxRed else RelaxTextSecondary,
-                            modifier = Modifier.size(18.dp),
+                            tint = if (isFavorite) RelaxRed else RelaxTextSecondary,
+                            modifier = Modifier.size(18.dp)
                         )
                     }
                 }
             }
 
+            // ── CONTENT ───────────────────────────
             Column(modifier = Modifier.padding(12.dp)) {
+
                 Text(
-                    text     = product.name,
-                    style    = MaterialTheme.typography.titleSmall,
-                    color    = RelaxTextPrimary,
+                    text = product.name,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = RelaxTextPrimary,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    lineHeight = 18.sp,
+                    overflow = TextOverflow.Ellipsis
                 )
-                if (!product.weight.isNullOrEmpty()) {
+
+                product.weight?.takeIf { it.isNotEmpty() }?.let {
                     Text(
-                        text  = product.weight ?: "",
+                        text = it,
                         style = MaterialTheme.typography.bodySmall,
-                        color = RelaxTextSecondary,
+                        color = RelaxTextSecondary
                     )
                 }
-                Spacer(Modifier.height(8.dp))
+
+                Spacer(Modifier.height(10.dp))
+
                 Row(
-                    modifier            = Modifier.fillMaxWidth(),
-                    verticalAlignment   = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
+
                     Column {
                         Text(
-                            text       = "${product.price.toInt()} TJS",
-                            style      = MaterialTheme.typography.titleMedium,
-                            color      = RelaxTextPrimary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize   = 16.sp,
+                            text = "${product.price.toInt()} TJS",
+                            style = MaterialTheme.typography.titleMedium,
+                            color = RelaxTextPrimary,
+                            fontWeight = FontWeight.Bold
                         )
-                        if (product.oldPrice != null) {
+
+                        product.oldPrice?.let {
                             Text(
-                                text           = "${product.oldPrice.toInt()} TJS",
-                                style          = MaterialTheme.typography.bodySmall,
-                                color          = RelaxTextHint,
-                                textDecoration = TextDecoration.LineThrough,
+                                text = "${it.toInt()} TJS",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = RelaxTextHint,
+                                textDecoration = TextDecoration.LineThrough
                             )
                         }
                     }
+
+                    // ── ADD BUTTON ──
                     if (quantity == 0) {
                         Box(
                             modifier = Modifier
@@ -173,9 +209,14 @@ fun ProductCardGrid(
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(RelaxDark)
                                 .clickable(onClick = onIncrease),
-                            contentAlignment = Alignment.Center,
+                            contentAlignment = Alignment.Center
                         ) {
-                            Icon(Icons.Rounded.Add, null, tint = RelaxWhite, modifier = Modifier.size(20.dp))
+                            Icon(
+                                Icons.Rounded.Add,
+                                contentDescription = null,
+                                tint = RelaxWhite,
+                                modifier = Modifier.size(18.dp)
+                            )
                         }
                     } else {
                         Row(
@@ -183,12 +224,18 @@ fun ProductCardGrid(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .background(RelaxDark)
-                                .padding(horizontal = 4.dp),
+                                .padding(horizontal = 6.dp)
                         ) {
                             IconButton(onClick = onDecrease, modifier = Modifier.size(28.dp)) {
                                 Icon(Icons.Rounded.Remove, null, tint = RelaxWhite, modifier = Modifier.size(14.dp))
                             }
-                            Text("$quantity", color = RelaxWhite, style = MaterialTheme.typography.labelMedium, fontWeight = FontWeight.Bold)
+
+                            Text(
+                                "$quantity",
+                                color = RelaxWhite,
+                                fontWeight = FontWeight.Bold
+                            )
+
                             IconButton(onClick = onIncrease, modifier = Modifier.size(28.dp)) {
                                 Icon(Icons.Rounded.Add, null, tint = RelaxWhite, modifier = Modifier.size(14.dp))
                             }

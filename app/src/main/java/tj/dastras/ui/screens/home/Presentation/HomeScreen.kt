@@ -89,264 +89,268 @@ fun HomeScreen(
         state        = pullState,
         modifier     = Modifier.fillMaxSize(),
     ) {
-        LazyColumn(
-            modifier            = Modifier
-                .fillMaxSize()
-                .background(RelaxBackground),
-            contentPadding      = PaddingValues(bottom = 32.dp),
-            verticalArrangement = Arrangement.spacedBy(0.dp),
-        ) {
+        Column(modifier = Modifier.fillMaxSize()) {
 
-            // ── TOP BAR ─────────────────────────────────────────────────────────
-            item {
-                HomeTopBar(
-                    address         = state.deliveryAddress,
-                    onAddressClick  = { showAddressSheet = true },
-                    onNotifications = onNotifications,
-                    onCart          = onCart,
-                    onFavorites     = onFavorites,
-                )
-            }
-
-            // ── SEARCH BAR ──────────────────────────────────────────────────────
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Brush.verticalGradient(
-                                listOf(RelaxDark, RelaxBackground),
-                                startY = 0f,
-                                endY   = 80f,
-                            )
-                        )
-                        .padding(horizontal = 20.dp)
-                        .padding(top = 4.dp, bottom = 24.dp)
-                ) {
-                    Card(
-                        onClick   = onSearch,
-                        modifier  = Modifier.fillMaxWidth(),
-                        shape     = RoundedCornerShape(18.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                        colors    = CardDefaults.cardColors(containerColor = RelaxWhite),
-                    ) {
-                        Row(
-                            modifier          = Modifier
-                                .fillMaxWidth()
-                                .padding(horizontal = 18.dp, vertical = 15.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                        ) {
-                            Box(
-                                modifier         = Modifier
-                                    .size(34.dp)
-                                    .background(RelaxBackground, RoundedCornerShape(10.dp)),
-                                contentAlignment = Alignment.Center,
-                            ) {
-                                Icon(
-                                    Icons.Rounded.Search,
-                                    contentDescription = null,
-                                    tint     = RelaxDark,
-                                    modifier = Modifier.size(18.dp),
-                                )
-                            }
-                            Spacer(Modifier.width(12.dp))
-                            Text(
-                                text  = stringResource(R.string.home_search_placeholder),
-                                color = RelaxTextHint,
-                                style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp),
-                            )
-                        }
-                    }
-                }
-            }
-
-            // ── BANNERS ─────────────────────────────────────────────────────────
-            if (bannerList.isNotEmpty()) {
+            // ── ЗАКРЕПЛЁННЫЙ TOP BAR ─────────────────────────────────────────
+            HomeTopBar(
+                address = state.deliveryAddress,
+                onAddressClick = { showAddressSheet = true },
+                onNotifications = onNotifications,
+                onCart = onCart,
+                onFavorites = onFavorites,
+            )
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(RelaxBackground),
+                contentPadding = PaddingValues(bottom = 32.dp),
+                verticalArrangement = Arrangement.spacedBy(0.dp),
+            ) {
+                // ── SEARCH BAR ──────────────────────────────────────────────────────
                 item {
-                    Column(modifier = Modifier.padding(horizontal = 20.dp)) {
-                        HorizontalPager(
-                            state       = bannerPager,
-                            pageSpacing = 14.dp,
-                        ) { page ->
-                            BannerCard(banner = bannerList[page], onClick = onPromotions)
-                        }
-                        Spacer(Modifier.height(14.dp))
-                        // Indicator dots
-                        Row(
-                            modifier              = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment     = Alignment.CenterVertically,
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(
+                                Brush.verticalGradient(
+                                    listOf(RelaxDark, RelaxBackground),
+                                    startY = 0f,
+                                    endY = 80f,
+                                )
+                            )
+                            .padding(horizontal = 20.dp)
+                            .padding(top = 4.dp, bottom = 24.dp)
+                    ) {
+
+                        Spacer(Modifier.height(30.dp))
+
+                        Card(
+                            onClick = onSearch,
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(18.dp),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
+                            colors = CardDefaults.cardColors(containerColor = RelaxWhite),
                         ) {
-                            repeat(bannerList.size) { idx ->
-                                val isSelected = idx == bannerPager.currentPage
-                                val dotWidth by animateDpAsState(
-                                    targetValue = if (isSelected) 22.dp else 6.dp,
-                                    animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
-                                    label = "dot_width",
-                                )
-                                val dotColor by animateColorAsState(
-                                    targetValue = if (isSelected) RelaxDark else RelaxDivider,
-                                    label = "dot_color",
-                                )
-                                Spacer(Modifier.width(3.dp))
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 18.dp, vertical = 15.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
                                 Box(
                                     modifier = Modifier
-                                        .height(6.dp)
-                                        .width(dotWidth)
-                                        .clip(RoundedCornerShape(3.dp))
-                                        .background(dotColor)
-                                )
-                                Spacer(Modifier.width(3.dp))
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ── CATEGORIES ──────────────────────────────────────────────────────
-            if (state.categories.isNotEmpty()) {
-                item {
-                    Column(modifier = Modifier.padding(top = 28.dp)) {
-                        SectionHeader(
-                            title    = stringResource(R.string.home_section_categories),
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        LazyRow(
-                            contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp),
-                        ) {
-                            items(state.categories) { cat ->
-                                CategoryChip(category = cat, onClick = { onCategory(cat.id) })
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ── POPULAR PRODUCTS ────────────────────────────────────────────────
-            if (state.products.isNotEmpty()) {
-                item {
-                    Column(modifier = Modifier.padding(top = 32.dp)) {
-                        SectionHeader(
-                            title    = stringResource(R.string.home_section_popular),
-                            onSeeAll = onSeeAllPopular,
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        LazyHorizontalGrid(
-                            rows                  = GridCells.Fixed(1),
-                            modifier              = Modifier.height(290.dp),
-                            contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            items(state.products.take(6)) { product ->
-                                ProductCardGrid(
-                                    product          = product,
-                                    onClick          = { onProduct(product.id) },
-                                    quantity         = cartState.items.find { it.product.id == product.id }?.quantity ?: 0,
-                                    onIncrease       = { cartViewModel.add(product) },
-                                    onDecrease       = { cartViewModel.decrease(product.id) },
-                                    isFavorite       = favoritesState.favorites.any { it.id == product.id },
-                                    onToggleFavorite = { favoritesViewModel.toggle(product) },
-                                    modifier         = Modifier.width(178.dp),
+                                        .size(34.dp)
+                                        .background(RelaxBackground, RoundedCornerShape(10.dp)),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Icon(
+                                        Icons.Rounded.Search,
+                                        contentDescription = null,
+                                        tint = RelaxDark,
+                                        modifier = Modifier.size(18.dp),
+                                    )
+                                }
+                                Spacer(Modifier.width(12.dp))
+                                Text(
+                                    text = stringResource(R.string.home_search_placeholder),
+                                    color = RelaxTextHint,
+                                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp),
                                 )
                             }
                         }
                     }
                 }
 
-                // Promo strip between sections
-                item {
-                    Spacer(Modifier.height(32.dp))
-                    PromoStrip(onClick = onPromotions)
-                }
-            }
-
-            // ── NEW PRODUCTS ────────────────────────────────────────────────────
-            if (state.newProducts.isNotEmpty()) {
-                item {
-                    Column(modifier = Modifier.padding(top = 32.dp)) {
-                        SectionHeader(
-                            title    = stringResource(R.string.home_section_new),
-                            onSeeAll = onSeeAllNew,
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        LazyRow(
-                            contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            items(state.newProducts) { product ->
-                                ProductCardHorizontal(
-                                    product   = product,
-                                    onClick   = { onProduct(product.id) },
-                                    onAddToCart = { cartViewModel.add(product) },
-                                )
+                // ── BANNERS ─────────────────────────────────────────────────────────
+                if (bannerList.isNotEmpty()) {
+                    item {
+                        Column(modifier = Modifier.padding(horizontal = 20.dp)) {
+                            HorizontalPager(
+                                state = bannerPager,
+                                pageSpacing = 14.dp,
+                            ) { page ->
+                                BannerCard(banner = bannerList[page], onClick = onPromotions)
+                            }
+                            Spacer(Modifier.height(14.dp))
+                            // Indicator dots
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                repeat(bannerList.size) { idx ->
+                                    val isSelected = idx == bannerPager.currentPage
+                                    val dotWidth by animateDpAsState(
+                                        targetValue = if (isSelected) 22.dp else 6.dp,
+                                        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                                        label = "dot_width",
+                                    )
+                                    val dotColor by animateColorAsState(
+                                        targetValue = if (isSelected) RelaxDark else RelaxDivider,
+                                        label = "dot_color",
+                                    )
+                                    Spacer(Modifier.width(3.dp))
+                                    Box(
+                                        modifier = Modifier
+                                            .height(6.dp)
+                                            .width(dotWidth)
+                                            .clip(RoundedCornerShape(3.dp))
+                                            .background(dotColor)
+                                    )
+                                    Spacer(Modifier.width(3.dp))
+                                }
                             }
                         }
                     }
                 }
-            }
 
-            // ── SALE PRODUCTS ───────────────────────────────────────────────────
-            if (state.saleProducts.isNotEmpty()) {
-                item {
-                    Column(modifier = Modifier.padding(top = 32.dp)) {
-                        SectionHeader(
-                            title    = stringResource(R.string.home_section_sale_week),
-                            onSeeAll = onPromotions,
-                            modifier = Modifier.padding(horizontal = 20.dp),
-                        )
-                        Spacer(Modifier.height(16.dp))
-                        LazyRow(
-                            contentPadding        = PaddingValues(horizontal = 20.dp),
-                            horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        ) {
-                            items(state.saleProducts) { product ->
-                                ProductCardHorizontal(
-                                    product   = product,
-                                    onClick   = { onProduct(product.id) },
-                                    onAddToCart = { cartViewModel.add(product) },
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-
-            // ── BEST OFFERS GRID ────────────────────────────────────────────────
-            if (state.products.size > 6) {
-                item {
-                    Spacer(Modifier.height(32.dp))
-                    SectionHeader(
-                        title    = stringResource(R.string.home_section_best_offers),
-                        onSeeAll = onSeeAllBestOffers,
-                        modifier = Modifier.padding(horizontal = 20.dp),
-                    )
-                    Spacer(Modifier.height(16.dp))
-                }
-                item {
-                    LazyVerticalGrid(
-                        columns               = GridCells.Fixed(2),
-                        modifier              = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 820.dp)
-                            .padding(horizontal = 20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement   = Arrangement.spacedBy(12.dp),
-                        userScrollEnabled     = false,
-                    ) {
-                        items(state.products.takeLast(6)) { product ->
-                            ProductCardGrid(
-                                product          = product,
-                                onClick          = { onProduct(product.id) },
-                                quantity         = cartState.items.find { it.product.id == product.id }?.quantity ?: 0,
-                                onIncrease       = { cartViewModel.add(product) },
-                                onDecrease       = { cartViewModel.decrease(product.id) },
-                                isFavorite       = favoritesState.favorites.any { it.id == product.id },
-                                onToggleFavorite = { favoritesViewModel.toggle(product) },
+                // ── CATEGORIES ──────────────────────────────────────────────────────
+                if (state.categories.isNotEmpty()) {
+                    item {
+                        Column(modifier = Modifier.padding(top = 28.dp)) {
+                            SectionHeader(
+                                title = stringResource(R.string.home_section_categories),
+                                modifier = Modifier.padding(horizontal = 20.dp),
                             )
+                            Spacer(Modifier.height(16.dp))
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                            ) {
+                                items(state.categories) { cat ->
+                                    CategoryChip(category = cat, onClick = { onCategory(cat.id) })
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── POPULAR PRODUCTS ────────────────────────────────────────────────
+                if (state.products.isNotEmpty()) {
+                    item {
+                        Column(modifier = Modifier.padding(top = 32.dp)) {
+                            SectionHeader(
+                                title = stringResource(R.string.home_section_popular),
+                                onSeeAll = onSeeAllPopular,
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            LazyHorizontalGrid(
+                                rows = GridCells.Fixed(1),
+                                modifier = Modifier.height(290.dp),
+                                contentPadding = PaddingValues(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                items(state.products.take(6)) { product ->
+                                    ProductCardGrid(
+                                        product = product,
+                                        onClick = { onProduct(product.id) },
+                                        quantity = cartState.items.find { it.product.id == product.id }?.quantity
+                                            ?: 0,
+                                        onIncrease = { cartViewModel.add(product) },
+                                        onDecrease = { cartViewModel.decrease(product.id) },
+                                        isFavorite = favoritesState.favorites.any { it.id == product.id },
+                                        onToggleFavorite = { favoritesViewModel.toggle(product) },
+                                        modifier = Modifier.width(178.dp),
+                                    )
+                                }
+                            }
+                        }
+                    }
+
+                    // Promo strip between sections
+                    item {
+                        Spacer(Modifier.height(32.dp))
+                        PromoStrip(onClick = onPromotions)
+                    }
+                }
+
+                // ── NEW PRODUCTS ────────────────────────────────────────────────────
+                if (state.newProducts.isNotEmpty()) {
+                    item {
+                        Column(modifier = Modifier.padding(top = 32.dp)) {
+                            SectionHeader(
+                                title = stringResource(R.string.home_section_new),
+                                onSeeAll = onSeeAllNew,
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                items(state.newProducts) { product ->
+                                    ProductCardHorizontal(
+                                        product = product,
+                                        onClick = { onProduct(product.id) },
+                                        onAddToCart = { cartViewModel.add(product) },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── SALE PRODUCTS ───────────────────────────────────────────────────
+                if (state.saleProducts.isNotEmpty()) {
+                    item {
+                        Column(modifier = Modifier.padding(top = 32.dp)) {
+                            SectionHeader(
+                                title = stringResource(R.string.home_section_sale_week),
+                                onSeeAll = onPromotions,
+                                modifier = Modifier.padding(horizontal = 20.dp),
+                            )
+                            Spacer(Modifier.height(16.dp))
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 20.dp),
+                                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            ) {
+                                items(state.saleProducts) { product ->
+                                    ProductCardHorizontal(
+                                        product = product,
+                                        onClick = { onProduct(product.id) },
+                                        onAddToCart = { cartViewModel.add(product) },
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ── BEST OFFERS GRID ────────────────────────────────────────────────
+                if (state.products.size > 6) {
+                    item {
+                        Spacer(Modifier.height(32.dp))
+                        SectionHeader(
+                            title = stringResource(R.string.home_section_best_offers),
+                            onSeeAll = onSeeAllBestOffers,
+                            modifier = Modifier.padding(horizontal = 20.dp),
+                        )
+                        Spacer(Modifier.height(16.dp))
+                    }
+                    item {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 820.dp)
+                                .padding(horizontal = 20.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp),
+                            userScrollEnabled = false,
+                        ) {
+                            items(state.products.takeLast(6)) { product ->
+                                ProductCardGrid(
+                                    product = product,
+                                    onClick = { onProduct(product.id) },
+                                    quantity = cartState.items.find { it.product.id == product.id }?.quantity
+                                        ?: 0,
+                                    onIncrease = { cartViewModel.add(product) },
+                                    onDecrease = { cartViewModel.decrease(product.id) },
+                                    isFavorite = favoritesState.favorites.any { it.id == product.id },
+                                    onToggleFavorite = { favoritesViewModel.toggle(product) },
+                                )
+                            }
                         }
                     }
                 }
@@ -600,27 +604,44 @@ private fun BannerCard(banner: Banner, onClick: () -> Unit) {
 // CATEGORY CHIP
 // ────────────────────────────────────────────────────────────────────────────
 @Composable
-private fun CategoryChip(category: Category, onClick: () -> Unit) {
-    Column(
-        modifier            = Modifier
-            .clip(RoundedCornerShape(18.dp))
-            .background(parseHexColor(category.color))
-            .clickable(onClick = onClick)
-            .padding(horizontal = 18.dp, vertical = 15.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+private fun CategoryChip(
+    category: Category,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .width(88.dp)
+            .height(96.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color(0xFFF8F9FB)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp
+        ),
+        onClick = onClick
     ) {
-        Text(
-            text     = category.icon ?: "",
-            fontSize = 30.sp,
-        )
-        Spacer(Modifier.height(7.dp))
-        Text(
-            text       = category.name,
-            fontSize   = 11.sp,
-            fontWeight = FontWeight.SemiBold,
-            color      = RelaxTextPrimary,
-            textAlign  = TextAlign.Center,
-        )
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = category.icon ?: "📦",
+                fontSize = 28.sp
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Text(
+                text = category.name,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium,
+                color = RelaxTextPrimary,
+                textAlign = TextAlign.Center,
+                maxLines = 2
+            )
+        }
     }
 }
 

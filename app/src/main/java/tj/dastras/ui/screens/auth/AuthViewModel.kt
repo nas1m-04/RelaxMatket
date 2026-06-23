@@ -14,6 +14,8 @@ import javax.inject.Inject
 data class AuthUiState(
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
+    val isRegistered: Boolean = false,
+    val registeredName: String = "",
     val error: String? = null,
 )
 
@@ -63,10 +65,13 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             val result = authRepository.register(toE164PhoneNumber(phone), password, name)
             uiState = result.fold(
-                onSuccess = { uiState.copy(isLoading = false, isSuccess = true) },
+                onSuccess = { uiState.copy(isLoading = false, isRegistered = true) },
                 onFailure = { uiState.copy(isLoading = false, error = it.message) },
             )
         }
+    }
+    fun onCongratulationsDone() {
+        uiState = uiState.copy(isRegistered = false, isSuccess = true)
     }
 
     fun clearError() {

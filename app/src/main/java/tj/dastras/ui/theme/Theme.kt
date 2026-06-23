@@ -44,18 +44,16 @@ private val RelaxColorScheme = lightColorScheme(
 )
 
 @Composable
-fun DastrasTheme(
-    content: @Composable () -> Unit
-) {
+fun DastrasTheme(content: @Composable () -> Unit) {
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = android.graphics.Color.TRANSPARENT
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
+            // true = тёмные иконки (для светлого фона)
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = false
         }
     }
-
     MaterialTheme(
         colorScheme = RelaxColorScheme,
         typography  = Typography,

@@ -3,6 +3,7 @@ package tj.dastras.ui.screens.main
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.*
@@ -71,7 +72,7 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
         NavHost(
             navController    = bottomNavController,
             startDestination = Route.Home.route,
-            modifier         = Modifier.padding(innerPadding),
+            modifier         = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
             enterTransition  = { fadeIn(tween(250, easing = EaseOut)) },
             exitTransition   = { fadeOut(tween(200)) },
             popEnterTransition  = { fadeIn(tween(250, easing = EaseOut)) },
@@ -123,20 +124,11 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
         }
     }
 }
-
 @Composable
 private fun RelaxBottomNavBar(currentRoute: String?, onNavigate: (String) -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(
-                elevation   = 32.dp,
-                shape       = RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp),
-                spotColor   = Color(0x26000000),
-                ambientColor = Color(0x0D000000),
-            )
-            .clip(RoundedCornerShape(topStart = 28.dp, topEnd = 28.dp))
-            .background(RelaxWhite)
             .navigationBarsPadding()
     ) {
         Row(
