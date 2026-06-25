@@ -19,6 +19,7 @@ sealed class Route(val route: String) {
     object Checkout      : Route("checkout")
     object Promotions    : Route("promotions")
     object Favorites     : Route("favorites")
+    object EditProfileScreen     : Route("edit_profile_screen")
     object OrderHistory  : Route("order_history")
     object Notifications : Route("notifications")
     object SelectBranch  : Route("select_branch/{mode}") {

@@ -103,58 +103,59 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(RelaxBackground),
-                contentPadding = PaddingValues(bottom = 32.dp),
-                verticalArrangement = Arrangement.spacedBy(0.dp),
+                contentPadding = PaddingValues(bottom = 24.dp),
             ) {
-                // ── SEARCH BAR ──────────────────────────────────────────────────────
+
+                // ── SEARCH BAR ─────────────────────────────────────
                 item {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(
-                                Brush.verticalGradient(
-                                    listOf(RelaxDark, RelaxBackground),
-                                    startY = 0f,
-                                    endY = 80f,
-                                )
-                            )
-                            .padding(horizontal = 20.dp)
-                            .padding(top = 4.dp, bottom = 24.dp)
+                            .background(RelaxBackground)
+                            .padding(horizontal = 16.dp, vertical = 12.dp)
                     ) {
-
-                        Spacer(Modifier.height(30.dp))
 
                         Card(
                             onClick = onSearch,
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(18.dp),
-                            elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
-                            colors = CardDefaults.cardColors(containerColor = RelaxWhite),
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = RelaxWhite
+                            ),
+                            elevation = CardDefaults.cardElevation(
+                                defaultElevation = 2.dp
+                            ),
                         ) {
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 18.dp, vertical = 15.dp),
-                                verticalAlignment = Alignment.CenterVertically,
+                                    .padding(horizontal = 14.dp, vertical = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
+
                                 Box(
                                     modifier = Modifier
-                                        .size(34.dp)
-                                        .background(RelaxBackground, RoundedCornerShape(10.dp)),
-                                    contentAlignment = Alignment.Center,
+                                        .size(32.dp)
+                                        .background(
+                                            RelaxBackground,
+                                            RoundedCornerShape(8.dp)
+                                        ),
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
                                         Icons.Rounded.Search,
                                         contentDescription = null,
-                                        tint = RelaxDark,
-                                        modifier = Modifier.size(18.dp),
+                                        tint = RelaxTextSecondary,
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
-                                Spacer(Modifier.width(12.dp))
+
+                                Spacer(Modifier.width(10.dp))
+
                                 Text(
                                     text = stringResource(R.string.home_search_placeholder),
                                     color = RelaxTextHint,
-                                    style = MaterialTheme.typography.bodyLarge.copy(fontSize = 15.sp),
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
                             }
                         }

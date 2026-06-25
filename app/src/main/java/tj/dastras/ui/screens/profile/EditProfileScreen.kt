@@ -1,5 +1,11 @@
 package tj.dastras.ui.screens.profile
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -14,28 +20,117 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
+import androidx.core.content.ContextCompat
+import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
-import tj.dastras.data.UserProfile
 import tj.dastras.ui.theme.*
+import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditProfileScreen(
-    profile: UserProfile,
-    isSaving: Boolean,
     onBack: () -> Unit,
-    onSave: (name: String, email: String) -> Unit,
-    onChangeAvatar: () -> Unit,
+    viewModel: ProfileViewModel = hiltViewModel(),
 ) {
-    var name  by remember { mutableStateOf(profile.name) }
-    var email by remember { mutableStateOf(profile.email) }
+    val state   = viewModel.uiState
+    val profile = state.profile
+    val context = LocalContext.current
 
-    val hasChanges = name.trim() != profile.name || email.trim() != profile.email
-    val nameError  = name.trim().length < 2
+    var showAvatarSheet by remember { mutableStateOf(false) }
+
+    // Инициализируем поля как только профиль загрузится
+    var name  by remember(profile?.name)  { mutableStateOf(profile?.name  ?: "") }
+    var email by remember(profile?.email) { mutableStateOf(profile?.email ?: "") }
+
+    val hasChanges = profile != null && (name.trim() != profile.name || email.trim() != profile.email)
+    val nameError  = name.trim().length < 2 && name.isNotBlank()
     val emailError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+
+    // — Лаунчеры для аватара —
+    val galleryLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let {
+            val mimeType = context.contentResolver.getType(it) ?: "image/jpeg"
+            context.contentResolver.openInputStream(it)?.use { input ->
+                viewModel.uploadAvatar(input.readBytes(), mimeType)
+            }
+        }
+        showAvatarSheet = false
+    }
+
+    val cameraLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.TakePicturePreview()
+    ) { bitmap ->
+        bitmap?.let {
+            val stream = ByteArrayOutputStream()
+            it.compress(Bitmap.CompressFormat.JPEG, 85, stream)
+            viewModel.uploadAvatar(stream.toByteArray(), "image/jpeg")
+        }
+        showAvatarSheet = false
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) cameraLauncher.launch(null)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.load(forceRefresh = false)
+    }
+
+    // — Bottom sheet выбора аватара —
+    if (showAvatarSheet) {
+        AvatarPickerSheet(
+            hasAvatar   = !profile?.avatarUrl.isNullOrEmpty(),
+            isUploading = state.isUploadingAvatar,
+            onCamera    = {
+                val granted = ContextCompat.checkSelfPermission(
+                    context, Manifest.permission.CAMERA
+                ) == PackageManager.PERMISSION_GRANTED
+                if (granted) cameraLauncher.launch(null)
+                else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+            },
+            onGallery   = {
+                galleryLauncher.launch(
+                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                )
+            },
+            onDelete    = { viewModel.removeAvatar(); showAvatarSheet = false },
+            onDismiss   = { showAvatarSheet = false },
+        )
+    }
+
+    // — Загрузка —
+    if (state.isLoading && profile == null) {
+        Scaffold(
+            containerColor = RelaxBackground,
+            topBar = {
+                TopAppBar(
+                    title = { Text("Личные данные", fontWeight = FontWeight.Bold, color = RelaxTextPrimary) },
+                    navigationIcon = {
+                        IconButton(onClick = onBack) {
+                            Icon(Icons.Rounded.ArrowBackIosNew, null, tint = RelaxTextPrimary)
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = RelaxWhite),
+                )
+            }
+        ) { padding ->
+            Box(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = RelaxDark)
+            }
+        }
+        return
+    }
 
     Scaffold(
         containerColor = RelaxBackground,
@@ -45,7 +140,7 @@ fun EditProfileScreen(
                     Text(
                         "Личные данные",
                         fontWeight = FontWeight.Bold,
-                        color      = RelaxTextPrimary
+                        color      = RelaxTextPrimary,
                     )
                 },
                 navigationIcon = {
@@ -64,13 +159,11 @@ fun EditProfileScreen(
                 .verticalScroll(rememberScrollState())
         ) {
 
-            // ── Шапка с аватаром ─────────────────────────────────────────
+            // ── Шапка с аватаром ──────────────────────────────────────────
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        Brush.verticalGradient(listOf(RelaxDark, RelaxDarkSecondary))
-                    )
+//                    .background(Brush.verticalGradient(listOf(RelaxDark, RelaxDarkSecondary)))
                     .padding(vertical = 32.dp),
                 contentAlignment = Alignment.Center,
             ) {
@@ -82,51 +175,67 @@ fun EditProfileScreen(
                             .clip(CircleShape)
                             .border(3.dp, RelaxWhite.copy(alpha = 0.25f), CircleShape)
                             .background(RelaxDarkSecondary)
-                            .clickable { onChangeAvatar() },
+                            .clickable { showAvatarSheet = true },
                         contentAlignment = Alignment.Center,
                     ) {
-                        if (profile.avatarUrl.isNullOrEmpty()) {
+                        if (profile?.avatarUrl.isNullOrEmpty()) {
                             Icon(
                                 Icons.Rounded.Person,
                                 null,
                                 tint     = RelaxTextOnDarkSub,
-                                modifier = Modifier.size(48.dp)
+                                modifier = Modifier.size(48.dp),
                             )
                         } else {
                             AsyncImage(
-                                model            = profile.avatarUrl,
-                                contentDescription = profile.name,
-                                contentScale     = ContentScale.Crop,
-                                modifier         = Modifier.fillMaxSize()
+                                model              = profile?.avatarUrl,
+                                contentDescription = profile?.name,
+                                contentScale       = ContentScale.Crop,
+                                modifier           = Modifier.fillMaxSize(),
                             )
                         }
-                        // Оверлей "сменить"
-                        Box(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .background(Color.Black.copy(alpha = 0.25f)),
-                            contentAlignment = Alignment.Center,
-                        ) {
-                            Icon(
-                                Icons.Rounded.PhotoCamera,
-                                null,
-                                tint     = RelaxWhite,
-                                modifier = Modifier.size(24.dp)
-                            )
+                        // Оверлей загрузки аватара
+                        if (state.isUploadingAvatar) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.45f)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                CircularProgressIndicator(
+                                    modifier    = Modifier.size(28.dp),
+                                    strokeWidth = 2.dp,
+                                    color       = RelaxWhite,
+                                )
+                            }
+                        } else {
+                            // Иконка камеры поверх
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .background(Color.Black.copy(alpha = 0.25f)),
+                                contentAlignment = Alignment.Center,
+                            ) {
+                                Icon(
+                                    Icons.Rounded.PhotoCamera,
+                                    null,
+                                    tint     = RelaxWhite,
+                                    modifier = Modifier.size(24.dp),
+                                )
+                            }
                         }
                     }
 
                     Spacer(Modifier.height(12.dp))
                     Text(
-                        text       = profile.name.ifEmpty { "Пользователь" },
-                        color      = RelaxWhite,
+                        text       = profile?.name?.ifEmpty { "Пользователь" } ?: "Пользователь",
+                        color      = RelaxTextSecondary,
                         fontSize   = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                     Text(
-                        text  = profile.phone,
-                        color = RelaxTextOnDarkSub,
-                        fontSize = 13.sp
+                        text     = profile?.phone ?: "",
+                        color    = RelaxTextSecondary,
+                        fontSize = 13.sp,
                     )
                 }
             }
@@ -136,14 +245,14 @@ fun EditProfileScreen(
             // ── Форма ─────────────────────────────────────────────────────
             Column(
                 modifier            = Modifier.padding(horizontal = 20.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
 
                 Text(
                     "Основная информация",
-                    style  = MaterialTheme.typography.labelMedium,
-                    color  = RelaxTextSecondary,
-                    modifier = Modifier.padding(start = 4.dp)
+                    style    = MaterialTheme.typography.labelMedium,
+                    color    = RelaxTextSecondary,
+                    modifier = Modifier.padding(start = 4.dp),
                 )
 
                 ProfileField(
@@ -152,7 +261,7 @@ fun EditProfileScreen(
                     onChange    = { name = it },
                     icon        = Icons.Rounded.Person,
                     placeholder = "Введите имя",
-                    isError     = nameError && name.isNotBlank(),
+                    isError     = nameError,
                     errorText   = "Минимум 2 символа",
                 )
 
@@ -170,7 +279,7 @@ fun EditProfileScreen(
                 // Телефон — только чтение
                 ProfileFieldReadOnly(
                     label = "Телефон",
-                    value = profile.phone,
+                    value = profile?.phone ?: "",
                     icon  = Icons.Rounded.Phone,
                 )
 
@@ -179,22 +288,25 @@ fun EditProfileScreen(
                 // ── Кнопка сохранить ──────────────────────────────────────
                 AnimatedVisibility(visible = hasChanges) {
                     Button(
-                        onClick  = {
-                            if (!nameError && !emailError) onSave(name.trim(), email.trim())
+                        onClick = {
+                            if (!nameError && !emailError) {
+                                viewModel.updateProfile(name.trim(), email.trim())
+                                onBack()
+                            }
                         },
-                        enabled  = !isSaving && !nameError && !emailError,
+                        enabled  = !state.isLoading && !nameError && !emailError,
                         modifier = Modifier.fillMaxWidth().height(54.dp),
                         shape    = RoundedCornerShape(16.dp),
                         colors   = ButtonDefaults.buttonColors(
-                            containerColor = RelaxDark,
+                            containerColor         = RelaxDark,
                             disabledContainerColor = RelaxDark.copy(alpha = 0.5f),
-                        )
+                        ),
                     ) {
-                        if (isSaving) {
+                        if (state.isLoading) {
                             CircularProgressIndicator(
                                 color       = RelaxWhite,
                                 modifier    = Modifier.size(20.dp),
-                                strokeWidth = 2.dp
+                                strokeWidth = 2.dp,
                             )
                         } else {
                             Icon(Icons.Rounded.Check, null, tint = RelaxWhite)
@@ -203,33 +315,33 @@ fun EditProfileScreen(
                                 "Сохранить изменения",
                                 color      = RelaxWhite,
                                 fontWeight = FontWeight.Bold,
-                                fontSize   = 15.sp
+                                fontSize   = 15.sp,
                             )
                         }
                     }
                 }
 
-                // Карточка с инфо
+                // Инфо-карточка
                 Card(
-                    shape  = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = RelaxSurfaceAlt),
+                    shape     = RoundedCornerShape(16.dp),
+                    colors    = CardDefaults.cardColors(containerColor = RelaxSurfaceAlt),
                     elevation = CardDefaults.cardElevation(0.dp),
                 ) {
                     Row(
-                        modifier          = Modifier.padding(16.dp),
-                        verticalAlignment = Alignment.Top,
+                        modifier              = Modifier.padding(16.dp),
+                        verticalAlignment     = Alignment.Top,
                         horizontalArrangement = Arrangement.spacedBy(12.dp),
                     ) {
                         Icon(
                             Icons.Rounded.Info,
                             null,
                             tint     = RelaxTextSecondary,
-                            modifier = Modifier.size(18.dp).padding(top = 1.dp)
+                            modifier = Modifier.size(18.dp).padding(top = 1.dp),
                         )
                         Text(
                             "Телефон изменить нельзя — это ваш логин. Для смены обратитесь в поддержку.",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = RelaxTextSecondary,
+                            style      = MaterialTheme.typography.bodySmall,
+                            color      = RelaxTextSecondary,
                             lineHeight = 18.sp,
                         )
                     }
@@ -257,15 +369,22 @@ private fun ProfileField(
     Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
         Text(label, style = MaterialTheme.typography.labelMedium, color = RelaxTextSecondary)
         OutlinedTextField(
-            value         = value,
-            onValueChange = onChange,
-            singleLine    = true,
-            isError       = isError,
-            placeholder   = { Text(placeholder, color = RelaxTextHint) },
-            leadingIcon   = { Icon(icon, null, tint = if (isError) MaterialTheme.colorScheme.error else RelaxTextSecondary, modifier = Modifier.size(20.dp)) },
+            value           = value,
+            onValueChange   = onChange,
+            singleLine      = true,
+            isError         = isError,
+            placeholder     = { Text(placeholder, color = RelaxTextHint) },
+            leadingIcon     = {
+                Icon(
+                    icon,
+                    null,
+                    tint     = if (isError) MaterialTheme.colorScheme.error else RelaxTextSecondary,
+                    modifier = Modifier.size(20.dp),
+                )
+            },
             keyboardOptions = KeyboardOptions(keyboardType = keyboard),
-            shape         = RoundedCornerShape(14.dp),
-            colors        = OutlinedTextFieldDefaults.colors(
+            shape           = RoundedCornerShape(14.dp),
+            colors          = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor   = RelaxDark,
                 unfocusedBorderColor = RelaxDivider,
                 focusedTextColor     = RelaxTextPrimary,
@@ -296,10 +415,10 @@ private fun ProfileFieldReadOnly(
             trailingIcon  = { Icon(Icons.Rounded.Lock, null, tint = RelaxTextHint, modifier = Modifier.size(18.dp)) },
             shape         = RoundedCornerShape(14.dp),
             colors        = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor    = RelaxDivider,
-                unfocusedBorderColor  = RelaxDivider,
-                focusedTextColor      = RelaxTextHint,
-                unfocusedTextColor    = RelaxTextHint,
+                focusedBorderColor     = RelaxDivider,
+                unfocusedBorderColor   = RelaxDivider,
+                focusedTextColor       = RelaxTextHint,
+                unfocusedTextColor     = RelaxTextHint,
                 disabledContainerColor = RelaxInputBg,
             ),
             modifier = Modifier.fillMaxWidth().alpha(0.7f),

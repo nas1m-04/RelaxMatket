@@ -30,7 +30,7 @@ import tj.dastras.R
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.theme.*
 import tj.dastras.core.util.LocaleManager
-import tj.dastras.ui.screens.loyalty.formatMemberSince
+import tj.dastras.ui.screens.loyaltycard.LoyaltyCardViewModel.formatMemberSince
 import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -41,6 +41,7 @@ fun ProfileScreen(
     onNotifications: () -> Unit,
     onSelectBranch: () -> Unit,
     onLoggedOut: () -> Unit,
+    onEditProfile: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state   = viewModel.uiState
@@ -50,23 +51,6 @@ fun ProfileScreen(
     var showAvatarSheet   by remember { mutableStateOf(false) }
     var showLanguageSheet by remember { mutableStateOf(false) }
     var currentLanguage   by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
-    var showEditProfile by remember { mutableStateOf(false) }
-
-    // Если показываем редактирование — рендерим поверх
-    if (showEditProfile) {
-        val profile = user ?: return
-        EditProfileScreen(
-            profile        = profile,
-            isSaving       = state.isLoading,
-            onBack         = { showEditProfile = false },
-            onSave         = { name, email ->
-                viewModel.updateProfile(name, email)
-                showEditProfile = false
-            },
-            onChangeAvatar = { showAvatarSheet = true },
-        )
-        return
-    }
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         uri?.let {
             val mimeType = context.contentResolver.getType(it) ?: "image/jpeg"
@@ -216,7 +200,7 @@ fun ProfileScreen(
             Spacer(Modifier.height(12.dp))
 
             ProfileSection(title = stringResource(R.string.section_account)) {
-                ProfileMenuItem(Icons.Rounded.Person,        stringResource(R.string.menu_personal_data), user.email.ifEmpty { stringResource(R.string.menu_not_specified) }, onClick = {showEditProfile = true})
+                ProfileMenuItem(Icons.Rounded.Person,        stringResource(R.string.menu_personal_data), user.email.ifEmpty { stringResource(R.string.menu_not_specified) }, onClick = {onEditProfile()})
                 ProfileMenuItem(Icons.Rounded.Store,         stringResource(R.string.menu_branch),         state.branchName ?: stringResource(R.string.menu_branch_not_selected), onClick = onSelectBranch)
                 ProfileMenuItem(Icons.Rounded.Notifications, stringResource(R.string.menu_notifications),  stringResource(R.string.menu_notifications_on), onClick = onNotifications)
             }

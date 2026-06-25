@@ -68,6 +68,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
     implementation("com.google.android.play:app-update:2.1.0")
     implementation("com.google.android.play:app-update-ktx:2.1.0")
+    implementation("com.google.zxing:core:3.5.3")
 
 
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")

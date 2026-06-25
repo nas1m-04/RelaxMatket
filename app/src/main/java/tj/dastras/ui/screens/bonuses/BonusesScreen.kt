@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,13 +25,13 @@ import tj.dastras.R
 import tj.dastras.core.api.AchievementApiResponse
 import tj.dastras.core.api.BonusTransactionApiResponse
 import tj.dastras.ui.components.RelaxDivider
-import tj.dastras.ui.screens.loyalty.LoyaltyViewModel
-import tj.dastras.ui.screens.loyalty.formatTransactionDate
+import tj.dastras.ui.screens.bonuses.ViewModel.BonusesViewModel
+import tj.dastras.ui.screens.loyaltycard.LoyaltyCardViewModel.formatTransactionDate
 import tj.dastras.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
+fun BonusesScreen(viewModel: BonusesViewModel = hiltViewModel()) {
     val state = viewModel.uiState
     val summary = state.summary
     var activeTab by remember { mutableStateOf(0) }
@@ -49,24 +50,38 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
     val achievements  = state.achievements
     val level         = summary.level
     val listState     = rememberLazyListState()
-    val refreshing = state.isLoading
+
+//    val shouldLoadMore = remember {
+//        derivedStateOf {
+//            if (state.transactions.isEmpty() || !state.hasMore || state.isLoadingMore) {
+//                false
+//            } else {
+//                val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
+//                val total = listState.layoutInfo.totalItemsCount
+//                total > 0 && lastVisible >= total - 3
+//            }
+//        }
+//    }
+//    LaunchedEffect(shouldLoadMore.value) {
+//        if (shouldLoadMore.value) {
+//            viewModel.loadMore()
+//        }
+//    }
+//
+//    LaunchedEffect(Unit) {
+//        viewModel.loadTransactions()
+//    }
+
+
     val pullState = rememberPullToRefreshState()
-    // Auto-load next page when user scrolls near the bottom
-    val shouldLoadMore = remember {
-        derivedStateOf {
-            val lastVisible = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
-            val total       = listState.layoutInfo.totalItemsCount
-            total > 0 && lastVisible >= total - 3
-        }
-    }
-    LaunchedEffect(shouldLoadMore.value) {
-        if (shouldLoadMore.value) viewModel.loadMoreTransactions()
-    }
 
-    LaunchedEffect(Unit) {
-        viewModel.onScreenVisible()
-    }
 
+    PullToRefreshBox(
+        isRefreshing = state.isLoading,
+        onRefresh    = { viewModel.refresh() },
+        state        = pullState,
+        modifier     = Modifier.fillMaxSize(),
+    ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -207,14 +222,14 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
                 transactions.filter { !it.isCredit }
 
             // Count badge
-            if (state.transactionTotal > 0) {
+            if (state.total > 0) {
                 item {
                     val typeLabel = if (activeTab == 0)
                         "начислений"
                     else
                         "списаний"
                     Text(
-                        "Всего ${filtered.size} $typeLabel из ${state.transactionTotal}",
+                        "Всего ${filtered.size} $typeLabel из ${state.total}",
                         style    = MaterialTheme.typography.bodySmall,
                         color    = RelaxTextHint,
                         modifier = Modifier.padding(horizontal = 20.dp, vertical = 4.dp),
@@ -262,20 +277,20 @@ fun BonusesScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = RelaxDark, strokeWidth = 2.dp)
                     }
                 }
-            } else if (state.hasMoreTransactions && filtered.isNotEmpty()) {
+            } else if (state.hasMore && filtered.isNotEmpty()) {
                 item {
                     Box(
                         modifier         = Modifier.fillMaxWidth().padding(12.dp),
                         contentAlignment = Alignment.Center,
                     ) {
-                        TextButton(onClick = { viewModel.loadMoreTransactions() }) {
+                        TextButton(onClick = { viewModel.loadMore() }) {
                             Text("Показать ещё", color = RelaxDark, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
             }
         }
-    }
+    }}
 }
 
 @Composable

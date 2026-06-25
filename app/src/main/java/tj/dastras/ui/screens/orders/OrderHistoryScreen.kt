@@ -24,7 +24,7 @@ import tj.dastras.data.Order
 import tj.dastras.data.OrderStatus
 import tj.dastras.ui.components.RelaxDivider
 import tj.dastras.ui.components.RelaxTopBar
-import tj.dastras.ui.screens.loyalty.formatTransactionDate
+import tj.dastras.ui.screens.loyaltycard.LoyaltyCardViewModel.formatTransactionDate
 import tj.dastras.ui.theme.*
 
 @Composable

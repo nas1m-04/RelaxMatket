@@ -26,6 +26,7 @@ import tj.dastras.ui.screens.promotions.PromotionsScreen
 import tj.dastras.ui.screens.search.SearchScreen
 import tj.dastras.ui.screens.splash.SplashScreen
 import tj.dastras.ui.components.ErrorAlertDialogHost
+import tj.dastras.ui.screens.profile.EditProfileScreen
 
 @Composable
 fun RelaxNavGraph(navController: NavHostController) {
@@ -193,6 +194,11 @@ fun RelaxNavGraph(navController: NavHostController) {
             FavoritesScreen(
                 onBack = { navController.popBackStack() },
                 onProduct = { id -> navController.navigate(Route.ProductDetail.createRoute(id)) }
+            )
+        }
+        composable(Route.EditProfileScreen.route) {
+            EditProfileScreen (
+                onBack = { navController.popBackStack() },
             )
         }
 

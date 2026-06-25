@@ -108,3 +108,8 @@ data class AchievementApiResponse(
     val unlockedAt: String? = null,
     val bonusReward: Int = 0,
 )
+
+data class QrTokenResponse(
+    val qrToken: String,
+    val expiresAt: String,
+)

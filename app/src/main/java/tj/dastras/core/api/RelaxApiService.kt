@@ -128,4 +128,7 @@ interface RelaxApiService {
 
     @GET("loyalty/achievements")
     suspend fun getAchievements(): Response<ApiResponse<List<AchievementApiResponse>>>
+
+    @GET("loyalty/qr-token")
+    suspend fun getQrToken(): Response<ApiResponse<QrTokenResponse>>
 }

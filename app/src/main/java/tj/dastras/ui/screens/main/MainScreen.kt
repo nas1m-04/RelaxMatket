@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
@@ -118,6 +119,7 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
                     onFavorites    = { rootNavController.navigate(Route.Favorites.route) },
                     onNotifications = { rootNavController.navigate(Route.Notifications.route) },
                     onSelectBranch = { rootNavController.navigate(Route.SelectBranch.createRoute("settings")) },
+                    onEditProfile = { rootNavController.navigate(Route.EditProfileScreen.route) },
                     onLoggedOut    = onLoggedOut,
                 )
             }
@@ -125,112 +127,169 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
     }
 }
 @Composable
-private fun RelaxBottomNavBar(currentRoute: String?, onNavigate: (String) -> Unit) {
+private fun RelaxBottomNavBar(
+    currentRoute: String?,
+    onNavigate: (String) -> Unit
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .navigationBarsPadding()
+            .padding(horizontal = 14.dp, vertical = 10.dp)
     ) {
-        Row(
-            modifier              = Modifier
+
+        // background
+        Box(
+            modifier = Modifier
                 .fillMaxWidth()
-                .height(72.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment     = Alignment.CenterVertically,
+                .height(80.dp)
+                .align(Alignment.BottomCenter)
+                .shadow(
+                    elevation = 20.dp,
+                    shape = RoundedCornerShape(26.dp),
+                    spotColor = Color.Black.copy(alpha = 0.12f)
+                )
+                .background(
+                    color = RelaxWhite.copy(alpha = 0.95f),
+                    shape = RoundedCornerShape(26.dp)
+                )
+        )
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(80.dp),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
+
             navItems.forEach { item ->
                 val isSelected = currentRoute == item.route
+
                 if (item.isCenter) {
-                    CenterNavItem(item = item, isSelected = isSelected, onClick = { onNavigate(item.route) })
+                    CenterNavItem(
+                        item = item,
+                        isSelected = isSelected,
+                        onClick = { onNavigate(item.route) }
+                    )
                 } else {
-                    BottomNavItem(item = item, isSelected = isSelected, onClick = { onNavigate(item.route) })
+                    BottomNavItem(
+                        item = item,
+                        isSelected = isSelected,
+                        onClick = { onNavigate(item.route) }
+                    )
                 }
             }
         }
     }
 }
-
 @Composable
-private fun RowScope.BottomNavItem(item: NavItem, isSelected: Boolean, onClick: () -> Unit) {
+private fun RowScope.BottomNavItem(
+    item: NavItem,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     val iconColor by animateColorAsState(
-        targetValue   = if (isSelected) RelaxDark else Color(0xFFAAB4BF),
-        animationSpec = tween(280, easing = FastOutSlowInEasing),
-        label         = "nav_color_${item.route}",
+        targetValue = if (isSelected) RelaxDark else Color(0xFF9AA4B2),
+        animationSpec = tween(250),
+        label = ""
     )
-    val pillAlpha by animateFloatAsState(
-        targetValue   = if (isSelected) 0.10f else 0f,
-        animationSpec = spring(stiffness = Spring.StiffnessMedium, dampingRatio = Spring.DampingRatioMediumBouncy),
-        label         = "nav_pill_${item.route}",
+
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.08f else 1f,
+        animationSpec = spring(stiffness = Spring.StiffnessMedium),
+        label = ""
     )
-    val label = stringResource(item.labelRes)
 
     Column(
         modifier = Modifier
             .weight(1f)
             .fillMaxHeight()
             .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication        = null,
-                onClick           = onClick,
-            ),
+                indication = null,
+                interactionSource = remember { MutableInteractionSource() }
+            ) { onClick() },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
+
         Box(
             modifier = Modifier
-                .height(36.dp)
-                .width(52.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(RelaxDark.copy(alpha = pillAlpha)),
-            contentAlignment = Alignment.Center,
+                .size(40.dp)        // ✅ 36 → 40
+                .scale(scale)
+                .background(
+                    color = if (isSelected)
+                        RelaxDark.copy(alpha = 0.08f)
+                    else
+                        Color.Transparent,
+                    shape = RoundedCornerShape(13.dp)
+                ),
+            contentAlignment = Alignment.Center
         ) {
             Icon(
-                imageVector        = if (isSelected) item.iconSelected else item.icon,
-                contentDescription = label,
-                tint               = iconColor,
-                modifier           = Modifier.size(22.dp),
+                imageVector = item.icon,
+                contentDescription = null,
+                tint = iconColor,
+                modifier = Modifier.size(22.dp)  // ✅ 20 → 22
             )
         }
+
         Spacer(Modifier.height(3.dp))
+
         Text(
-            text       = label,
-            fontSize   = 10.sp,
+            text = stringResource(item.labelRes),
+            fontSize = 10.sp,
+            color = iconColor,
             fontWeight = if (isSelected) FontWeight.SemiBold else FontWeight.Normal,
-            color      = iconColor,
-            maxLines   = 1,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            softWrap = false
         )
     }
 }
-
 @Composable
-private fun RowScope.CenterNavItem(item: NavItem, isSelected: Boolean, onClick: () -> Unit) {
-    val glowAlpha by animateFloatAsState(
-        targetValue   = if (isSelected) 0.55f else 0.35f,
-        animationSpec = tween(300),
-        label         = "center_glow",
+private fun RowScope.CenterNavItem(
+    item: NavItem,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.12f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+        label = ""
     )
+
     Column(
-        modifier = Modifier
-            .weight(1f)
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        modifier = Modifier.weight(1f),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         Box(
             modifier = Modifier
-                .size(56.dp)
-                .offset(y = (-16).dp)
+                .offset(y = (-20).dp)
+                .size(64.dp)
+                .scale(scale)
                 .shadow(
-                    elevation = 16.dp,
-                    shape     = RoundedCornerShape(18.dp),
-                    spotColor = RelaxRed.copy(alpha = glowAlpha),
+                    elevation = 22.dp,
+                    shape = RoundedCornerShape(22.dp),
+                    spotColor = RelaxRed.copy(alpha = 0.35f)
                 )
-                .clip(RoundedCornerShape(18.dp))
-                .background(Brush.linearGradient(listOf(RelaxRed, RelaxOrange)))
-                .clickable(onClick = onClick),
-            contentAlignment = Alignment.Center,
+                .background(
+                    brush = Brush.linearGradient(
+                        listOf(RelaxRed, RelaxOrange)
+                    ),
+                    shape = RoundedCornerShape(22.dp)
+                )
+                .clickable { onClick() },
+            contentAlignment = Alignment.Center
         ) {
-            Icon(item.icon, null, tint = RelaxWhite, modifier = Modifier.size(26.dp))
+
+            Icon(
+                imageVector = item.icon,
+                contentDescription = null,
+                tint = RelaxWhite,
+                modifier = Modifier.size(28.dp)
+            )
         }
     }
 }

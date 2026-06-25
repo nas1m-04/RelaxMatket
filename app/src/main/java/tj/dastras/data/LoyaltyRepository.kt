@@ -5,6 +5,7 @@ import tj.dastras.core.api.BonusTransactionApiResponse
 import tj.dastras.core.api.LoyaltyLevelResponse
 import tj.dastras.core.api.LoyaltySummaryResponse
 import tj.dastras.core.api.PagedResponse
+import tj.dastras.core.api.QrTokenResponse
 import tj.dastras.core.api.RelaxApiService
 import tj.dastras.core.api.dataOrThrow
 import javax.inject.Inject
@@ -65,4 +66,7 @@ class LoyaltyRepository @Inject constructor(
         cachedSummary = null
         summaryFetchedAt = 0L
     }
+
+    suspend fun getQrToken(): QrTokenResponse =
+        api.getQrToken().dataOrThrow()
 }
