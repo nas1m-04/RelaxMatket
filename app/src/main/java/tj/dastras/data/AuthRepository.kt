@@ -1,11 +1,13 @@
 package tj.dastras.data
 
 import android.util.Log
+import kotlinx.coroutines.launch
 import tj.dastras.core.api.LoginRequest
 import tj.dastras.core.api.RegisterRequest
 import tj.dastras.core.api.RelaxApiService
 import tj.dastras.core.api.apiErrorMessage
 import tj.dastras.core.api.friendlyErrorMessage
+import tj.dastras.core.firebase.RelaxFcmTokenManager
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -28,6 +30,7 @@ class AuthRepository @Inject constructor(
 
             if (response.isSuccessful && body?.success == true && body.data != null) {
                 tokenManager.saveTokens(body.data.accessToken, body.data.refreshToken)
+                uploadFcmToken()
                 Log.i(TAG, "register: success uid=${body.data.user?.uid}")
                 Result.success(body.data.user ?: UserProfile())
             } else {
@@ -52,6 +55,7 @@ class AuthRepository @Inject constructor(
 
             if (response.isSuccessful && body?.success == true && body.data != null) {
                 tokenManager.saveTokens(body.data.accessToken, body.data.refreshToken)
+                uploadFcmToken()
                 Log.i(TAG, "login: success uid=${body.data.user?.uid}")
                 Result.success(body.data.user ?: UserProfile())
             } else {
@@ -72,5 +76,21 @@ class AuthRepository @Inject constructor(
         Log.d(TAG, "logout")
         tokenManager.clearTokens()
         userRepository.clearCache()
+    }
+    private suspend fun uploadFcmToken() {
+        try {
+            RelaxFcmTokenManager.getTokenAndUpload { token ->
+                kotlinx.coroutines.GlobalScope.launch {
+                    try {
+                        api.updateFcmToken(RelaxApiService.UpdateFcmTokenRequest(token))
+                        Log.i(TAG, "FCM token uploaded: $token")
+                    } catch (e: Exception) {
+                        Log.w(TAG, "FCM token upload failed", e)
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Log.w(TAG, "uploadFcmToken error", e)
+        }
     }
 }

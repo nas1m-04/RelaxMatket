@@ -23,6 +23,7 @@ object ErrorPresenter {
 
     /** Reports any throwable, wrapping non-API errors (e.g. network/IO) into a generic [ApiException]. */
     fun report(throwable: Throwable) {
+        if (throwable is kotlinx.coroutines.CancellationException) return
         current = throwable as? ApiException
             ?: ApiException(apiCode = null, message = friendlyErrorMessage(throwable))
     }

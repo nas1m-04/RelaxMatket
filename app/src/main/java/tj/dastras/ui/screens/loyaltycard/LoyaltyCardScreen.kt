@@ -3,6 +3,7 @@ package tj.dastras.ui.screens.loyaltycard
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
@@ -276,7 +277,7 @@ fun LoyaltyCardScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
                     elevation = CardDefaults.cardElevation(0.dp),
                 ) {
                     Column(
-                        modifier            = Modifier.padding(24.dp),
+                        modifier            = Modifier.padding(24.dp).fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
@@ -293,16 +294,6 @@ fun LoyaltyCardScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
                             stringResource(R.string.loyalty_barcode_title),
                             style = MaterialTheme.typography.bodySmall,
                             color = RelaxTextHint,
-                        )
-                        Spacer(Modifier.height(8.dp))
-                        BarcodeVisual(modifier = Modifier.fillMaxWidth().height(50.dp))
-                        Spacer(Modifier.height(6.dp))
-                        Text(
-                            cardNumber.replace("RELAX ", ""),
-                            style         = MaterialTheme.typography.bodySmall,
-                            color         = RelaxTextSecondary,
-                            fontFamily    = FontFamily.Monospace,
-                            letterSpacing = 2.sp,
                         )
                     }
                 }
@@ -388,23 +379,24 @@ fun LoyaltyCardScreen(viewModel: LoyaltyViewModel = hiltViewModel()) {
                 item {
                 Spacer(Modifier.height(20.dp))
 
-                Card(
-                    modifier  = Modifier.padding(horizontal = 20.dp).fillMaxWidth(),
-                    shape     = RoundedCornerShape(20.dp),
-                    colors    = CardDefaults.cardColors(containerColor = RelaxDark),
-                    elevation = CardDefaults.cardElevation(0.dp),
-                ) {
-                    Row(
-                        modifier              = Modifier.padding(24.dp),
-                        horizontalArrangement = Arrangement.SpaceAround,
+                    Card(
+                        modifier  = Modifier.padding(horizontal = 20.dp).fillMaxWidth(),
+                        shape     = RoundedCornerShape(20.dp),
+                        colors    = CardDefaults.cardColors(containerColor = RelaxDark),
+                        elevation = CardDefaults.cardElevation(0.dp),
                     ) {
-                        StatBlock("${summary.bonusBalance.toInt()}", stringResource(R.string.loyalty_stat_bonuses), RelaxGold)
-                        Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
-                        StatBlock("${summary.totalSpent.toInt()} TJS", stringResource(R.string.loyalty_stat_spent), RelaxWhite)
-                        Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
-                        StatBlock("${(summary.bonusBalance * (level.cashbackPercent / 100)).toInt()} TJS", stringResource(R.string.loyalty_stat_cashback), RelaxOrange)
+                        Row(
+                            modifier              = Modifier.fillMaxWidth().padding(24.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment     = Alignment.CenterVertically,
+                        ) {
+                            StatBlock("${summary.bonusBalance.toInt()}", stringResource(R.string.loyalty_stat_bonuses), RelaxGold)
+                            Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
+                            StatBlock("${summary.totalSpent.toInt()} TJS", stringResource(R.string.loyalty_stat_spent), RelaxWhite)
+                            Box(modifier = Modifier.width(1.dp).height(48.dp).background(RelaxWhite.copy(alpha = 0.12f)))
+                            StatBlock("${(summary.bonusBalance * (level.cashbackPercent / 100)).toInt()} TJS", stringResource(R.string.loyalty_stat_cashback), RelaxOrange)
+                        }
                     }
-                }
 
                 Spacer(Modifier.height(24.dp))
             }
@@ -422,24 +414,24 @@ private fun StatBlock(value: String, label: String, color: Color) {
 }
 
 
-@Composable
-private fun BarcodeVisual(modifier: Modifier = Modifier) {
-    val bars = remember {
-        List(40) { i ->
-            Pair(((i * 13 + 42) % 3) + 1, ((i * 7 + 42) % 2) + 1)
-        }
-    }
-    Canvas(modifier = modifier) {
-        var x = 0f
-        bars.forEach { (barW, gapW) ->
-            val bw = barW * size.height * 0.04f
-            val gw = gapW * size.height * 0.03f
-            drawRect(Color(0xFF0F172A), Offset(x, 0f), androidx.compose.ui.geometry.Size(bw, size.height))
-            x += bw + gw
-            if (x >= size.width) return@forEach
-        }
-    }
-}
+//@Composable
+//private fun BarcodeVisual(modifier: Modifier = Modifier) {
+//    val bars = remember {
+//        List(40) { i ->
+//            Pair(((i * 13 + 42) % 3) + 1, ((i * 7 + 42) % 2) + 1)
+//        }
+//    }
+//    Canvas(modifier = modifier) {
+//        var x = 0f
+//        bars.forEach { (barW, gapW) ->
+//            val bw = barW * size.height * 0.04f
+//            val gw = gapW * size.height * 0.03f
+//            drawRect(Color(0xFF0F172A), Offset(x, 0f), androidx.compose.ui.geometry.Size(bw, size.height))
+//            x += bw + gw
+//            if (x >= size.width) return@forEach
+//        }
+//    }
+//}
 
 private val CircleShape = RoundedCornerShape(50)
 private val RelaxGold   = Color(0xFFD4AF37)

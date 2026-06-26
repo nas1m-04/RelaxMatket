@@ -131,4 +131,8 @@ interface RelaxApiService {
 
     @GET("loyalty/qr-token")
     suspend fun getQrToken(): Response<ApiResponse<QrTokenResponse>>
+
+    @POST("profile/fcm-token")
+    suspend fun updateFcmToken(@Body request: UpdateFcmTokenRequest): Response<ApiResponse<Unit>>
+    data class UpdateFcmTokenRequest(val fcmToken: String)
 }
