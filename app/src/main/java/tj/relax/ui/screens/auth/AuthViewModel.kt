@@ -37,7 +37,14 @@ class AuthViewModel @Inject constructor(
         }
     }
 
-    fun register(name: String, phone: String, password: String, confirmPassword: String) {
+    fun register(
+        name: String,
+        phone: String,
+        password: String,
+        confirmPassword: String,
+        secretQuestion: String = "",
+        secretAnswer: String = "",
+    ) {
         if (uiState.isLoading) return
 
         if (name.isBlank() || phone.isBlank() || password.isBlank()) {
@@ -52,10 +59,22 @@ class AuthViewModel @Inject constructor(
             uiState = uiState.copy(error = "Пароли не совпадают")
             return
         }
+        // Optional pair — but if one is filled in, both need to be, otherwise support staff would
+        // have no way to verify the caller against a question with no matching answer.
+        if (secretQuestion.isBlank() != secretAnswer.isBlank()) {
+            uiState = uiState.copy(error = "Заполните и секретный вопрос, и ответ, либо оставьте оба поля пустыми")
+            return
+        }
 
         uiState = uiState.copy(isLoading = true, error = null)
         viewModelScope.launch {
-            val result = authRepository.register(toE164PhoneNumber(phone), password, name)
+            val result = authRepository.register(
+                toE164PhoneNumber(phone),
+                password,
+                name,
+                secretQuestion.trim().takeIf { it.isNotBlank() },
+                secretAnswer.trim().takeIf { it.isNotBlank() },
+            )
             uiState = result.fold(
                 onSuccess = { uiState.copy(isLoading = false, isRegistered = true) },
                 onFailure = { uiState.copy(isLoading = false, error = it.message) },

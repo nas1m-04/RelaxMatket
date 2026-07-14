@@ -6,6 +6,7 @@ import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.apiErrorMessage
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.core.firebase.RelaxFcmTokenManager
+import tj.relax.ui.screens.auth.data.dto.request.ChangePasswordRequest
 import tj.relax.ui.screens.auth.data.dto.request.LoginRequest
 import tj.relax.ui.screens.auth.data.dto.request.RegisterRequest
 import javax.inject.Inject
@@ -22,10 +23,22 @@ class AuthRepository @Inject constructor(
     val isLoggedIn: Boolean
         get() = tokenManager.isLoggedIn()
 
-    suspend fun register(phone: String, password: String, name: String): Result<UserProfile> {
+    suspend fun register(
+        phone: String,
+        password: String,
+        name: String,
+        secretQuestion: String? = null,
+        secretAnswer: String? = null,
+    ): Result<UserProfile> {
         return try {
             Log.d(TAG, "register: phone=$phone")
-            val response = api.register(RegisterRequest(phone = phone, password = password, name = name))
+            val response = api.register(RegisterRequest(
+                phone = phone,
+                password = password,
+                name = name,
+                secretQuestion = secretQuestion,
+                secretAnswer = secretAnswer,
+            ))
             val body = response.body()
 
             if (response.isSuccessful && body?.success == true && body.data != null) {
@@ -68,6 +81,28 @@ class AuthRepository @Inject constructor(
             }
         } catch (e: Exception) {
             Log.e(TAG, "login: error", e)
+            Result.failure(Exception(friendlyErrorMessage(e)))
+        }
+    }
+
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        return try {
+            val response = api.changePassword(ChangePasswordRequest(currentPassword, newPassword))
+            val body = response.body()
+
+            if (response.isSuccessful && body?.success == true) {
+                Log.i(TAG, "changePassword: success")
+                Result.success(Unit)
+            } else {
+                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code()) {
+                    401 -> "Текущий пароль неверен"
+                    else -> "Не удалось сменить пароль. Попробуйте позже"
+                }
+                Log.w(TAG, "changePassword: failed code=${response.code()} message=$message")
+                Result.failure(Exception(message))
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "changePassword: error", e)
             Result.failure(Exception(friendlyErrorMessage(e)))
         }
     }

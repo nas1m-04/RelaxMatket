@@ -26,6 +26,12 @@
     <string name="menu_notifications_on">Фаъол</string>
     <string name="menu_notifications_off">Ғайрифаъол</string>
     <string name="menu_language">Забон</string>
+    <string name="menu_change_password">Иваз кардани парол</string>
+    <string name="change_password_title">Иваз кардани парол</string>
+    <string name="change_password_current_placeholder">Пароли ҷорӣ</string>
+    <string name="change_password_new_placeholder">Пароли нав</string>
+    <string name="change_password_confirm_placeholder">Пароли навро такрор кунед</string>
+    <string name="change_password_submit">Захира кардан</string>
 
     <!-- Logout -->
     <string name="logout_button">Аз ҳисоб баромадан</string>
@@ -84,6 +90,9 @@
     <string name="register_password_placeholder">На кам аз 6 аломат</string>
     <string name="register_confirm_password_label">Паролро такрор кунед</string>
     <string name="register_confirm_password_placeholder">Паролро такрор кунед</string>
+    <string name="register_secret_hint">Агар паролро фаромӯш кунед, барқарор кардани дастрасиро осон мекунад (ихтиёрӣ)</string>
+    <string name="register_secret_question_placeholder">Саволи махфӣ</string>
+    <string name="register_secret_answer_placeholder">Ҷавоб ба саволи махфӣ</string>
     <string name="register_button">Бақайдгирӣ</string>
     <string name="register_have_account">Аллакай ҳисоб доред? </string>
     <string name="register_login_link">Воридшавӣ</string>

@@ -35,6 +35,8 @@ fun RegisterScreen(
     var confirmPassword        by remember { mutableStateOf("") }
     var passwordVisible        by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var secretQuestion         by remember { mutableStateOf("") }
+    var secretAnswer           by remember { mutableStateOf("") }
     val state = viewModel.uiState
 
     // ДОЛЖНО БЫТЬ ТАК:
@@ -171,11 +173,33 @@ fun RegisterScreen(
                 onTogglePassword   = { confirmPasswordVisible = !confirmPasswordVisible },
             )
 
+            Spacer(Modifier.height(18.dp))
+            Text(
+                stringResource(R.string.register_secret_hint),
+                color      = RelaxTextHint,
+                style      = MaterialTheme.typography.bodySmall,
+                lineHeight = 16.sp,
+            )
+            Spacer(Modifier.height(10.dp))
+            AuthField(
+                value       = secretQuestion,
+                onChange    = { secretQuestion = it },
+                placeholder = stringResource(R.string.register_secret_question_placeholder),
+                icon        = Icons.Rounded.HelpOutline,
+            )
+            Spacer(Modifier.height(14.dp))
+            AuthField(
+                value       = secretAnswer,
+                onChange    = { secretAnswer = it },
+                placeholder = stringResource(R.string.register_secret_answer_placeholder),
+                icon        = Icons.Rounded.QuestionAnswer,
+            )
+
             Spacer(Modifier.height(28.dp))
 
             RelaxButton(
                 text      = stringResource(R.string.register_button),
-                onClick   = { viewModel.register(name, phone, password, confirmPassword) },
+                onClick   = { viewModel.register(name, phone, password, confirmPassword, secretQuestion, secretAnswer) },
                 modifier  = Modifier.fillMaxWidth(),
                 isLoading = state.isLoading,
             )

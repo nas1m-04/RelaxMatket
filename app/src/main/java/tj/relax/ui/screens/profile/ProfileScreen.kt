@@ -49,6 +49,7 @@ fun ProfileScreen(
     var showLogoutDialog  by remember { mutableStateOf(false) }
     var showAvatarSheet   by remember { mutableStateOf(false) }
     var showLanguageSheet by remember { mutableStateOf(false) }
+    var showChangePasswordSheet by remember { mutableStateOf(false) }
     var currentLanguage   by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
 
     var name  by remember(user?.name)  { mutableStateOf(user?.name  ?: "") }
@@ -111,6 +112,17 @@ fun ProfileScreen(
                 showLanguageSheet = false
             },
             onDismiss = { showLanguageSheet = false },
+        )
+    }
+
+    if (showChangePasswordSheet) {
+        ChangePasswordSheet(
+            state = viewModel.changePasswordState,
+            onSubmit = { current, new, confirm -> viewModel.changePassword(current, new, confirm) },
+            onDismiss = {
+                showChangePasswordSheet = false
+                viewModel.resetChangePasswordState()
+            },
         )
     }
 
@@ -247,6 +259,7 @@ fun ProfileScreen(
 
         ProfileSection(title = stringResource(R.string.section_settings)) {
             ProfileMenuItem(Icons.Rounded.Language, stringResource(R.string.menu_language), languageDisplayName(currentLanguage), onClick = { showLanguageSheet = true })
+            ProfileMenuItem(Icons.Rounded.Lock, stringResource(R.string.menu_change_password), "", onClick = { showChangePasswordSheet = true })
         }
 
         Spacer(Modifier.height(16.dp))

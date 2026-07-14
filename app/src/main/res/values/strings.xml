@@ -26,6 +26,12 @@
     <string name="menu_notifications_on">Включены</string>
     <string name="menu_notifications_off">Отключены</string>
     <string name="menu_language">Язык</string>
+    <string name="menu_change_password">Сменить пароль</string>
+    <string name="change_password_title">Смена пароля</string>
+    <string name="change_password_current_placeholder">Текущий пароль</string>
+    <string name="change_password_new_placeholder">Новый пароль</string>
+    <string name="change_password_confirm_placeholder">Повторите новый пароль</string>
+    <string name="change_password_submit">Сохранить</string>
 
     <!-- Logout -->
     <string name="logout_button">Выйти из аккаунта</string>
@@ -84,6 +90,9 @@
     <string name="register_password_placeholder">Не менее 6 символов</string>
     <string name="register_confirm_password_label">Повторите пароль</string>
     <string name="register_confirm_password_placeholder">Повторите пароль</string>
+    <string name="register_secret_hint">Поможет восстановить доступ, если вы забудете пароль (необязательно)</string>
+    <string name="register_secret_question_placeholder">Секретный вопрос</string>
+    <string name="register_secret_answer_placeholder">Ответ на секретный вопрос</string>
     <string name="register_button">Зарегистрироваться</string>
     <string name="register_have_account">Уже есть аккаунт? </string>
     <string name="register_login_link">Войти</string>

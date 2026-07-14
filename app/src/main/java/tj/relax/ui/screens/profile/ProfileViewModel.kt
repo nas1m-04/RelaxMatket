@@ -130,4 +130,43 @@ class ProfileViewModel @Inject constructor(
     fun consumeError() {
         uiState = uiState.copy(error = null)
     }
+
+    var changePasswordState by mutableStateOf(ChangePasswordUiState())
+        private set
+
+    fun changePassword(currentPassword: String, newPassword: String, confirmPassword: String) {
+        if (changePasswordState.isLoading) return
+
+        if (currentPassword.isBlank() || newPassword.isBlank()) {
+            changePasswordState = changePasswordState.copy(error = "Заполните все поля")
+            return
+        }
+        if (newPassword.length < 6) {
+            changePasswordState = changePasswordState.copy(error = "Новый пароль должен содержать не менее 6 символов")
+            return
+        }
+        if (newPassword != confirmPassword) {
+            changePasswordState = changePasswordState.copy(error = "Пароли не совпадают")
+            return
+        }
+
+        changePasswordState = changePasswordState.copy(isLoading = true, error = null)
+        viewModelScope.launch {
+            val result = authRepository.changePassword(currentPassword, newPassword)
+            changePasswordState = result.fold(
+                onSuccess = { changePasswordState.copy(isLoading = false, success = true) },
+                onFailure = { changePasswordState.copy(isLoading = false, error = it.message) },
+            )
+        }
+    }
+
+    fun resetChangePasswordState() {
+        changePasswordState = ChangePasswordUiState()
+    }
 }
+
+data class ChangePasswordUiState(
+    val isLoading: Boolean = false,
+    val error: String? = null,
+    val success: Boolean = false,
+)

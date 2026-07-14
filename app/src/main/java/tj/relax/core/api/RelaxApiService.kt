@@ -19,6 +19,7 @@ import tj.relax.data.CreateOrderRequest
 import tj.relax.data.Product
 import tj.relax.data.UpdateProfileRequest
 import tj.relax.data.UserProfile
+import tj.relax.ui.screens.auth.data.dto.request.ChangePasswordRequest
 import tj.relax.ui.screens.auth.data.dto.request.LoginRequest
 import tj.relax.ui.screens.auth.data.dto.request.RefreshRequest
 import tj.relax.ui.screens.auth.data.dto.request.RegisterRequest
@@ -111,6 +112,9 @@ interface RelaxApiService {
 
     @DELETE("profile/avatar")
     suspend fun deleteAvatar(): Response<ApiResponse<UserProfile>>
+
+    @POST("auth/change-password")
+    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiResponse<Unit>>
 
     // ── Favorites (auth required) ─────────────────────────────────────────
     @GET("favorites")
