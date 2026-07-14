@@ -25,6 +25,7 @@ import tj.relax.ui.screens.auth.data.dto.request.RegisterRequest
 import tj.relax.ui.screens.auth.data.dto.response.AuthResponse
 import tj.relax.ui.screens.cart.data.dto.response.CartItemResponse
 import tj.relax.ui.screens.notifications.data.dto.response.NotificationResponse
+import tj.relax.ui.screens.notifications.data.dto.response.UnreadCountResponse
 import tj.relax.ui.screens.orders.data.dto.response.OrderResponse
 import tj.relax.ui.screens.promotions.data.dto.response.PromotionResponse
 
@@ -163,4 +164,7 @@ interface RelaxApiService {
 
     @POST("notifications/{id}/read")
     suspend fun markNotificationRead(@Path("id") id: Int): Response<ApiResponse<Unit>>
+
+    @GET("notifications/unread-count")
+    suspend fun getUnreadNotificationsCount(): Response<ApiResponse<UnreadCountResponse>>
 }

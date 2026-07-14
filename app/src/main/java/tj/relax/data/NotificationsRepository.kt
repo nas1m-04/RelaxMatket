@@ -26,4 +26,7 @@ class NotificationsRepository @Inject constructor(
     suspend fun markRead(id: Int) {
         api.markNotificationRead(id)
     }
+
+    suspend fun getUnreadCount(): Int =
+        api.getUnreadNotificationsCount().dataOrThrow().count
 }

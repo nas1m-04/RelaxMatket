@@ -27,4 +27,5 @@ data class UpdateProfileRequest(
     val email: String? = null,
     val avatarUrl: String? = null,
     val preferredBranchId: Int? = null,
+    val pushEnabled: Boolean? = null,
 )

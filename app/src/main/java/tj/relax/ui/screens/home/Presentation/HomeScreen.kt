@@ -15,6 +15,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import tj.relax.data.Notification
 import tj.relax.data.NotificationType
 import androidx.compose.runtime.*
@@ -87,6 +90,17 @@ fun HomeScreen(
     var showAddressSheet by remember { mutableStateOf(false) }
     val pullState = rememberPullToRefreshState()
 
+    // Marking notifications read happens on a separate screen — re-check the unread dot whenever
+    // the user comes back here (e.g. from the notifications list), not just on first load.
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) viewModel.refreshUnreadCount()
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
+    }
+
     // ── IN-APP MODAL ─────────────────────────────────────────────────────────
     state.inAppModal?.let { modal ->
         InAppMessageDialog(
@@ -110,6 +124,7 @@ fun HomeScreen(
                 onNotifications = onNotifications,
                 onCart = onCart,
                 onFavorites = onFavorites,
+                hasUnread = state.hasUnread,
             )
             LazyColumn(
                 modifier = Modifier
@@ -401,6 +416,7 @@ private fun HomeTopBar(
     onNotifications: () -> Unit,
     onCart: () -> Unit,
     onFavorites: () -> Unit,
+    hasUnread: Boolean,
 ) {
     Box(
         modifier = Modifier
@@ -488,7 +504,7 @@ private fun HomeTopBar(
             Spacer(Modifier.width(8.dp))
             HomeIconButton(
                 icon    = Icons.Rounded.NotificationsNone,
-                badge   = true,
+                badge   = hasUnread,
                 onClick = onNotifications,
             )
             Spacer(Modifier.width(8.dp))

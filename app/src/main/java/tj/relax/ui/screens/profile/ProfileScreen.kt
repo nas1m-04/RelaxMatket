@@ -39,7 +39,6 @@ import java.io.ByteArrayOutputStream
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    onNotifications: () -> Unit,
     onSelectBranch: () -> Unit,
     onLoggedOut: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
@@ -235,7 +234,13 @@ fun ProfileScreen(
 
         ProfileSection(title = stringResource(R.string.section_account)) {
             ProfileMenuItem(Icons.Rounded.Store,         stringResource(R.string.menu_branch),         state.branchName ?: stringResource(R.string.menu_branch_not_selected), onClick = onSelectBranch)
-            ProfileMenuItem(Icons.Rounded.Notifications, stringResource(R.string.menu_notifications),  stringResource(R.string.menu_notifications_on), onClick = onNotifications)
+            ProfileSwitchItem(
+                icon     = Icons.Rounded.Notifications,
+                title    = stringResource(R.string.menu_notifications),
+                subtitle = stringResource(if (state.profile?.pushEnabled != false) R.string.menu_notifications_on else R.string.menu_notifications_off),
+                checked  = state.profile?.pushEnabled != false,
+                onCheckedChange = { viewModel.setPushEnabled(it) },
+            )
         }
 
         Spacer(Modifier.height(12.dp))
@@ -294,6 +299,31 @@ private fun ColumnScope.ProfileMenuItem(icon: ImageVector, title: String, subtit
             if (subtitle.isNotEmpty()) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
         }
         Icon(Icons.Rounded.ChevronRight, null, tint = RelaxTextHint, modifier = Modifier.size(20.dp))
+    }
+    RelaxDivider(modifier = Modifier.padding(start = 68.dp))
+}
+
+@Composable
+private fun ColumnScope.ProfileSwitchItem(icon: ImageVector, title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 14.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(40.dp).clip(RoundedCornerShape(12.dp)).background(RelaxSurfaceAlt), contentAlignment = Alignment.Center) {
+            Icon(icon, null, tint = RelaxTextPrimary, modifier = Modifier.size(20.dp))
+        }
+        Spacer(Modifier.width(12.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
+            if (subtitle.isNotEmpty()) Text(subtitle, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+        }
+        Switch(
+            checked = checked,
+            onCheckedChange = onCheckedChange,
+            colors = SwitchDefaults.colors(
+                checkedThumbColor = RelaxWhite,
+                checkedTrackColor = RelaxDark,
+                uncheckedThumbColor = RelaxWhite,
+                uncheckedTrackColor = RelaxDivider,
+            ),
+        )
     }
     RelaxDivider(modifier = Modifier.padding(start = 68.dp))
 }

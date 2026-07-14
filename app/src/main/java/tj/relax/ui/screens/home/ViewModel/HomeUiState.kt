@@ -16,6 +16,7 @@ data class HomeUiState(
     val isRefreshing: Boolean = false,
     val error: String? = null,
     val inAppModal: Notification? = null,
+    val hasUnread: Boolean = false,
 ) {
     val isEmpty get() = products.isEmpty() && categories.isEmpty() && banners.isEmpty()
 }

@@ -12,6 +12,7 @@ data class UserProfile(
     val memberSince: String = "",
     val favoriteIds: List<Int> = emptyList(),
     val preferredBranchId: Int? = null,
+    val pushEnabled: Boolean = true,
     @kotlin.jvm.Transient val level: LoyaltyLevel = LoyaltyLevel(
         "Старт", 0, 4999, 1f, 0xFFC0C0C0L, listOf("1% кэшбэк бонусами")
     ),

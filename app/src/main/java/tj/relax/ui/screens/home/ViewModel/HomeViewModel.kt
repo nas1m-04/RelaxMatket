@@ -42,7 +42,20 @@ class HomeViewModel @Inject constructor(
     fun dismissInAppModal() {
         val id = uiState.inAppModal?.id ?: return
         uiState = uiState.copy(inAppModal = null)
-        viewModelScope.launch { runCatching { notificationsRepository.markRead(id) } }
+        viewModelScope.launch {
+            runCatching { notificationsRepository.markRead(id) }
+            refreshUnreadCount()
+        }
+    }
+
+    /** Re-checks whether the bell icon's unread dot should show — called on init/pull-to-refresh
+     * and whenever the Home screen resumes, since marking notifications read happens on a
+     * separate screen this ViewModel has no other way to hear about. */
+    fun refreshUnreadCount() {
+        viewModelScope.launch {
+            runCatching { notificationsRepository.getUnreadCount() }
+                .onSuccess { count -> uiState = uiState.copy(hasUnread = count > 0) }
+        }
     }
 
     init { load() }
@@ -68,6 +81,7 @@ class HomeViewModel @Inject constructor(
                     val catsD     = async { categoryRepository.getAll() }
                     val bannersD  = async { bannerRepository.getAll() }
                     val modalD    = async { runCatching { notificationsRepository.getInAppModal() }.getOrNull() }
+                    val unreadD   = async { runCatching { notificationsRepository.getUnreadCount() }.getOrNull() }
 
                     val products     = popularD.await()
                     val newProducts  = newD.await().ifEmpty { products.filter { it.isNew } }
@@ -75,6 +89,7 @@ class HomeViewModel @Inject constructor(
                     val categories   = catsD.await()
                     val banners      = bannersD.await().ifEmpty { MockData.banners }
                     val inAppModal   = modalD.await()
+                    val unreadCount  = unreadD.await()
 
                     uiState = uiState.copy(
                         products     = products,
@@ -83,6 +98,7 @@ class HomeViewModel @Inject constructor(
                         categories   = categories,
                         banners      = banners,
                         inAppModal   = inAppModal,
+                        hasUnread    = unreadCount?.let { it > 0 } ?: uiState.hasUnread,
                         isLoading    = false,
                         isRefreshing = false,
                     )

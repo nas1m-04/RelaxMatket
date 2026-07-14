@@ -22,8 +22,9 @@
     <string name="menu_personal_data">Маълумоти шахсӣ</string>
     <string name="menu_branch">Филиали ман</string>
     <string name="menu_branch_not_selected">Интихоб нашудааст</string>
-    <string name="menu_notifications">Огоҳиномаҳо</string>
+    <string name="menu_notifications">Огоҳиномаҳои push</string>
     <string name="menu_notifications_on">Фаъол</string>
+    <string name="menu_notifications_off">Ғайрифаъол</string>
     <string name="menu_language">Забон</string>
 
     <!-- Logout -->

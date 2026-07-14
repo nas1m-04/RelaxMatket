@@ -117,7 +117,6 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
             }
             composable(Route.Profile.route) {
                 ProfileScreen(
-                    onNotifications = { rootNavController.navigate(Route.Notifications.route) },
                     onSelectBranch = { rootNavController.navigate(Route.SelectBranch.createRoute("settings")) },
                     onLoggedOut    = onLoggedOut,
                 )

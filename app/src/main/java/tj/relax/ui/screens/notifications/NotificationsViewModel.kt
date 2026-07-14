@@ -44,4 +44,18 @@ class NotificationsViewModel @Inject constructor(
             } catch (_: Exception) {}
         }
     }
+
+    fun markRead(id: Int) {
+        val target = uiState.notifications.firstOrNull { it.id == id } ?: return
+        if (target.isRead) return
+        // Optimistic — tapping a notification should feel instant.
+        uiState = uiState.copy(notifications = uiState.notifications.map { if (it.id == id) it.copy(isRead = true) else it })
+        viewModelScope.launch {
+            try {
+                repository.markRead(id)
+            } catch (_: Exception) {
+                uiState = uiState.copy(notifications = uiState.notifications.map { if (it.id == id) it.copy(isRead = false) else it })
+            }
+        }
+    }
 }

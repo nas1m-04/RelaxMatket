@@ -112,6 +112,21 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    fun setPushEnabled(enabled: Boolean) {
+        val current = uiState.profile ?: return
+        // Optimistic — a settings toggle should feel instant, not wait on a round trip.
+        uiState = uiState.copy(profile = current.copy(pushEnabled = enabled))
+        viewModelScope.launch {
+            try {
+                userRepository.updateProfile(UpdateProfileRequest(pushEnabled = enabled))
+            } catch (e: Exception) {
+                Log.e(TAG, "setPushEnabled: error", e)
+                uiState = uiState.copy(profile = current, error = friendlyErrorMessage(e))
+                ErrorPresenter.report(e)
+            }
+        }
+    }
+
     fun consumeError() {
         uiState = uiState.copy(error = null)
     }

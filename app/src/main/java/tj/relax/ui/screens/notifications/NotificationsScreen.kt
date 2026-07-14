@@ -1,6 +1,7 @@
 ﻿package tj.relax.ui.screens.notifications
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -74,7 +75,7 @@ fun NotificationsScreen(
             else -> {
                 LazyColumn(modifier = Modifier.fillMaxSize().background(RelaxWhite)) {
                     items(state.notifications, key = { it.id }) { notif ->
-                        NotificationItem(notif)
+                        NotificationItem(notif, onClick = { viewModel.markRead(notif.id) })
                         RelaxDivider(modifier = Modifier.padding(start = 72.dp))
                     }
                 }
@@ -84,19 +85,20 @@ fun NotificationsScreen(
 }
 
 @Composable
-private fun NotificationItem(notif: Notification) {
+private fun NotificationItem(notif: Notification, onClick: () -> Unit) {
     val (icon, bg, color) = when (notif.type) {
         NotificationType.PROMO  -> Triple(Icons.Rounded.LocalOffer,      Color(0xFFFFE5E5), Color(0xFFE8393A))
         NotificationType.BONUS  -> Triple(Icons.Rounded.Stars,            Color(0xFFFFF8DC), Color(0xFFD4AF37))
         NotificationType.ORDER  -> Triple(Icons.Rounded.ShoppingBag,     Color(0xFFE3F2FD), Color(0xFF1976D2))
         NotificationType.SYSTEM -> Triple(Icons.Rounded.NotificationsNone, Color(0xFFF3E5F5), Color(0xFF7B1FA2))
-        NotificationType.NEWS -> TODO()
+        NotificationType.NEWS   -> Triple(Icons.Rounded.Article,          Color(0xFFE8F5E9), Color(0xFF2E7D32))
     }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .background(if (!notif.isRead) RelaxDark.copy(alpha = 0.02f) else RelaxWhite)
+            .clickable(onClick = onClick)
             .padding(horizontal = 20.dp, vertical = 14.dp),
         verticalAlignment = Alignment.Top,
     ) {

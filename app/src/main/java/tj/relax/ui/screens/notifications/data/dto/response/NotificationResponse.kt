@@ -10,3 +10,7 @@ data class NotificationResponse(
     val imageUrl: String? = null,
     val displayMode: String = "INBOX",
 )
+
+data class UnreadCountResponse(
+    val count: Int = 0,
+)

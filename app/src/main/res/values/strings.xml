@@ -22,8 +22,9 @@
     <string name="menu_personal_data">Личные данные</string>
     <string name="menu_branch">Мой филиал</string>
     <string name="menu_branch_not_selected">Не выбран</string>
-    <string name="menu_notifications">Уведомления</string>
+    <string name="menu_notifications">Push-уведомления</string>
     <string name="menu_notifications_on">Включены</string>
+    <string name="menu_notifications_off">Отключены</string>
     <string name="menu_language">Язык</string>
 
     <!-- Logout -->

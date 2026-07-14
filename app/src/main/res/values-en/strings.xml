@@ -22,8 +22,9 @@
     <string name="menu_personal_data">Personal data</string>
     <string name="menu_branch">My branch</string>
     <string name="menu_branch_not_selected">Not selected</string>
-    <string name="menu_notifications">Notifications</string>
+    <string name="menu_notifications">Push notifications</string>
     <string name="menu_notifications_on">Enabled</string>
+    <string name="menu_notifications_off">Disabled</string>
     <string name="menu_language">Language</string>
 
     <!-- Logout -->
