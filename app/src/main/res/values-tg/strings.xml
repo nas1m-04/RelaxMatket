@@ -1,46 +1,30 @@
-<resources>
-    <string name="app_name">Dastras</string>
+﻿<resources>
+    <string name="app_name">Relax</string>
 
     <!-- Bottom navigation -->
     <string name="nav_home">Асосӣ</string>
     <string name="nav_catalog">Каталог</string>
     <string name="nav_card">Корт</string>
-    <string name="nav_bonuses">Бонусҳо</string>
+    <string name="nav_history">Таърих</string>
     <string name="nav_profile">Профил</string>
 
     <!-- Profile header -->
     <string name="profile_user_default">Корбар</string>
     <string name="profile_points">%1$s · %2$d балл</string>
-    <string name="profile_stat_bonuses">Бонусҳо</string>
-    <string name="profile_stat_spent">Сарф шуд</string>
-    <string name="profile_stat_with_us">Бо мо</string>
+    <string name="save_changes">Захира кардан</string>
 
     <!-- Sections -->
-    <string name="section_purchases">Харидҳо</string>
     <string name="section_account">Ҳисоб</string>
     <string name="section_settings">Танзимот</string>
-    <string name="section_support">Дастгирӣ</string>
 
     <!-- Menu items -->
-    <string name="menu_order_history">Таърихи фармоишҳо</string>
-    <string name="menu_my_orders">Фармоишҳои ман</string>
     <string name="menu_favorites">Дилхоҳ</string>
-    <string name="menu_favorites_count">%d мол</string>
     <string name="menu_personal_data">Маълумоти шахсӣ</string>
-    <string name="menu_not_specified">Зикр нашудааст</string>
-    <string name="menu_addresses">Суроғаҳои ман</string>
-    <string name="menu_addresses_count">1 суроға</string>
     <string name="menu_branch">Филиали ман</string>
     <string name="menu_branch_not_selected">Интихоб нашудааст</string>
     <string name="menu_notifications">Огоҳиномаҳо</string>
     <string name="menu_notifications_on">Фаъол</string>
     <string name="menu_language">Забон</string>
-    <string name="menu_theme">Мавзӯъ</string>
-    <string name="menu_theme_light">Равшан</string>
-    <string name="menu_help">Кӯмак</string>
-    <string name="menu_chat_support">Чат бо дастгирӣ</string>
-    <string name="menu_online">Онлайн</string>
-    <string name="menu_about">Дар бораи барнома</string>
 
     <!-- Logout -->
     <string name="logout_button">Аз ҳисоб баромадан</string>
@@ -154,6 +138,8 @@
     <string name="product_add_to_cart_price">Ба сабад · %1$d TJS</string>
     <string name="product_savings">Сарфа %1$d TJS</string>
     <string name="product_discount_badge">−%1$d%%</string>
+    <string name="product_card_price_label">Нархи корти</string>
+    <string name="product_card_price_badge">Бо корт</string>
     <string name="product_tab_description">Тасвир</string>
     <string name="product_tab_composition">Таркиб</string>
     <string name="product_tab_reviews">Шарҳҳо</string>
@@ -281,14 +267,23 @@
     <string name="loyalty_stat_bonuses">Бонусҳо</string>
     <string name="loyalty_stat_spent">Сарф шуд</string>
     <string name="loyalty_stat_cashback">Кэшбэк</string>
+    <string name="loyalty_history_title">Таърихи баллҳо</string>
+    <string name="loyalty_history_empty_tab">Дар ин ҷо ҳанӯз холӣ аст</string>
+    <string name="loyalty_history_load_more">Боз нишон диҳед</string>
 
-    <!-- Order history screen -->
-    <string name="order_history_title">Таърихи фармоишҳо</string>
+    <!-- History / order detail screens -->
+    <string name="history_title">Таърих</string>
+    <string name="history_stat_orders">харид</string>
+    <string name="history_stat_spent">сарф шуд</string>
+    <string name="history_source_pos">Мағоза</string>
+    <string name="history_items_unavailable">Таркиби чек дар роҳ аст</string>
+    <string name="order_detail_title">Тафсилоти фармоиш</string>
+    <string name="order_detail_items_title">Маҷулот</string>
+    <string name="order_detail_item_qty_price">%1$d × %2$s TJS</string>
     <string name="order_number_label">Фармоиши №%1$s</string>
     <string name="order_empty_title">Ҳанӯз фармоиш нест</string>
     <string name="order_empty_subtitle">Фармоишҳои шумо дар ин ҷо нишон дода мешаванд</string>
-    <string name="order_total_label">Ҳамагӣ: %1$d TJS</string>
-    <string name="order_repeat_button">Такрор кардан</string>
+    <string name="order_total_label">Ҳамагӣ: %1$s TJS</string>
     <string name="order_more_items">+%1$d</string>
     <string name="order_status_pending">Интизор</string>
     <string name="order_status_confirmed">Тасдиқшуда</string>

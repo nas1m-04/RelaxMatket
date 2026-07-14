@@ -9,11 +9,11 @@ plugins {
 }
 
 android {
-    namespace = "tj.dastras"
+    namespace = "tj.relax"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "tj.dastras"
+        applicationId = "tj.relax"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
@@ -24,7 +24,8 @@ android {
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
@@ -79,13 +80,16 @@ dependencies {
     implementation(libs.hilt.navigation.compose)
 
     implementation(platform("com.google.firebase:firebase-bom:33.5.1"))
-    implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-messaging-ktx")
 
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
 
 }

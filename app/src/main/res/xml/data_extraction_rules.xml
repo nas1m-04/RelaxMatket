@@ -5,15 +5,14 @@
 -->
 <data-extraction-rules>
     <cloud-backup>
-        <!-- TODO: Use <include> and <exclude> to control what is backed up.
-        <include .../>
-        <exclude .../>
-        -->
+        <!-- Exclude auth tokens — never back up to Google Cloud -->
+        <exclude domain="sharedpref" path="auth_prefs.xml"/>
+        <!-- Exclude the local cache DB (tokens not stored here, but better to be safe) -->
+        <exclude domain="database" path="relax_db"/>
     </cloud-backup>
-    <!--
     <device-transfer>
-        <include .../>
-        <exclude .../>
+        <!-- Exclude auth tokens on device-to-device transfers too -->
+        <exclude domain="sharedpref" path="auth_prefs.xml"/>
+        <exclude domain="database" path="relax_db"/>
     </device-transfer>
-    -->
 </data-extraction-rules>

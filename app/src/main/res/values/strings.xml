@@ -1,46 +1,30 @@
-<resources>
-    <string name="app_name">Dastras</string>
+﻿<resources>
+    <string name="app_name">Relax</string>
 
     <!-- Bottom navigation -->
     <string name="nav_home">Главная</string>
     <string name="nav_catalog">Каталог</string>
     <string name="nav_card">Карта</string>
-    <string name="nav_bonuses">Бонусы</string>
+    <string name="nav_history">История</string>
     <string name="nav_profile">Профиль</string>
 
     <!-- Profile header -->
     <string name="profile_user_default">Пользователь</string>
     <string name="profile_points">%1$s · %2$d баллов</string>
-    <string name="profile_stat_bonuses">Бонусов</string>
-    <string name="profile_stat_spent">Потрачено</string>
-    <string name="profile_stat_with_us">С нами</string>
+    <string name="save_changes">Сохранить</string>
 
     <!-- Sections -->
-    <string name="section_purchases">Покупки</string>
     <string name="section_account">Аккаунт</string>
     <string name="section_settings">Настройки</string>
-    <string name="section_support">Поддержка</string>
 
     <!-- Menu items -->
-    <string name="menu_order_history">История заказов</string>
-    <string name="menu_my_orders">Мои заказы</string>
     <string name="menu_favorites">Избранное</string>
-    <string name="menu_favorites_count">%d товаров</string>
     <string name="menu_personal_data">Личные данные</string>
-    <string name="menu_not_specified">Не указан</string>
-    <string name="menu_addresses">Мои адреса</string>
-    <string name="menu_addresses_count">1 адрес</string>
     <string name="menu_branch">Мой филиал</string>
     <string name="menu_branch_not_selected">Не выбран</string>
     <string name="menu_notifications">Уведомления</string>
     <string name="menu_notifications_on">Включены</string>
     <string name="menu_language">Язык</string>
-    <string name="menu_theme">Тема</string>
-    <string name="menu_theme_light">Светлая</string>
-    <string name="menu_help">Помощь</string>
-    <string name="menu_chat_support">Чат с поддержкой</string>
-    <string name="menu_online">Онлайн</string>
-    <string name="menu_about">О приложении</string>
 
     <!-- Logout -->
     <string name="logout_button">Выйти из аккаунта</string>
@@ -154,6 +138,8 @@
     <string name="product_add_to_cart_price">В корзину · %1$d TJS</string>
     <string name="product_savings">Экономия %1$d TJS</string>
     <string name="product_discount_badge">−%1$d%%</string>
+    <string name="product_card_price_label">Цена по карте</string>
+    <string name="product_card_price_badge">По карте</string>
     <string name="product_tab_description">Описание</string>
     <string name="product_tab_composition">Состав</string>
     <string name="product_tab_reviews">Отзывы</string>
@@ -281,14 +267,23 @@
     <string name="loyalty_stat_bonuses">Бонусов</string>
     <string name="loyalty_stat_spent">Потрачено</string>
     <string name="loyalty_stat_cashback">Кэшбэк</string>
+    <string name="loyalty_history_title">История баллов</string>
+    <string name="loyalty_history_empty_tab">Здесь пока пусто</string>
+    <string name="loyalty_history_load_more">Показать ещё</string>
 
-    <!-- Order history screen -->
-    <string name="order_history_title">История заказов</string>
+    <!-- History / order detail screens -->
+    <string name="history_title">История</string>
+    <string name="history_stat_orders">покупок</string>
+    <string name="history_stat_spent">потрачено</string>
+    <string name="history_source_pos">Касса</string>
+    <string name="history_items_unavailable">Состав чека уточняется</string>
+    <string name="order_detail_title">Детали заказа</string>
+    <string name="order_detail_items_title">Товары</string>
+    <string name="order_detail_item_qty_price">%1$d × %2$s TJS</string>
     <string name="order_number_label">Заказ №%1$s</string>
     <string name="order_empty_title">Заказов пока нет</string>
     <string name="order_empty_subtitle">Ваши заказы появятся здесь</string>
-    <string name="order_total_label">Итого: %1$d TJS</string>
-    <string name="order_repeat_button">Повторить</string>
+    <string name="order_total_label">Итого: %1$s TJS</string>
     <string name="order_more_items">+%1$d</string>
     <string name="order_status_pending">Ожидает</string>
     <string name="order_status_confirmed">Подтверждён</string>

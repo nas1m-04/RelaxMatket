@@ -1,0 +1,31 @@
+﻿package tj.relax.data
+
+import tj.relax.core.api.RelaxApiService
+import tj.relax.core.api.dataOrThrow
+import tj.relax.core.api.toApiException
+import javax.inject.Inject
+import javax.inject.Singleton
+
+@Singleton
+class CartRepository @Inject constructor(
+    private val api: RelaxApiService,
+) {
+    suspend fun getItems(): List<CartItem> =
+        api.getCart().dataOrThrow()
+            .mapNotNull { row -> row.product?.let { CartItem(product = it, quantity = row.quantity) } }
+
+    suspend fun upsert(productId: Int, quantity: Int) {
+        val response = api.addToCart(AddToCartRequest(productId, quantity))
+        if (!response.isSuccessful) throw response.toApiException()
+    }
+
+    suspend fun remove(productId: Int) {
+        val response = api.removeFromCart(productId)
+        if (!response.isSuccessful) throw response.toApiException()
+    }
+
+    suspend fun clear() {
+        val response = api.clearCart()
+        if (!response.isSuccessful) throw response.toApiException()
+    }
+}

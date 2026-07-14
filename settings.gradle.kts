@@ -19,6 +19,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Dastras"
+rootProject.name = "Relax"
 include(":app")
  
