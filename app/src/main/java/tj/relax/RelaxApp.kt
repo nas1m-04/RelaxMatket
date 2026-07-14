@@ -6,9 +6,15 @@ import coil.ImageLoaderFactory
 import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import dagger.hilt.android.HiltAndroidApp
+import tj.relax.core.firebase.NotificationChannels
 
 @HiltAndroidApp
 class RelaxApp : Application(), ImageLoaderFactory {
+
+    override fun onCreate() {
+        super.onCreate()
+        NotificationChannels.ensureCreated(this)
+    }
 
     override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
         .crossfade(250)

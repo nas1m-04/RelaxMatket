@@ -1,12 +1,16 @@
 ﻿package tj.relax.core.firebase
-import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toBitmap
+import coil.imageLoader
+import coil.request.ImageRequest
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import kotlinx.coroutines.runBlocking
 import tj.relax.R
 import tj.relax.MainActivity
 
@@ -23,21 +27,16 @@ class RelaxFirebaseMessagingService : FirebaseMessagingService() {
 
         val title = message.notification?.title ?: message.data["title"] ?: return
         val body  = message.notification?.body  ?: message.data["body"]  ?: return
+        val imageUrl = message.notification?.imageUrl?.toString() ?: message.data["imageUrl"]
 
-        showNotification(title, body)
+        showNotification(title, body, imageUrl)
     }
 
-    private fun showNotification(title: String, body: String) {
-        val channelId = "relax_main"
-        val manager   = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // Создаём канал (Android 8+)
-        val channel = NotificationChannel(
-            channelId,
-            "Уведомления Relax",
-            NotificationManager.IMPORTANCE_HIGH,
-        )
-        manager.createNotificationChannel(channel)
+    // onMessageReceived already runs off the main thread (FCM SDK's own contract), so a blocking
+    // image fetch here is safe — no ANR risk, same reasoning typical FCM sample code relies on.
+    private fun showNotification(title: String, body: String, imageUrl: String?) {
+        NotificationChannels.ensureCreated(this)
+        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -47,14 +46,28 @@ class RelaxFirebaseMessagingService : FirebaseMessagingService() {
             PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE,
         )
 
-        val notification = NotificationCompat.Builder(this, channelId)
+        val bitmap: Bitmap? = imageUrl?.let { url ->
+            runCatching {
+                runBlocking {
+                    val result = imageLoader.execute(ImageRequest.Builder(this@RelaxFirebaseMessagingService).data(url).build())
+                    result.drawable?.toBitmap()
+                }
+            }.getOrNull()
+        }
+
+        val builder = NotificationCompat.Builder(this, NotificationChannels.MAIN)
             .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
-            .build()
 
-        manager.notify(System.currentTimeMillis().toInt(), notification)
+        if (bitmap != null) {
+            builder
+                .setLargeIcon(bitmap)
+                .setStyle(NotificationCompat.BigPictureStyle().bigPicture(bitmap).bigLargeIcon(null as Bitmap?))
+        }
+
+        manager.notify(System.currentTimeMillis().toInt(), builder.build())
     }
 }
