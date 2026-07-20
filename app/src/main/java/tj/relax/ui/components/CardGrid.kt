@@ -232,7 +232,8 @@ fun ProductCardGrid(
                         }
                     }
 
-                    // ── ADD BUTTON ──
+                    // ── ADD BUTTON — disabled, no delivery/pickup cart flow ──
+                    /*
                     if (quantity == 0) {
                         Box(
                             modifier = Modifier
@@ -272,6 +273,7 @@ fun ProductCardGrid(
                             }
                         }
                     }
+                    */
                 }
             }
         }

@@ -10,6 +10,7 @@ sealed class Route(val route: String) {
     object Catalog       : Route("catalog")
     object Search        : Route("search")
     object LoyaltyCard   : Route("loyalty_card")
+    object LoyaltyCardDetail : Route("loyalty_card_detail")
     object History       : Route("history")
     object Profile       : Route("profile")
     object ProductDetail : Route("product/{id}") {
@@ -26,4 +27,6 @@ sealed class Route(val route: String) {
     object SelectBranch  : Route("select_branch/{mode}") {
         fun createRoute(mode: String) = "select_branch/$mode"
     }
+    object Support       : Route("support")
+    object About         : Route("about")
 }

@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -62,22 +63,11 @@ fun LoginScreen(
             )
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .background(
-                            Brush.linearGradient(listOf(RelaxDark, RelaxDarkSecondary)),
-                            RoundedCornerShape(20.dp)
-                        ),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Text(
-                        text       = "R",
-                        color      = RelaxWhite,
-                        fontSize   = 40.sp,
-                        fontWeight = FontWeight.Black
-                    )
-                }
+                Image(
+                    painter = painterResource(R.drawable.logo_mark),
+                    contentDescription = null,
+                    modifier = Modifier.size(72.dp),
+                )
 
                 Spacer(Modifier.height(16.dp))
 

@@ -90,7 +90,7 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
                 }
                 HomeScreen(
                     onProduct     = { id -> rootNavController.navigate(Route.ProductDetail.createRoute(id)) },
-                    onCart        = { rootNavController.navigate(Route.Cart.route) },
+                    onCart        = { /* cart disabled — no delivery/pickup */ },
                     onNotifications = { rootNavController.navigate(Route.Notifications.route) },
                     onPromotions  = { rootNavController.navigate(Route.Promotions.route) },
                     onFavorites   = { rootNavController.navigate(Route.Favorites.route) },
@@ -104,11 +104,11 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
             composable(Route.Catalog.route) {
                 CatalogScreen(
                     onProduct = { id -> rootNavController.navigate(Route.ProductDetail.createRoute(id)) },
-                    onCart    = { rootNavController.navigate(Route.Cart.route) },
+                    onCart    = { /* cart disabled — no delivery/pickup */ },
                 )
             }
             composable(Route.LoyaltyCard.route) {
-                LoyaltyCardScreen()
+                LoyaltyCardScreen(onDetails = { rootNavController.navigate(Route.LoyaltyCardDetail.route) })
             }
             composable(Route.History.route) {
                 HistoryScreen(
@@ -119,6 +119,8 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
                 ProfileScreen(
                     onSelectBranch = { rootNavController.navigate(Route.SelectBranch.createRoute("settings")) },
                     onLoggedOut    = onLoggedOut,
+                    onSupport      = { rootNavController.navigate(Route.Support.route) },
+                    onAbout        = { rootNavController.navigate(Route.About.route) },
                 )
             }
         }

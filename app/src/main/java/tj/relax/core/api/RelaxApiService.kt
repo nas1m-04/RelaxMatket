@@ -15,7 +15,10 @@ import tj.relax.data.AddToCartRequest
 import tj.relax.data.Banner
 import tj.relax.data.Branch
 import tj.relax.data.Category
+import tj.relax.data.CrashReportRequest
 import tj.relax.data.CreateOrderRequest
+import tj.relax.data.CreateSupportTicketRequest
+import tj.relax.data.SupportTicket
 import tj.relax.data.Product
 import tj.relax.data.UpdateProfileRequest
 import tj.relax.data.UserProfile
@@ -89,9 +92,26 @@ interface RelaxApiService {
     @DELETE("cart")
     suspend fun clearCart(): Response<ApiResponse<Unit>>
 
+    // ── Crash reports (no auth — a crash can happen with an expired/missing token) ────────
+    @POST("crash-reports")
+    suspend fun reportCrash(@Body request: CrashReportRequest): Response<ApiResponse<Any>>
+
+    // ── Support tickets (auth required) ───────────────────────────────────
+    @POST("support")
+    suspend fun createSupportTicket(@Body request: CreateSupportTicketRequest): Response<ApiResponse<SupportTicket>>
+
+    @GET("support")
+    suspend fun getSupportTickets(
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 20,
+    ): Response<ApiResponse<PagedResponse<SupportTicket>>>
+
     // ── Orders (auth required) ────────────────────────────────────────────
     @GET("orders")
-    suspend fun getOrders(): Response<ApiResponse<List<OrderResponse>>>
+    suspend fun getOrders(
+        @Query("page") page: Int = 1,
+        @Query("pageSize") pageSize: Int = 20,
+    ): Response<ApiResponse<PagedResponse<OrderResponse>>>
 
     @POST("orders")
     suspend fun createOrder(@Body request: CreateOrderRequest): Response<ApiResponse<OrderResponse>>

@@ -6,9 +6,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Redeem
 import androidx.compose.material.icons.rounded.Receipt
+import androidx.compose.material.icons.rounded.ShoppingBag
 import androidx.compose.material.icons.rounded.Storefront
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,16 +25,18 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import kotlinx.coroutines.launch
 import tj.relax.R
 import tj.relax.data.CartItem
 import tj.relax.data.Order
 import tj.relax.data.OrderStatus
 import tj.relax.ui.components.RelaxDivider
-import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatDayTime
-import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatMemberSince
+import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatFullDate
+import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatTimeOnly
 import tj.relax.ui.screens.orders.OrdersViewModel
 import tj.relax.ui.theme.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HistoryScreen(
     onOrder: (String) -> Unit,
@@ -45,6 +50,7 @@ fun HistoryScreen(
     // measured (not hardcoded) so it always matches the header's real content/locale/text size.
     var headerHeight by remember { mutableStateOf(0.dp) }
     val density = LocalDensity.current
+    val scope = rememberCoroutineScope()
 
     Box(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         when {
@@ -61,26 +67,46 @@ fun HistoryScreen(
             }
             else -> {
                 val grouped = remember(state.orders) {
-                    state.orders.groupBy { monthLabel(it.date) }
+                    state.orders.groupBy { dayLabel(it.date) }
                 }
-                LazyColumn(
-                    modifier       = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = headerHeight + 16.dp, bottom = 16.dp),
+                PullToRefreshBox(
+                    isRefreshing = state.isRefreshing,
+                    onRefresh    = { scope.launch { viewModel.refresh() } },
+                    modifier     = Modifier.fillMaxSize().padding(top = headerHeight),
                 ) {
-                    grouped.forEach { (month, orders) ->
-                        item(key = "header_$month") {
-                            Text(
-                                month.uppercase(),
-                                style      = MaterialTheme.typography.labelLarge,
-                                color      = RelaxTextHint,
-                                fontWeight = FontWeight.Bold,
-                                letterSpacing = 1.sp,
-                                modifier   = Modifier.padding(top = 12.dp, bottom = 10.dp),
-                            )
+                    LazyColumn(
+                        modifier       = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 16.dp, bottom = 16.dp),
+                    ) {
+                        grouped.forEach { (month, orders) ->
+                            item(key = "header_$month") {
+                                Text(
+                                    month.uppercase(),
+                                    style      = MaterialTheme.typography.labelLarge,
+                                    color      = RelaxTextHint,
+                                    fontWeight = FontWeight.Bold,
+                                    letterSpacing = 1.sp,
+                                    modifier   = Modifier.padding(top = 12.dp, bottom = 10.dp),
+                                )
+                            }
+                            items(orders, key = { it.id }) { order ->
+                                HistoryCard(order = order, onClick = { onOrder(order.id) })
+                                Spacer(Modifier.height(12.dp))
+                            }
                         }
-                        items(orders, key = { it.id }) { order ->
-                            HistoryCard(order = order, onClick = { onOrder(order.id) })
-                            Spacer(Modifier.height(12.dp))
+
+                        if (state.hasMore || state.isLoadingMore) {
+                            item(key = "load_more") {
+                                Box(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp), contentAlignment = Alignment.Center) {
+                                    if (state.isLoadingMore) {
+                                        CircularProgressIndicator(color = RelaxDark, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
+                                    } else {
+                                        TextButton(onClick = { viewModel.loadMore() }) {
+                                            Text(stringResource(R.string.loyalty_history_load_more), color = RelaxDark, fontWeight = FontWeight.SemiBold)
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }
@@ -88,14 +114,15 @@ fun HistoryScreen(
         }
 
         HistoryHeader(
-            orders   = state.orders,
-            modifier = Modifier.onGloballyPositioned { headerHeight = with(density) { it.size.height.toDp() } },
+            orders     = state.orders,
+            totalCount = state.totalCount,
+            modifier   = Modifier.onGloballyPositioned { headerHeight = with(density) { it.size.height.toDp() } },
         )
     }
 }
 
 @Composable
-private fun HistoryHeader(orders: List<Order>, modifier: Modifier = Modifier) {
+private fun HistoryHeader(orders: List<Order>, totalCount: Int, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -110,11 +137,32 @@ private fun HistoryHeader(orders: List<Order>, modifier: Modifier = Modifier) {
                 style      = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Black,
             )
+            // Customers care about how many times they've shopped and how much cashback that
+            // earned them — not a running total of money spent, which reads more like a bill
+            // than a reward. Two icon badges instead of plain text chips make the pair feel like
+            // an achievement rather than a receipt summary.
             if (orders.isNotEmpty()) {
-                Spacer(Modifier.height(14.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    HeaderStatChip(orders.size.toString(), stringResource(R.string.history_stat_orders))
-                    HeaderStatChip("${formatAmount(orders.sumOf { it.total })} TJS", stringResource(R.string.history_stat_spent))
+                Spacer(Modifier.height(16.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    HeaderStatBadge(
+                        icon      = Icons.Rounded.ShoppingBag,
+                        iconTint  = RelaxWhite,
+                        iconBg    = RelaxWhite.copy(alpha = 0.16f),
+                        value     = totalCount.toString(),
+                        label     = stringResource(R.string.history_stat_orders),
+                        modifier  = Modifier.weight(1f),
+                    )
+                    HeaderStatBadge(
+                        icon      = Icons.Rounded.Redeem,
+                        iconTint  = RelaxDark,
+                        iconBg    = RelaxGold,
+                        value     = formatAmount(orders.sumOf { it.bonusEarned }),
+                        label     = stringResource(R.string.history_stat_cashback),
+                        modifier  = Modifier.weight(1f),
+                    )
                 }
             }
         }
@@ -122,17 +170,32 @@ private fun HistoryHeader(orders: List<Order>, modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun HeaderStatChip(value: String, label: String) {
+private fun HeaderStatBadge(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    iconTint: Color,
+    iconBg: Color,
+    value: String,
+    label: String,
+    modifier: Modifier = Modifier,
+) {
     Row(
-        modifier = Modifier
-            .clip(RoundedCornerShape(14.dp))
-            .background(RelaxWhite.copy(alpha = 0.12f))
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(RelaxWhite.copy(alpha = 0.10f))
+            .padding(horizontal = 14.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(value, color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 15.sp)
-        Spacer(Modifier.width(6.dp))
-        Text(label, color = RelaxTextOnDarkSub, fontSize = 12.sp)
+        Box(
+            modifier = Modifier.size(32.dp).clip(CircleShape).background(iconBg),
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(icon, null, tint = iconTint, modifier = Modifier.size(16.dp))
+        }
+        Spacer(Modifier.width(10.dp))
+        Column {
+            Text(value, color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
+            Text(label, color = RelaxTextOnDarkSub, fontSize = 11.sp)
+        }
     }
 }
 
@@ -157,13 +220,7 @@ private fun HistoryCard(order: Order, onClick: () -> Unit) {
                         if (order.source == "pos") SourceBadge()
                     }
                     Spacer(Modifier.height(2.dp))
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(formatDayTime(order.date), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
-                        when {
-                            order.bonusEarned > 0 -> BonusNote("+${formatAmount(order.bonusEarned)}", RelaxSuccess)
-                            order.bonusesUsed > 0 -> BonusNote("−${formatAmount(order.bonusesUsed)}", RelaxRed)
-                        }
-                    }
+                    Text(formatTimeOnly(order.date), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                 }
                 // POS purchases are always stamped "delivered" server-side (it's how a completed
                 // in-store sale is represented) — that status label is meaningless here, it wasn't
@@ -193,20 +250,30 @@ private fun HistoryCard(order: Order, onClick: () -> Unit) {
             RelaxDivider()
             Spacer(Modifier.height(12.dp))
 
-            Text(stringResource(R.string.order_total_label, formatAmount(order.total)), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
+            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+                Text(stringResource(R.string.order_total_label, formatAmount(order.total)), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
+                when {
+                    order.bonusEarned > 0 -> BonusPill("+${formatAmount(order.bonusEarned)}", RelaxSuccess)
+                    order.bonusesUsed > 0 -> BonusPill("−${formatAmount(order.bonusesUsed)}", RelaxRed)
+                }
+            }
         }
     }
 }
 
-// Small, muted note next to the date — not a loud pill, this is secondary metadata, not the
-// headline figure on the card (that's the total below).
+// Bottom-right pill for the bonus points this order earned or spent — the card's secondary
+// figure, set apart from the total rather than crammed next to the date.
 @Composable
-private fun BonusNote(text: String, color: Color) {
+private fun BonusPill(text: String, color: Color) {
     Text(
-        "  ·  $text",
-        style      = MaterialTheme.typography.bodySmall,
+        text,
+        style      = MaterialTheme.typography.labelMedium,
         color      = color,
-        fontWeight = FontWeight.SemiBold,
+        fontWeight = FontWeight.Bold,
+        modifier   = Modifier
+            .clip(RoundedCornerShape(10.dp))
+            .background(color.copy(alpha = 0.12f))
+            .padding(horizontal = 10.dp, vertical = 4.dp),
     )
 }
 
@@ -254,7 +321,7 @@ internal fun orderStatusLabel(status: OrderStatus): Int = when (status) {
     OrderStatus.CANCELLED  -> R.string.order_status_cancelled
 }
 
-private fun monthLabel(rawDate: String): String = formatMemberSince(rawDate)
+private fun dayLabel(rawDate: String): String = formatFullDate(rawDate)
 
 // Bonus amounts (cashback % of a purchase) are often fractional — .toInt() would silently
 // truncate e.g. 0.15 down to "0". Show up to 2 decimals, trimmed of trailing zeros.

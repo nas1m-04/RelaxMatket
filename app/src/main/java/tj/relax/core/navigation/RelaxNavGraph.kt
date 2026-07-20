@@ -14,9 +14,11 @@ import tj.relax.ui.screens.splash.SplashViewModel
 import tj.relax.ui.screens.auth.LoginScreen
 import tj.relax.ui.screens.auth.RegisterScreen
 import tj.relax.ui.screens.branch.SelectBranchScreen
-import tj.relax.ui.screens.cart.CartScreen
-import tj.relax.ui.screens.checkout.CheckoutScreen
+// Cart/checkout flow disabled — no delivery/pickup, see composable(Route.Cart...) below
+// import tj.relax.ui.screens.cart.CartScreen
+// import tj.relax.ui.screens.checkout.CheckoutScreen
 import tj.relax.ui.screens.favorites.FavoritesScreen
+import tj.relax.ui.screens.loyaltycard.LoyaltyCardDetailScreen
 import tj.relax.ui.screens.main.MainScreen
 import tj.relax.ui.screens.notifications.NotificationsScreen
 import tj.relax.ui.screens.onboarding.OnboardingScreen
@@ -25,6 +27,8 @@ import tj.relax.ui.screens.product.ProductDetailScreen
 import tj.relax.ui.screens.promotions.PromotionsScreen
 import tj.relax.ui.screens.search.SearchScreen
 import tj.relax.ui.screens.splash.SplashScreen
+import tj.relax.ui.screens.support.SupportScreen
+import tj.relax.ui.screens.about.AboutScreen
 import tj.relax.ui.components.ErrorAlertDialogHost
 
 @Composable
@@ -170,6 +174,8 @@ fun RelaxNavGraph(navController: NavHostController) {
             OrderDetailScreen(onBack = { navController.popBackStack() })
         }
 
+        // Cart/checkout flow disabled — no delivery/pickup
+        /*
         composable(Route.Cart.route) {
             CartScreen(
                 onBack     = { navController.popBackStack() },
@@ -187,6 +193,7 @@ fun RelaxNavGraph(navController: NavHostController) {
                 }
             )
         }
+        */
 
         composable(Route.Promotions.route) {
             PromotionsScreen(
@@ -197,6 +204,10 @@ fun RelaxNavGraph(navController: NavHostController) {
 
         composable(Route.Notifications.route) {
             NotificationsScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Route.LoyaltyCardDetail.route) {
+            LoyaltyCardDetailScreen(onBack = { navController.popBackStack() })
         }
 
         composable(Route.Favorites.route) {
@@ -210,6 +221,14 @@ fun RelaxNavGraph(navController: NavHostController) {
                 onBack    = { navController.popBackStack() },
                 onProduct = { id -> navController.navigate(Route.ProductDetail.createRoute(id)) },
             )
+        }
+
+        composable(Route.Support.route) {
+            SupportScreen(onBack = { navController.popBackStack() })
+        }
+
+        composable(Route.About.route) {
+            AboutScreen(onBack = { navController.popBackStack() })
         }
     }
 

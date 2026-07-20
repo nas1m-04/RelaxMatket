@@ -12,6 +12,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import tj.relax.core.api.ErrorPresenter
+import tj.relax.core.events.LoyaltyPushEvents
 import tj.relax.data.LocalUserStore
 import tj.relax.data.LoyaltyRepository
 import java.time.OffsetDateTime
@@ -35,6 +36,13 @@ class LoyaltyViewModel @Inject constructor(
     var uiState by mutableStateOf(LoyaltyCardState())
         private set
 
+    // fetchFromNetwork() (initial load/refresh, replaces the tx list) and
+    // loadMoreTransactions() (appends a page) both mutate uiState.transactions — only one
+    // may be in flight at a time, otherwise a stale loadMore response can land after a
+    // refresh already replaced the list, appending overlapping transaction ids and
+    // crashing the list with a duplicate key.
+    private var txJob: Job? = null
+
     init {
         // Show cached data instantly — no spinner at all if we have local data
         val cachedSummary = loyaltyRepository.getCachedSummary()
@@ -55,9 +63,19 @@ class LoyaltyViewModel @Inject constructor(
                 ErrorPresenter.report(e)
             }
         }
+
+        // A push arrives once the cashier has used the currently-displayed QR — only worth acting
+        // on if the QR screen is actually open right now (qrJob active); otherwise the next time it
+        // opens will fetch a fresh one anyway.
+        viewModelScope.launch {
+            LoyaltyPushEvents.qrConsumed.collect {
+                if (qrJob?.isActive == true) startQrRefresh()
+            }
+        }
     }
 
     private suspend fun fetchFromNetwork(showSpinner: Boolean = false) {
+        txJob?.cancel()
         if (showSpinner) uiState = uiState.copy(isLoading = true)
         coroutineScope {
             val summaryD = async { loyaltyRepository.getSummary() }
@@ -93,7 +111,8 @@ class LoyaltyViewModel @Inject constructor(
 
     fun loadMoreTransactions() {
         if (uiState.isLoadingMoreTx || !uiState.hasMoreTx) return
-        viewModelScope.launch {
+        if (uiState.isLoading || uiState.isRefreshing) return
+        txJob = viewModelScope.launch {
             uiState = uiState.copy(isLoadingMoreTx = true)
             try {
                 val next = uiState.txPage + 1
@@ -161,6 +180,25 @@ fun formatDayTime(raw: String): String = try {
     OffsetDateTime.parse(raw)
         .atZoneSameInstant(localZone)
         .format(DateTimeFormatter.ofPattern("d, HH:mm", Locale("ru")))
+} catch (e: Exception) {
+    raw
+}
+
+// Time only — for rows already grouped under a full-date header, where the date itself
+// would just repeat what the header already says.
+fun formatTimeOnly(raw: String): String = try {
+    OffsetDateTime.parse(raw)
+        .atZoneSameInstant(localZone)
+        .format(DateTimeFormatter.ofPattern("HH:mm", Locale("ru")))
+} catch (e: Exception) {
+    raw
+}
+
+// Full date — "14 февраля 2026" — used as a group-section header.
+fun formatFullDate(raw: String): String = try {
+    OffsetDateTime.parse(raw)
+        .atZoneSameInstant(localZone)
+        .format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru")))
 } catch (e: Exception) {
     raw
 }

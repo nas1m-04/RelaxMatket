@@ -130,6 +130,8 @@ fun ProductCardHorizontal(
                             Text("${product.oldPrice.toInt()} TJS", style = MaterialTheme.typography.labelSmall, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
                         }
                     }
+                    // Add-to-cart stepper — disabled, no delivery/pickup cart flow
+                    /*
                     if (quantity == 0) {
                         Box(
                             modifier = Modifier
@@ -158,6 +160,7 @@ fun ProductCardHorizontal(
                             }
                         }
                     }
+                    */
                 }
             }
         }

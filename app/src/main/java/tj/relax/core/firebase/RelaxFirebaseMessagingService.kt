@@ -13,6 +13,7 @@ import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.runBlocking
 import tj.relax.R
 import tj.relax.MainActivity
+import tj.relax.core.events.LoyaltyPushEvents
 
 class RelaxFirebaseMessagingService : FirebaseMessagingService() {
 
@@ -24,6 +25,13 @@ class RelaxFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(message: RemoteMessage) {
         super.onMessageReceived(message)
+
+        // Cashier just consumed this user's loyalty QR (accrue or redeem) — refresh it now rather
+        // than waiting for the screen's own 5-minute timer, if the QR screen is currently open.
+        val type = message.data["type"]
+        if (type == "bonus_earned" || type == "bonus_spent") {
+            LoyaltyPushEvents.notifyQrConsumed()
+        }
 
         val title = message.notification?.title ?: message.data["title"] ?: return
         val body  = message.notification?.body  ?: message.data["body"]  ?: return
@@ -56,7 +64,7 @@ class RelaxFirebaseMessagingService : FirebaseMessagingService() {
         }
 
         val builder = NotificationCompat.Builder(this, NotificationChannels.MAIN)
-            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(title)
             .setContentText(body)
             .setAutoCancel(true)

@@ -151,6 +151,8 @@ fun ProductDetailScreen(
 
                 Spacer(Modifier.height(20.dp))
 
+                // Cart quantity stepper — disabled, no delivery/pickup cart flow
+                /*
                 val cartQuantity = cartState.items.find { it.product.id == product.id }?.quantity ?: 0
                 Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
                     Row(modifier = Modifier.clip(RoundedCornerShape(16.dp)).background(RelaxSurfaceAlt).padding(4.dp), verticalAlignment = Alignment.CenterVertically) {
@@ -168,12 +170,15 @@ fun ProductDetailScreen(
                     }
                     Text("${(product.effectivePrice * cartQuantity.coerceAtLeast(1)).toInt()} TJS", fontSize = 20.sp, fontWeight = FontWeight.Bold, color = RelaxTextPrimary)
                 }
+                */
 
                 Spacer(Modifier.height(24.dp))
                 ProductTabs(product = product, categoryName = state.category?.name)
             }
         }
 
+        // Add-to-cart bar — disabled, no delivery/pickup cart flow
+        /*
         Box(
             modifier = Modifier.align(Alignment.BottomCenter).fillMaxWidth()
                 .background(Brush.verticalGradient(listOf(Color.Transparent, RelaxWhite, RelaxWhite)))
@@ -195,6 +200,7 @@ fun ProductDetailScreen(
                 Text(stringResource(R.string.product_add_to_cart_price, (product.effectivePrice * cartQuantity.coerceAtLeast(1)).toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
+        */
     }
 }
 

@@ -7,6 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -28,11 +29,30 @@ class CatalogViewModel @Inject constructor(
     var uiState by mutableStateOf(CatalogUiState())
         private set
 
-    init { load() }
+    // Fetching the whole catalog is expensive — this ViewModel is shared (activityViewModel()) and
+    // grabbed from the Home screen too (just to pre-set a quick filter before navigating here), so
+    // it must NOT fetch on construction. The Catalog screen triggers the first load itself via
+    // loadIfNeeded() when it actually appears.
+    private var hasLoaded = false
 
-    private fun load() {
-        viewModelScope.launch {
-            uiState = uiState.copy(isLoading = true, error = null)
+    // fetch() (full reload/filter change) and loadNextPage() (append) both mutate
+    // uiState.products, so only one may be in flight at a time — otherwise a next-page
+    // response for a stale filter can land after a fetch() already replaced the list,
+    // appending overlapping product ids and crashing the grid with a duplicate key.
+    private var fetchJob: Job? = null
+
+    fun loadIfNeeded() {
+        if (hasLoaded) return
+        fetch()
+    }
+
+    fun refresh() = fetch(isRefresh = true)
+
+    private fun fetch(isRefresh: Boolean = false) {
+        hasLoaded = true
+        fetchJob?.cancel()
+        fetchJob = viewModelScope.launch {
+            uiState = uiState.copy(isLoading = !isRefresh, isRefreshing = isRefresh, error = null)
             try {
                 coroutineScope {
                     val productsD   = async {
@@ -53,15 +73,16 @@ class CatalogViewModel @Inject constructor(
                     val categories = categoriesD.await()
 
                     uiState = uiState.copy(
-                        products    = response.items,
-                        categories  = categories,
-                        page        = response.page,
-                        hasNextPage = response.hasNextPage,
-                        isLoading   = false,
+                        products     = response.items,
+                        categories   = categories,
+                        page         = response.page,
+                        hasNextPage  = response.hasNextPage,
+                        isLoading    = false,
+                        isRefreshing = false,
                     )
                 }
             } catch (e: Exception) {
-                uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
+                uiState = uiState.copy(isLoading = false, isRefreshing = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
         }
@@ -71,12 +92,13 @@ class CatalogViewModel @Inject constructor(
         if (uiState.isLoadingMore) return
         if (!uiState.hasNextPage) return
 
-        viewModelScope.launch {
+        fetchJob?.cancel()
+        fetchJob = viewModelScope.launch {
             uiState = uiState.copy(isLoadingMore = true)
             try {
                 val response = productRepository.getAll(
                     CatalogRequest(
-                        page       = 1,
+                        page       = uiState.page + 1,
                         categoryId = uiState.selectedCategoryId.takeIf { it != 0 },
                         search     = uiState.searchQuery.ifBlank { null },
                         sort       = if (uiState.showNewOnly) "new" else uiState.sortBy,
@@ -136,6 +158,6 @@ class CatalogViewModel @Inject constructor(
         applyFilters()
     }
     private fun applyFilters() {
-        load()
+        fetch()
     }
 }

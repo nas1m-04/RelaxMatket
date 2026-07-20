@@ -1,6 +1,7 @@
 ﻿package tj.relax.ui.screens.splash
 
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -9,12 +10,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.delay
 import tj.relax.R
+import tj.relax.ui.components.TelegramLinkRow
 import tj.relax.ui.theme.*
 
 @Composable
@@ -74,23 +77,11 @@ fun SplashScreen(onFinished: () -> Unit) {
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // Logo mark — R in a premium box
-                    Box(
-                        modifier = Modifier
-                            .size(88.dp)
-                            .background(
-                                Brush.linearGradient(listOf(RelaxDark, RelaxDarkSecondary)),
-                                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
-                            ),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text       = "R",
-                            color      = RelaxWhite,
-                            fontSize   = 52.sp,
-                            fontWeight = FontWeight.Black,
-                        )
-                    }
+                    Image(
+                        painter = painterResource(R.drawable.logo_mark),
+                        contentDescription = null,
+                        modifier = Modifier.size(88.dp),
+                    )
                     Spacer(Modifier.height(20.dp))
                     Text(
                         text       = "RELAX",
@@ -129,6 +120,14 @@ fun SplashScreen(onFinished: () -> Unit) {
                 .alpha(taglineAlpha.value),
             color     = RelaxRed,
             trackColor = RelaxWhite.copy(alpha = 0.15f),
+        )
+
+        TelegramLinkRow(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(bottom = 16.dp)
+                .alpha(taglineAlpha.value),
         )
     }
 }

@@ -3,6 +3,9 @@ package tj.relax.ui.screens.profile
 import android.Manifest
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.Matrix
+import androidx.exifinterface.media.ExifInterface
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -28,19 +31,21 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
 import androidx.core.content.ContextCompat
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
+import coil.compose.SubcomposeAsyncImage
 import tj.relax.BuildConfig
 import tj.relax.R
 import tj.relax.ui.components.RelaxDivider
+import tj.relax.ui.components.ShimmerBox
 import tj.relax.ui.theme.*
 import tj.relax.core.util.LocaleManager
-import java.io.ByteArrayOutputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
     onSelectBranch: () -> Unit,
     onLoggedOut: () -> Unit,
+    onSupport: () -> Unit,
+    onAbout: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel(),
 ) {
     val state   = viewModel.uiState
@@ -48,6 +53,7 @@ fun ProfileScreen(
     val context = LocalContext.current
     var showLogoutDialog  by remember { mutableStateOf(false) }
     var showAvatarSheet   by remember { mutableStateOf(false) }
+    var pendingCropBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var showLanguageSheet by remember { mutableStateOf(false) }
     var showChangePasswordSheet by remember { mutableStateOf(false) }
     var currentLanguage   by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
@@ -59,21 +65,12 @@ fun ProfileScreen(
     val emailError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
 
     val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let {
-            val mimeType = context.contentResolver.getType(it) ?: "image/jpeg"
-            context.contentResolver.openInputStream(it)?.use { input ->
-                viewModel.uploadAvatar(input.readBytes(), mimeType)
-            }
-        }
+        uri?.let { pendingCropBitmap = decodeBitmapWithExifRotation(context, it) }
         showAvatarSheet = false
     }
 
     val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        bitmap?.let {
-            val stream = ByteArrayOutputStream()
-            it.compress(Bitmap.CompressFormat.JPEG, 85, stream)
-            viewModel.uploadAvatar(stream.toByteArray(), "image/jpeg")
-        }
+        bitmap?.let { pendingCropBitmap = it }
         showAvatarSheet = false
     }
 
@@ -100,6 +97,17 @@ fun ProfileScreen(
             onGallery   = { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
             onDelete    = { viewModel.removeAvatar(); showAvatarSheet = false },
             onDismiss   = { showAvatarSheet = false },
+        )
+    }
+
+    pendingCropBitmap?.let { bitmap ->
+        AvatarCropDialog(
+            bitmap = bitmap,
+            onConfirm = { bytes ->
+                viewModel.uploadAvatar(bytes, "image/jpeg")
+                pendingCropBitmap = null
+            },
+            onDismiss = { pendingCropBitmap = null },
         )
     }
 
@@ -167,9 +175,22 @@ fun ProfileScreen(
                 contentAlignment = Alignment.Center,
             ) {
                 if (user.avatarUrl.isNullOrEmpty()) {
-                    Icon(Icons.Rounded.Person, null, tint = RelaxWhite, modifier = Modifier.size(44.dp))
+                    Icon(Icons.Rounded.AccountCircle, null, tint = RelaxWhite.copy(alpha = 0.9f), modifier = Modifier.size(64.dp))
                 } else {
-                    AsyncImage(model = user.avatarUrl, contentDescription = user.name, contentScale = ContentScale.Crop, modifier = Modifier.fillMaxSize())
+                    // The backend gives every uploaded avatar its own unique filename (a fresh GUID
+                    // each time), so the URL itself already changes whenever the photo changes —
+                    // Coil's normal URL-keyed cache is exactly right here: same photo → cache hit,
+                    // no repeat request; new photo → new URL → fresh fetch automatically.
+                    SubcomposeAsyncImage(
+                        model = user.avatarUrl,
+                        contentDescription = user.name,
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.fillMaxSize(),
+                        loading = { ShimmerBox(modifier = Modifier.fillMaxSize(), shape = CircleShape) },
+                        error = {
+                            Icon(Icons.Rounded.AccountCircle, null, tint = RelaxWhite.copy(alpha = 0.9f), modifier = Modifier.size(64.dp))
+                        },
+                    )
                 }
                 if (state.isUploadingAvatar) {
                     Box(modifier = Modifier.fillMaxSize().background(RelaxOverlay), contentAlignment = Alignment.Center) {
@@ -188,15 +209,6 @@ fun ProfileScreen(
             Text(user.name.ifEmpty { stringResource(R.string.profile_user_default) }, color = RelaxTextPrimary, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text(user.phone, color = RelaxTextSecondary, style = MaterialTheme.typography.bodyMedium)
-            Spacer(Modifier.height(12.dp))
-            Row(
-                modifier              = Modifier.clip(RoundedCornerShape(20.dp)).background(Color(user.level.color)).padding(horizontal = 16.dp, vertical = 6.dp),
-                verticalAlignment     = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp),
-            ) {
-                Icon(Icons.Rounded.Stars, null, tint = RelaxWhite, modifier = Modifier.size(16.dp))
-                Text(stringResource(R.string.profile_points, user.level.name, user.bonusBalance.toInt()), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-            }
         }
 
         Spacer(Modifier.height(20.dp))
@@ -260,6 +272,13 @@ fun ProfileScreen(
         ProfileSection(title = stringResource(R.string.section_settings)) {
             ProfileMenuItem(Icons.Rounded.Language, stringResource(R.string.menu_language), languageDisplayName(currentLanguage), onClick = { showLanguageSheet = true })
             ProfileMenuItem(Icons.Rounded.Lock, stringResource(R.string.menu_change_password), "", onClick = { showChangePasswordSheet = true })
+        }
+
+        Spacer(Modifier.height(12.dp))
+
+        ProfileSection(title = stringResource(R.string.about_title)) {
+            ProfileMenuItem(Icons.Rounded.SupportAgent, stringResource(R.string.menu_support), "", onClick = onSupport)
+            ProfileMenuItem(Icons.Rounded.Info, stringResource(R.string.about_title), "", onClick = onAbout)
         }
 
         Spacer(Modifier.height(16.dp))
@@ -405,3 +424,25 @@ private fun languageDisplayName(code: String): String = when (code) {
 
 private val CircleShape = RoundedCornerShape(50)
 private val RelaxError  = Color(0xFFEF4444)
+
+// Gallery-picked photos often carry EXIF rotation metadata rather than pre-rotated pixels — the
+// crop dialog works directly on pixel data, so without this a portrait photo would show sideways
+// in the crop preview (and stay sideways in the final avatar).
+private fun decodeBitmapWithExifRotation(context: android.content.Context, uri: android.net.Uri): Bitmap? {
+    val resolver = context.contentResolver
+    val bitmap = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: return null
+
+    val rotationDegrees = resolver.openInputStream(uri)?.use { input ->
+        when (ExifInterface(input).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
+            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
+            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
+            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
+            else -> 0f
+        }
+    } ?: 0f
+
+    if (rotationDegrees == 0f) return bitmap
+
+    val matrix = Matrix().apply { postRotate(rotationDegrees) }
+    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
+}

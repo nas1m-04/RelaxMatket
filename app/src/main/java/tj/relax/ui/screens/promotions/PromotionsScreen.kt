@@ -218,6 +218,8 @@ private fun SaleProductCard(
                     }
                 }
             }
+            // Add-to-cart stepper — disabled, no delivery/pickup cart flow
+            /*
             Spacer(Modifier.width(8.dp))
             if (quantity == 0) {
                 Box(
@@ -247,6 +249,7 @@ private fun SaleProductCard(
                     }
                 }
             }
+            */
         }
     }
 }

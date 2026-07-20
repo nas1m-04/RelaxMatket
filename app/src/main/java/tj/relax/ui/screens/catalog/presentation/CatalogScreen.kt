@@ -11,6 +11,8 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.*
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,12 +46,12 @@ fun CatalogScreen(
     var showSortSheet   by remember { mutableStateOf(false) }
     var showFilterSheet by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) { viewModel.loadIfNeeded() }
 
     val categories = listOf(Pair(0, stringResource(R.string.catalog_category_all))) +
             state.categories.map { Pair(it.id, it.name) }
 
-
-
+    val pullState = rememberPullToRefreshState()
     val gridState = rememberLazyGridState()
 
     LaunchedEffect(gridState) {
@@ -84,6 +86,8 @@ fun CatalogScreen(
                         color = RelaxTextPrimary,
                         modifier = Modifier.weight(1f)
                     )
+                    // Cart button — disabled, no delivery/pickup cart flow
+                    /*
                     IconButton(
                         onClick  = onCart,
                         modifier = Modifier
@@ -98,6 +102,7 @@ fun CatalogScreen(
                             modifier = Modifier.size(20.dp)
                         )
                     }
+                    */
                 }
 
                 Spacer(Modifier.height(12.dp))
@@ -246,69 +251,71 @@ fun CatalogScreen(
         RelaxDivider()
 
         // ── Контент ───────────────────────────────────────────────────────────
-        when {
-            state.isLoading -> {
-                Box(
-                    modifier         = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(color = RelaxDark)
+        PullToRefreshBox(
+            isRefreshing = state.isRefreshing,
+            onRefresh    = { viewModel.refresh() },
+            state        = pullState,
+            modifier     = Modifier.fillMaxSize().weight(1f),
+        ) {
+            when {
+                state.isLoading -> {
+                    CatalogScreenSkeleton()
                 }
-            }
 
-            state.products.isEmpty() -> {
-                EmptyState()
-            }
+                state.products.isEmpty() -> {
+                    EmptyState()
+                }
 
-            else -> {
-                LazyVerticalGrid(
-                    columns               = GridCells.Fixed(2),
-                    state                 = gridState,
-                    modifier              = Modifier.fillMaxSize(),
-                    contentPadding        = PaddingValues(20.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement   = Arrangement.spacedBy(12.dp),
-                ) {
-                    // Счётчик товаров
-                    item(span = { GridItemSpan(2) }) {
-                        Text(
-                            text  = stringResource(R.string.catalog_products_count, state.products.size),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = RelaxTextSecondary
-                        )
-                    }
-
-                    // Товары
-                    items(
-                        items = state.products,
-                        key   = { it.id }
-                    ) { product ->
-                        ProductCardGrid(
-                            product          = product,
-                            onClick          = { onProduct(product.id) },
-                            quantity         = cartState.items
-                                .find { it.product.id == product.id }?.quantity ?: 0,
-                            onIncrease       = { cartViewModel.add(product) },
-                            onDecrease       = { cartViewModel.decrease(product.id) },
-                            isFavorite       = favoritesState.favorites.any { it.id == product.id },
-                            onToggleFavorite = { favoritesViewModel.toggle(product) },
-                        )
-                    }
-
-                    // Спиннер при загрузке следующей страницы
-                    if (state.isLoadingMore) {
+                else -> {
+                    LazyVerticalGrid(
+                        columns               = GridCells.Fixed(2),
+                        state                 = gridState,
+                        modifier              = Modifier.fillMaxSize(),
+                        contentPadding        = PaddingValues(20.dp),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement   = Arrangement.spacedBy(12.dp),
+                    ) {
+                        // Счётчик товаров
                         item(span = { GridItemSpan(2) }) {
-                            Box(
-                                modifier         = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    color    = RelaxDark,
-                                    modifier = Modifier.size(28.dp),
-                                    strokeWidth = 2.dp
-                                )
+                            Text(
+                                text  = stringResource(R.string.catalog_products_count, state.products.size),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = RelaxTextSecondary
+                            )
+                        }
+
+                        // Товары
+                        items(
+                            items = state.products,
+                            key   = { it.id }
+                        ) { product ->
+                            ProductCardGrid(
+                                product          = product,
+                                onClick          = { onProduct(product.id) },
+                                quantity         = cartState.items
+                                    .find { it.product.id == product.id }?.quantity ?: 0,
+                                onIncrease       = { cartViewModel.add(product) },
+                                onDecrease       = { cartViewModel.decrease(product.id) },
+                                isFavorite       = favoritesState.favorites.any { it.id == product.id },
+                                onToggleFavorite = { favoritesViewModel.toggle(product) },
+                            )
+                        }
+
+                        // Спиннер при загрузке следующей страницы
+                        if (state.isLoadingMore) {
+                            item(span = { GridItemSpan(2) }) {
+                                Box(
+                                    modifier         = Modifier
+                                        .fillMaxWidth()
+                                        .padding(vertical = 16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        color    = RelaxDark,
+                                        modifier = Modifier.size(28.dp),
+                                        strokeWidth = 2.dp
+                                    )
+                                }
                             }
                         }
                     }

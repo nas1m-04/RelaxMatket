@@ -195,6 +195,25 @@ fun RegisterScreen(
                 icon        = Icons.Rounded.QuestionAnswer,
             )
 
+            Spacer(Modifier.height(10.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(RelaxWarning.copy(alpha = 0.12f))
+                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.Top,
+            ) {
+                Icon(Icons.Rounded.WarningAmber, null, tint = RelaxWarning, modifier = Modifier.size(18.dp))
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    stringResource(R.string.register_secret_warning),
+                    color      = RelaxWarning,
+                    style      = MaterialTheme.typography.bodySmall,
+                    lineHeight = 16.sp,
+                )
+            }
+
             Spacer(Modifier.height(28.dp))
 
             RelaxButton(

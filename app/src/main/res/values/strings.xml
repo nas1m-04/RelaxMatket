@@ -1,6 +1,13 @@
 ﻿<resources>
     <string name="app_name">Relax</string>
 
+    <!-- About screen -->
+    <string name="about_title">О приложении</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_description">RELAX — приложение для покупок и программы лояльности сети супермаркетов RELAX. Копите бонусы, следите за акциями и историей покупок в одном месте.</string>
+    <string name="about_contact">Связаться с нами</string>
+    <string name="developed">Разработан</string>
+
     <!-- Bottom navigation -->
     <string name="nav_home">Главная</string>
     <string name="nav_catalog">Каталог</string>
@@ -27,6 +34,7 @@
     <string name="menu_notifications_off">Отключены</string>
     <string name="menu_language">Язык</string>
     <string name="menu_change_password">Сменить пароль</string>
+    <string name="menu_support">Поддержка</string>
     <string name="change_password_title">Смена пароля</string>
     <string name="change_password_current_placeholder">Текущий пароль</string>
     <string name="change_password_new_placeholder">Новый пароль</string>
@@ -58,6 +66,10 @@
     <string name="avatar_choose_gallery">Выбрать из галереи</string>
     <string name="avatar_delete_photo">Удалить фото</string>
     <string name="avatar_uploading">Загрузка...</string>
+    <string name="avatar_crop_title">Выберите область фото</string>
+    <string name="avatar_crop_hint">Перетащите фото и сведите/разведите пальцы, чтобы приблизить</string>
+    <string name="avatar_crop_cancel">Отмена</string>
+    <string name="avatar_crop_confirm">Готово</string>
 
     <!-- Language picker -->
     <string name="language_sheet_title">Язык приложения</string>
@@ -93,6 +105,7 @@
     <string name="register_secret_hint">Поможет восстановить доступ, если вы забудете пароль (необязательно)</string>
     <string name="register_secret_question_placeholder">Секретный вопрос</string>
     <string name="register_secret_answer_placeholder">Ответ на секретный вопрос</string>
+    <string name="register_secret_warning">Если вы забудете ответ на секретный вопрос, восстановить доступ к аккаунту будет невозможно</string>
     <string name="register_button">Зарегистрироваться</string>
     <string name="register_have_account">Уже есть аккаунт? </string>
     <string name="register_login_link">Войти</string>
@@ -274,17 +287,15 @@
     <string name="loyalty_next_level_label">Следующий</string>
     <string name="loyalty_progress_to_level">До уровня «%1$s» осталось %2$d баллов</string>
     <string name="loyalty_benefits_title">Привилегии уровня</string>
-    <string name="loyalty_stat_bonuses">Бонусов</string>
-    <string name="loyalty_stat_spent">Потрачено</string>
-    <string name="loyalty_stat_cashback">Кэшбэк</string>
     <string name="loyalty_history_title">История баллов</string>
     <string name="loyalty_history_empty_tab">Здесь пока пусто</string>
     <string name="loyalty_history_load_more">Показать ещё</string>
+    <string name="loyalty_details_title">Уровень и история</string>
 
     <!-- History / order detail screens -->
     <string name="history_title">История</string>
     <string name="history_stat_orders">покупок</string>
-    <string name="history_stat_spent">потрачено</string>
+    <string name="history_stat_cashback">кэшбэк заработан</string>
     <string name="history_source_pos">Касса</string>
     <string name="history_items_unavailable">Состав чека уточняется</string>
     <string name="order_detail_title">Детали заказа</string>

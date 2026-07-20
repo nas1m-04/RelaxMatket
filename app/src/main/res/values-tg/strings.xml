@@ -1,6 +1,14 @@
 ﻿<resources>
     <string name="app_name">Relax</string>
 
+    <!-- About screen -->
+    <string name="about_title">Дар бораи барнома</string>
+    <string name="about_version">Версия %1$s</string>
+    <string name="about_description">RELAX — барномаи харид ва вафодории занҷираи маркетҳои RELAX. Бонусҳо ҷамъ кунед, аксияҳо ва таърихи харидҳоро дар як ҷо пайгирӣ кунед.</string>
+    <string name="about_contact">Бо мо тамос гиред</string>
+    <string name="developed">Таҳиягар</string>
+
+
     <!-- Bottom navigation -->
     <string name="nav_home">Асосӣ</string>
     <string name="nav_catalog">Каталог</string>
@@ -27,6 +35,7 @@
     <string name="menu_notifications_off">Ғайрифаъол</string>
     <string name="menu_language">Забон</string>
     <string name="menu_change_password">Иваз кардани парол</string>
+    <string name="menu_support">Дастгирӣ</string>
     <string name="change_password_title">Иваз кардани парол</string>
     <string name="change_password_current_placeholder">Пароли ҷорӣ</string>
     <string name="change_password_new_placeholder">Пароли нав</string>
@@ -58,6 +67,10 @@
     <string name="avatar_choose_gallery">Аз галерея интихоб кардан</string>
     <string name="avatar_delete_photo">Расмро нест кардан</string>
     <string name="avatar_uploading">Боргузорӣ...</string>
+    <string name="avatar_crop_title">Қисми аксро интихоб кунед</string>
+    <string name="avatar_crop_hint">Аксро кашед ва барои калон кардан ангуштонро гиред</string>
+    <string name="avatar_crop_cancel">Бекор кардан</string>
+    <string name="avatar_crop_confirm">Тайёр</string>
 
     <!-- Language picker -->
     <string name="language_sheet_title">Забони барнома</string>
@@ -93,6 +106,7 @@
     <string name="register_secret_hint">Агар паролро фаромӯш кунед, барқарор кардани дастрасиро осон мекунад (ихтиёрӣ)</string>
     <string name="register_secret_question_placeholder">Саволи махфӣ</string>
     <string name="register_secret_answer_placeholder">Ҷавоб ба саволи махфӣ</string>
+    <string name="register_secret_warning">Агар ҷавоби саволи махфиро фаромӯш кунед, барқарор кардани дастрасӣ ба ҳисоб имконнопазир мешавад</string>
     <string name="register_button">Бақайдгирӣ</string>
     <string name="register_have_account">Аллакай ҳисоб доред? </string>
     <string name="register_login_link">Воридшавӣ</string>
@@ -274,17 +288,15 @@
     <string name="loyalty_next_level_label">Навбатӣ</string>
     <string name="loyalty_progress_to_level">То сатҳи «%1$s» %2$d балл боқӣ мондааст</string>
     <string name="loyalty_benefits_title">Имтиёзҳои сатҳ</string>
-    <string name="loyalty_stat_bonuses">Бонусҳо</string>
-    <string name="loyalty_stat_spent">Сарф шуд</string>
-    <string name="loyalty_stat_cashback">Кэшбэк</string>
     <string name="loyalty_history_title">Таърихи баллҳо</string>
     <string name="loyalty_history_empty_tab">Дар ин ҷо ҳанӯз холӣ аст</string>
     <string name="loyalty_history_load_more">Боз нишон диҳед</string>
+    <string name="loyalty_details_title">Дараҷа ва таърих</string>
 
     <!-- History / order detail screens -->
     <string name="history_title">Таърих</string>
     <string name="history_stat_orders">харид</string>
-    <string name="history_stat_spent">сарф шуд</string>
+    <string name="history_stat_cashback">кэшбэки бадастомада</string>
     <string name="history_source_pos">Мағоза</string>
     <string name="history_items_unavailable">Таркиби чек дар роҳ аст</string>
     <string name="order_detail_title">Тафсилоти фармоиш</string>

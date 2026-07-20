@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -434,22 +435,11 @@ private fun HomeTopBar(
             Column(modifier = Modifier.weight(1f)) {
                 // Logo row
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .background(
-                                Brush.linearGradient(listOf(RelaxDark, RelaxDarkSecondary)),
-                                RoundedCornerShape(11.dp),
-                            ),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text       = "R",
-                            color      = RelaxWhite,
-                            fontSize   = 21.sp,
-                            fontWeight = FontWeight.Black,
-                        )
-                    }
+                    Image(
+                        painter = painterResource(R.drawable.logo_mark),
+                        contentDescription = null,
+                        modifier = Modifier.size(38.dp),
+                    )
                     Spacer(Modifier.width(10.dp))
                     Text(
                         text          = "RELAX",
@@ -460,7 +450,8 @@ private fun HomeTopBar(
                     )
                 }
                 Spacer(Modifier.height(8.dp))
-                // Address chip
+                // Address chip — временно отключена в главной странице
+                /*
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier          = Modifier
@@ -492,6 +483,7 @@ private fun HomeTopBar(
                         modifier = Modifier.size(14.dp),
                     )
                 }
+                */
             }
 
             // Action buttons — separated by explicit spacing
@@ -507,12 +499,15 @@ private fun HomeTopBar(
                 badge   = hasUnread,
                 onClick = onNotifications,
             )
+            // Cart button — disabled, no delivery/pickup cart flow
+            /*
             Spacer(Modifier.width(8.dp))
             HomeIconButton(
                 icon    = Icons.Rounded.ShoppingCart,
                 badge   = false,
                 onClick = onCart,
             )
+            */
         }
     }
 }

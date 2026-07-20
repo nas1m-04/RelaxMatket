@@ -1,6 +1,13 @@
 ﻿<resources>
     <string name="app_name">Relax</string>
 
+    <!-- About screen -->
+    <string name="about_title">About</string>
+    <string name="about_version">Version %1$s</string>
+    <string name="about_description">RELAX is the shopping and loyalty app for the RELAX supermarket chain. Earn bonuses, track promotions, and keep your purchase history in one place.</string>
+    <string name="about_contact">Contact us</string>
+    <string name="developed">Developed by</string>
+
     <!-- Bottom navigation -->
     <string name="nav_home">Home</string>
     <string name="nav_catalog">Catalog</string>
@@ -27,6 +34,7 @@
     <string name="menu_notifications_off">Disabled</string>
     <string name="menu_language">Language</string>
     <string name="menu_change_password">Change password</string>
+    <string name="menu_support">Support</string>
     <string name="change_password_title">Change password</string>
     <string name="change_password_current_placeholder">Current password</string>
     <string name="change_password_new_placeholder">New password</string>
@@ -58,6 +66,10 @@
     <string name="avatar_choose_gallery">Choose from gallery</string>
     <string name="avatar_delete_photo">Delete photo</string>
     <string name="avatar_uploading">Uploading...</string>
+    <string name="avatar_crop_title">Choose photo area</string>
+    <string name="avatar_crop_hint">Drag the photo and pinch to zoom</string>
+    <string name="avatar_crop_cancel">Cancel</string>
+    <string name="avatar_crop_confirm">Done</string>
 
     <!-- Language picker -->
     <string name="language_sheet_title">App language</string>
@@ -93,6 +105,7 @@
     <string name="register_secret_hint">Helps recover access if you forget your password (optional)</string>
     <string name="register_secret_question_placeholder">Secret question</string>
     <string name="register_secret_answer_placeholder">Answer to secret question</string>
+    <string name="register_secret_warning">If you forget the answer to your secret question, we won\'t be able to recover your account</string>
     <string name="register_button">Sign up</string>
     <string name="register_have_account">Already have an account? </string>
     <string name="register_login_link">Sign in</string>
@@ -274,17 +287,15 @@
     <string name="loyalty_next_level_label">Next</string>
     <string name="loyalty_progress_to_level">%2$d points left to reach \"%1$s\" level</string>
     <string name="loyalty_benefits_title">Level benefits</string>
-    <string name="loyalty_stat_bonuses">Bonuses</string>
-    <string name="loyalty_stat_spent">Spent</string>
-    <string name="loyalty_stat_cashback">Cashback</string>
     <string name="loyalty_history_title">Points history</string>
     <string name="loyalty_history_empty_tab">Nothing here yet</string>
     <string name="loyalty_history_load_more">Show more</string>
+    <string name="loyalty_details_title">Level and history</string>
 
     <!-- History / order detail screens -->
     <string name="history_title">History</string>
     <string name="history_stat_orders">orders</string>
-    <string name="history_stat_spent">spent</string>
+    <string name="history_stat_cashback">cashback earned</string>
     <string name="history_source_pos">In-store</string>
     <string name="history_items_unavailable">Receipt items pending</string>
     <string name="order_detail_title">Order details</string>
