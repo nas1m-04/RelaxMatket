@@ -1,10 +1,14 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class AddToCartRequest(
     val productId: Int,
     val quantity: Int,
 )
 
+@Serializable
 data class CreateOrderRequest(
     val deliveryType: String = "delivery",
     val address: String? = null,
@@ -17,11 +21,13 @@ data class CreateOrderRequest(
     val items: List<OrderItemRequest>,
 )
 
+@Serializable
 data class OrderItemRequest(
     val productId: Int,
     val quantity: Int,
 )
 
+@Serializable
 data class UpdateProfileRequest(
     val name: String? = null,
     val email: String? = null,

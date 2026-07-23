@@ -1,5 +1,8 @@
 package tj.relax.core.api
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class LoyaltyLevelResponse(
     val name: String = "",
     val minSpent: Double = 0.0,
@@ -10,6 +13,7 @@ data class LoyaltyLevelResponse(
     val isCurrent: Boolean = false,
 )
 
+@Serializable
 data class LoyaltySummaryResponse(
     val bonusBalance: Double = 0.0,
     val totalSpent: Double = 0.0,
@@ -23,6 +27,7 @@ data class LoyaltySummaryResponse(
     val maxBonusPaymentPercent: Double = 50.0,
 )
 
+@Serializable
 data class BonusTransactionApiResponse(
     val id: Int = 0,
     val description: String = "",
@@ -32,6 +37,7 @@ data class BonusTransactionApiResponse(
     val createdAt: String = "",
 )
 
+@Serializable
 data class AchievementApiResponse(
     val id: String = "",
     val title: String = "",
@@ -42,6 +48,7 @@ data class AchievementApiResponse(
     val bonusReward: Int = 0,
 )
 
+@Serializable
 data class QrTokenResponse(
     val qrToken: String,
     val expiresAt: String,

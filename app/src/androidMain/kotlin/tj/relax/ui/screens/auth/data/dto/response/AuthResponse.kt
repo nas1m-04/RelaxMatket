@@ -1,10 +1,12 @@
 package tj.relax.ui.screens.auth.data.dto.response
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import tj.relax.data.UserProfile
 
+@Serializable
 data class AuthResponse(
-    @SerializedName("access_token")  val accessToken: String = "",
-    @SerializedName("refresh_token") val refreshToken: String = "",
+    @SerialName("access_token")  val accessToken: String = "",
+    @SerialName("refresh_token") val refreshToken: String = "",
     val user: UserProfile? = null,
 )

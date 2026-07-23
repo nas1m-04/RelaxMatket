@@ -36,7 +36,7 @@ class AuthRepository(
                 secretQuestion = secretQuestion,
                 secretAnswer = secretAnswer,
             ))
-            val body = response.body()
+            val body = response.body
 
             if (response.isSuccessful && body?.success == true && body.data != null) {
                 tokenManager.saveTokens(body.data.accessToken, body.data.refreshToken)
@@ -44,11 +44,11 @@ class AuthRepository(
                 Log.i(TAG, "register: success uid=${body.data.user?.uid}")
                 Result.success(body.data.user ?: UserProfile())
             } else {
-                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code()) {
+                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code) {
                     409, 400 -> "Пользователь с таким номером уже зарегистрирован"
                     else     -> "Не удалось зарегистрироваться. Попробуйте позже"
                 }
-                Log.w(TAG, "register: failed code=${response.code()} message=$message")
+                Log.w(TAG, "register: failed code=${response.code} message=$message")
                 Result.failure(Exception(message))
             }
         } catch (e: Exception) {
@@ -61,7 +61,7 @@ class AuthRepository(
         return try {
             Log.d(TAG, "login: phone=$phone")
             val response = api.login(LoginRequest(phone = phone, password = password))
-            val body = response.body()
+            val body = response.body
 
             if (response.isSuccessful && body?.success == true && body.data != null) {
                 tokenManager.saveTokens(body.data.accessToken, body.data.refreshToken)
@@ -69,11 +69,11 @@ class AuthRepository(
                 Log.i(TAG, "login: success uid=${body.data.user?.uid}")
                 Result.success(body.data.user ?: UserProfile())
             } else {
-                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code()) {
+                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code) {
                     401, 400, 404 -> "Неверный номер телефона или пароль"
                     else          -> "Не удалось выполнить вход. Попробуйте позже"
                 }
-                Log.w(TAG, "login: failed code=${response.code()} message=$message")
+                Log.w(TAG, "login: failed code=${response.code} message=$message")
                 Result.failure(Exception(message))
             }
         } catch (e: Exception) {
@@ -85,17 +85,17 @@ class AuthRepository(
     suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
         return try {
             val response = api.changePassword(ChangePasswordRequest(currentPassword, newPassword))
-            val body = response.body()
+            val body = response.body
 
             if (response.isSuccessful && body?.success == true) {
                 Log.i(TAG, "changePassword: success")
                 Result.success(Unit)
             } else {
-                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code()) {
+                val message = response.apiErrorMessage() ?: body?.error ?: when (response.code) {
                     401 -> "Текущий пароль неверен"
                     else -> "Не удалось сменить пароль. Попробуйте позже"
                 }
-                Log.w(TAG, "changePassword: failed code=${response.code()} message=$message")
+                Log.w(TAG, "changePassword: failed code=${response.code} message=$message")
                 Result.failure(Exception(message))
             }
         } catch (e: Exception) {

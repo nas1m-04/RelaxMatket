@@ -1,7 +1,9 @@
 package tj.relax.ui.screens.auth.data.dto.request
 
-import com.google.gson.annotations.SerializedName
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class RefreshRequest(
-    @SerializedName("refresh_token") val refreshToken: String,
+    @SerialName("refresh_token") val refreshToken: String,
 )

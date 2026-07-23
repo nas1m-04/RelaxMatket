@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Promotion(
     val id: Int = 0,
     val title: String = "",

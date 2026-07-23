@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class LoyaltyLevel(
     val name: String,
     val minPoints: Int,

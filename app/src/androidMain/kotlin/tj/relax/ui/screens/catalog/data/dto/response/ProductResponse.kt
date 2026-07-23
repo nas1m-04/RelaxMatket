@@ -1,5 +1,8 @@
 package tj.relax.ui.screens.catalog.data.dto.response
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class ProductResponse(
     val id: Int,
     val name: String,

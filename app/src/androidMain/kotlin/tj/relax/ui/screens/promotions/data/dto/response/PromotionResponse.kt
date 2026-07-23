@@ -1,5 +1,8 @@
 package tj.relax.ui.screens.promotions.data.dto.response
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class PromotionResponse(
     val id: Int = 0,
     val title: String = "",

@@ -3,7 +3,8 @@ package tj.relax.core.crash
 import android.content.Context
 import android.os.Build
 import android.util.Log
-import com.google.gson.Gson
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import tj.relax.BuildConfig
 import tj.relax.core.api.RelaxApiService
 import tj.relax.data.CrashReportRequest
@@ -15,6 +16,7 @@ private const val CRASH_FILE_NAME = "pending_crash.json"
 private const val MAX_MESSAGE_LENGTH = 2000
 private const val MAX_STACK_TRACE_LENGTH = 20000
 
+@Serializable
 private data class PendingCrash(
     val message: String,
     val stackTrace: String,
@@ -31,7 +33,7 @@ private data class PendingCrash(
  * can't be trusted to complete an HTTP call before it's killed.
  */
 object CrashReporter {
-    private val gson = Gson()
+    private val json = Json { ignoreUnknownKeys = true }
 
     fun install(context: Context) {
         val appContext = context.applicationContext
@@ -53,7 +55,7 @@ object CrashReporter {
             stackTrace = Log.getStackTraceString(throwable),
             occurredAt = Instant.now().toString(),
         )
-        File(context.filesDir, CRASH_FILE_NAME).writeText(gson.toJson(crash))
+        File(context.filesDir, CRASH_FILE_NAME).writeText(json.encodeToString(PendingCrash.serializer(), crash))
     }
 
     /** Call once on app start — uploads a crash captured just before the previous process died. */
@@ -62,7 +64,7 @@ object CrashReporter {
         if (!file.exists()) return
 
         val crash = try {
-            gson.fromJson(file.readText(), PendingCrash::class.java)
+            json.decodeFromString<PendingCrash>(file.readText())
         } catch (e: Exception) {
             null
         }

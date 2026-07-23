@@ -38,10 +38,18 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
             implementation(libs.koin.compose.viewmodel)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.logging)
+            implementation(libs.ktor.client.auth)
         }
 
         androidMain.dependencies {
             implementation(libs.koin.android)
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.gson)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -63,12 +71,12 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(platform(libs.firebase.bom.get()))
             implementation(libs.firebase.messaging.ktx)
-            implementation(libs.okhttp)
-            implementation(libs.okhttp.logging.interceptor)
-            implementation(libs.retrofit)
-            implementation(libs.retrofit.converter.gson)
             implementation(libs.room.runtime)
             implementation(libs.room.ktx)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
 
         androidUnitTest.dependencies {

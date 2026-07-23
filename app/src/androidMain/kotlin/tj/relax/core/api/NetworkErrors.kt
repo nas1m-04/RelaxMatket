@@ -1,11 +1,13 @@
 package tj.relax.core.api
 
-import com.google.gson.Gson
-import retrofit2.Response
-import java.io.IOException
+import io.ktor.client.plugins.HttpRequestTimeoutException
+import io.ktor.utils.io.errors.IOException
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 
-private val errorGson = Gson()
+private val errorJson = Json { ignoreUnknownKeys = true }
 
+@Serializable
 private data class ApiErrorBody(
     val success: Boolean = false,
     val error: String? = null,
@@ -15,34 +17,34 @@ private data class ApiErrorBody(
     val exceptionMessage: String? = null,
 )
 
-private fun Response<*>.apiErrorBody(): ApiErrorBody? {
-    val raw = errorBody()?.string()?.takeIf { it.isNotBlank() } ?: return null
+private fun ApiHttpResponse<*>.apiErrorBody(): ApiErrorBody? {
+    val raw = errorBody?.takeIf { it.isNotBlank() } ?: return null
     return try {
-        errorGson.fromJson(raw, ApiErrorBody::class.java)
+        errorJson.decodeFromString<ApiErrorBody>(raw)
     } catch (e: Exception) {
         null
     }
 }
 
 /** Extracts the human-readable `error` field from a failed response's JSON body, if present. */
-fun Response<*>.apiErrorMessage(): String? = apiErrorBody()?.error?.takeIf { it.isNotBlank() }
+fun ApiHttpResponse<*>.apiErrorMessage(): String? = apiErrorBody()?.error?.takeIf { it.isNotBlank() }
 
 /** Builds an [ApiException] describing why this response failed, ready to throw or report. */
-fun Response<*>.toApiException(fallbackMessage: String = "Не удалось выполнить запрос. Попробуйте позже"): ApiException {
+fun ApiHttpResponse<*>.toApiException(fallbackMessage: String = "Не удалось выполнить запрос. Попробуйте позже"): ApiException {
     val body = apiErrorBody()
     return ApiException(
         apiCode = body?.code,
         traceId = body?.traceId,
         exceptionType = body?.exceptionType,
         exceptionMessage = body?.exceptionMessage,
-        httpCode = code(),
+        httpCode = code,
         message = body?.error?.takeIf { it.isNotBlank() } ?: fallbackMessage,
     )
 }
 
 /** Returns the response's `data` payload, or throws [ApiException] if the request failed. */
-fun <T> Response<ApiResponse<T>>.dataOrThrow(fallbackMessage: String = "Не удалось выполнить запрос. Попробуйте позже"): T {
-    val data = body()?.data
+fun <T> ApiHttpResponse<ApiResponse<T>>.dataOrThrow(fallbackMessage: String = "Не удалось выполнить запрос. Попробуйте позже"): T {
+    val data = body?.data
     if (isSuccessful && data != null) return data
     throw toApiException(fallbackMessage)
 }
@@ -54,6 +56,6 @@ fun friendlyErrorMessage(e: Throwable): String = when (e) {
         e.isInternalError     -> "Произошла ошибка, попробуйте позже"
         else                  -> e.message ?: "Что-то пошло не так. Попробуйте позже"
     }
-    is IOException -> "Нет подключения к интернету. Проверьте сеть и попробуйте снова"
+    is IOException, is HttpRequestTimeoutException -> "Нет подключения к интернету. Проверьте сеть и попробуйте снова"
     else -> e.message?.takeIf { it.isNotBlank() } ?: "Что-то пошло не так. Попробуйте позже"
 }

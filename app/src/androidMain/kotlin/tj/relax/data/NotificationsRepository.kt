@@ -16,7 +16,7 @@ class NotificationsRepository(
 
     suspend fun getInAppModal(): Notification? {
         val response = api.getInAppNotification()
-        if (response.code() == 204) return null
+        if (response.code == 204) return null
         return response.dataOrThrow().toDomain()
     }
 

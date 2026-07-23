@@ -1,16 +1,20 @@
-﻿package tj.relax.core.api
+package tj.relax.core.api
 
-import okhttp3.MultipartBody
-import retrofit2.Response
-import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.Multipart
-import retrofit2.http.PATCH
-import retrofit2.http.POST
-import retrofit2.http.Part
-import retrofit2.http.Path
-import retrofit2.http.Query
+import io.ktor.client.HttpClient
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
+import io.ktor.client.request.parameter
+import io.ktor.client.request.request
+import io.ktor.client.request.setBody
+import io.ktor.client.statement.HttpResponse
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.ContentType
+import io.ktor.http.HttpHeaders
+import io.ktor.http.HttpMethod
+import io.ktor.http.contentType
+import io.ktor.http.isSuccess
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
 import tj.relax.data.AddToCartRequest
 import tj.relax.data.Banner
 import tj.relax.data.Branch
@@ -33,162 +37,195 @@ import tj.relax.ui.screens.notifications.data.dto.response.UnreadCountResponse
 import tj.relax.ui.screens.orders.data.dto.response.OrderResponse
 import tj.relax.ui.screens.promotions.data.dto.response.PromotionResponse
 
-interface RelaxApiService {
+private val json = Json { ignoreUnknownKeys = true }
 
-    // ── Auth (public) ────────────────────────────────────────────────────
-    @POST("auth/register")
-    suspend fun register(@Body request: RegisterRequest): Response<ApiResponse<AuthResponse>>
+class RelaxApiService(private val client: HttpClient) {
 
-    @POST("auth/login")
-    suspend fun login(@Body request: LoginRequest): Response<ApiResponse<AuthResponse>>
-
-    @POST("auth/refresh")
-    suspend fun refresh(@Body request: RefreshRequest): Response<ApiResponse<AuthResponse>>
-
-    // ── Products (public) ─────────────────────────────────────────────────
-    @GET("products")
-    suspend fun getProducts(
-        @Query("category_id") categoryId: Int? = null,
-        @Query("search")      search: String? = null,
-        @Query("sort")        sort: String? = null,
-        @Query("page")        page: Int = 1,
-        @Query("pageSize")    pageSize: Int = 20,
-    ): Response<ApiResponse<PagedResponse<Product>>>
-
-    @GET("products/{id}")
-    suspend fun getProduct(@Path("id") id: Int): Response<ApiResponse<Product>>
-
-    @GET("products/new")
-    suspend fun getNewProducts(): Response<ApiResponse<List<Product>>>
-
-    @GET("products/popular")
-    suspend fun getPopularProducts(): Response<ApiResponse<List<Product>>>
-
-    @GET("products/sale")
-    suspend fun getSaleProducts(): Response<ApiResponse<List<Product>>>
-
-    // ── Categories (public) ───────────────────────────────────────────────
-    @GET("categories")
-    suspend fun getCategories(): Response<ApiResponse<List<Category>>>
-
-    // ── Branches (public) ─────────────────────────────────────────────────
-    @GET("branches")
-    suspend fun getBranches(): Response<ApiResponse<List<Branch>>>
-
-    // ── Banners (public) ──────────────────────────────────────────────────
-    @GET("banners")
-    suspend fun getBanners(): Response<ApiResponse<List<Banner>>>
-
-    // ── Cart (auth required) ──────────────────────────────────────────────
-    @GET("cart")
-    suspend fun getCart(): Response<ApiResponse<List<CartItemResponse>>>
-
-    @POST("cart")
-    suspend fun addToCart(@Body request: AddToCartRequest): Response<ApiResponse<Unit>>
-
-    @DELETE("cart/{productId}")
-    suspend fun removeFromCart(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
-
-    @DELETE("cart")
-    suspend fun clearCart(): Response<ApiResponse<Unit>>
-
-    // ── Crash reports (no auth — a crash can happen with an expired/missing token) ────────
-    @POST("crash-reports")
-    suspend fun reportCrash(@Body request: CrashReportRequest): Response<ApiResponse<Any>>
-
-    // ── Support tickets (auth required) ───────────────────────────────────
-    @POST("support")
-    suspend fun createSupportTicket(@Body request: CreateSupportTicketRequest): Response<ApiResponse<SupportTicket>>
-
-    @GET("support")
-    suspend fun getSupportTickets(
-        @Query("page") page: Int = 1,
-        @Query("pageSize") pageSize: Int = 20,
-    ): Response<ApiResponse<PagedResponse<SupportTicket>>>
-
-    // ── Orders (auth required) ────────────────────────────────────────────
-    @GET("orders")
-    suspend fun getOrders(
-        @Query("page") page: Int = 1,
-        @Query("pageSize") pageSize: Int = 20,
-    ): Response<ApiResponse<PagedResponse<OrderResponse>>>
-
-    @POST("orders")
-    suspend fun createOrder(@Body request: CreateOrderRequest): Response<ApiResponse<OrderResponse>>
-
-    @GET("orders/{id}")
-    suspend fun getOrder(@Path("id") id: String): Response<ApiResponse<OrderResponse>>
-
-    // ── Profile (auth required) ───────────────────────────────────────────
-    @GET("profile")
-    suspend fun getProfile(): Response<ApiResponse<UserProfile>>
-
-    @PATCH("profile")
-    suspend fun updateProfile(@Body request: UpdateProfileRequest): Response<ApiResponse<UserProfile>>
-
-    @Multipart
-    @POST("profile/avatar")
-    suspend fun uploadAvatar(@Part avatar: MultipartBody.Part): Response<ApiResponse<UserProfile>>
-
-    @DELETE("profile/avatar")
-    suspend fun deleteAvatar(): Response<ApiResponse<UserProfile>>
-
-    @POST("auth/change-password")
-    suspend fun changePassword(@Body request: ChangePasswordRequest): Response<ApiResponse<Unit>>
-
-    // ── Favorites (auth required) ─────────────────────────────────────────
-    @GET("favorites")
-    suspend fun getFavorites(): Response<ApiResponse<List<Product>>>
-
-    @POST("favorites/{productId}")
-    suspend fun addFavorite(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
-
-    @DELETE("favorites/{productId}")
-    suspend fun removeFavorite(@Path("productId") productId: Int): Response<ApiResponse<Unit>>
-
-    // ── Loyalty (auth required) ───────────────────────────────────────────
-    @GET("loyalty")
-    suspend fun getLoyaltySummary(): Response<ApiResponse<LoyaltySummaryResponse>>
-
-    @GET("loyalty/levels")
-    suspend fun getLoyaltyLevels(): Response<ApiResponse<List<LoyaltyLevelResponse>>>
-
-    @GET("loyalty/transactions")
-    suspend fun getBonusTransactions(
-        @Query("page") page: Int = 1,
-        @Query("pageSize") pageSize: Int = 20,
-    ): Response<ApiResponse<PagedResponse<BonusTransactionApiResponse>>>
-
-    @GET("loyalty/achievements")
-    suspend fun getAchievements(): Response<ApiResponse<List<AchievementApiResponse>>>
-
-    @GET("loyalty/qr-token")
-    suspend fun getQrToken(): Response<ApiResponse<QrTokenResponse>>
-
-    @POST("profile/fcm-token")
-    suspend fun updateFcmToken(@Body request: UpdateFcmTokenRequest): Response<ApiResponse<Unit>>
+    @Serializable
     data class UpdateFcmTokenRequest(val fcmToken: String)
 
+    private suspend inline fun <reified T> call(
+        method: HttpMethod,
+        path: String,
+        query: Map<String, Any?> = emptyMap(),
+        requestBody: Any? = null,
+    ): ApiHttpResponse<ApiResponse<T>> {
+        val response = client.request(ApiConfig.BASE_URL + path) {
+            this.method = method
+            query.forEach { (key, value) -> if (value != null) parameter(key, value) }
+            if (requestBody != null) {
+                contentType(ContentType.Application.Json)
+                setBody(requestBody)
+            }
+        }
+        return response.toApiHttpResponse()
+    }
+
+    private suspend inline fun <reified T> HttpResponse.toApiHttpResponse(): ApiHttpResponse<ApiResponse<T>> {
+        val text = bodyAsText()
+        val parsed = if (text.isNotBlank()) {
+            try { json.decodeFromString<ApiResponse<T>>(text) } catch (e: Exception) { null }
+        } else null
+        return ApiHttpResponse(
+            isSuccessful = status.isSuccess(),
+            code = status.value,
+            body = parsed,
+            errorBody = if (!status.isSuccess()) text else null,
+        )
+    }
+
+    // ── Auth (public) ────────────────────────────────────────────────────
+    suspend fun register(request: RegisterRequest): ApiHttpResponse<ApiResponse<AuthResponse>> =
+        call(HttpMethod.Post, "auth/register", requestBody = request)
+
+    suspend fun login(request: LoginRequest): ApiHttpResponse<ApiResponse<AuthResponse>> =
+        call(HttpMethod.Post, "auth/login", requestBody = request)
+
+    suspend fun refresh(request: RefreshRequest): ApiHttpResponse<ApiResponse<AuthResponse>> =
+        call(HttpMethod.Post, "auth/refresh", requestBody = request)
+
+    // ── Products (public) ─────────────────────────────────────────────────
+    suspend fun getProducts(
+        categoryId: Int? = null,
+        search: String? = null,
+        sort: String? = null,
+        page: Int = 1,
+        pageSize: Int = 20,
+    ): ApiHttpResponse<ApiResponse<PagedResponse<Product>>> = call(
+        HttpMethod.Get, "products",
+        query = mapOf("category_id" to categoryId, "search" to search, "sort" to sort, "page" to page, "pageSize" to pageSize),
+    )
+
+    suspend fun getProduct(id: Int): ApiHttpResponse<ApiResponse<Product>> =
+        call(HttpMethod.Get, "products/$id")
+
+    suspend fun getNewProducts(): ApiHttpResponse<ApiResponse<List<Product>>> =
+        call(HttpMethod.Get, "products/new")
+
+    suspend fun getPopularProducts(): ApiHttpResponse<ApiResponse<List<Product>>> =
+        call(HttpMethod.Get, "products/popular")
+
+    suspend fun getSaleProducts(): ApiHttpResponse<ApiResponse<List<Product>>> =
+        call(HttpMethod.Get, "products/sale")
+
+    // ── Categories (public) ───────────────────────────────────────────────
+    suspend fun getCategories(): ApiHttpResponse<ApiResponse<List<Category>>> =
+        call(HttpMethod.Get, "categories")
+
+    // ── Branches (public) ─────────────────────────────────────────────────
+    suspend fun getBranches(): ApiHttpResponse<ApiResponse<List<Branch>>> =
+        call(HttpMethod.Get, "branches")
+
+    // ── Banners (public) ──────────────────────────────────────────────────
+    suspend fun getBanners(): ApiHttpResponse<ApiResponse<List<Banner>>> =
+        call(HttpMethod.Get, "banners")
+
+    // ── Cart (auth required) ──────────────────────────────────────────────
+    suspend fun getCart(): ApiHttpResponse<ApiResponse<List<CartItemResponse>>> =
+        call(HttpMethod.Get, "cart")
+
+    suspend fun addToCart(request: AddToCartRequest): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "cart", requestBody = request)
+
+    suspend fun removeFromCart(productId: Int): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Delete, "cart/$productId")
+
+    suspend fun clearCart(): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Delete, "cart")
+
+    // ── Crash reports (no auth — a crash can happen with an expired/missing token) ────────
+    suspend fun reportCrash(request: CrashReportRequest): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "crash-reports", requestBody = request)
+
+    // ── Support tickets (auth required) ───────────────────────────────────
+    suspend fun createSupportTicket(request: CreateSupportTicketRequest): ApiHttpResponse<ApiResponse<SupportTicket>> =
+        call(HttpMethod.Post, "support", requestBody = request)
+
+    suspend fun getSupportTickets(page: Int = 1, pageSize: Int = 20): ApiHttpResponse<ApiResponse<PagedResponse<SupportTicket>>> =
+        call(HttpMethod.Get, "support", query = mapOf("page" to page, "pageSize" to pageSize))
+
+    // ── Orders (auth required) ────────────────────────────────────────────
+    suspend fun getOrders(page: Int = 1, pageSize: Int = 20): ApiHttpResponse<ApiResponse<PagedResponse<OrderResponse>>> =
+        call(HttpMethod.Get, "orders", query = mapOf("page" to page, "pageSize" to pageSize))
+
+    suspend fun createOrder(request: CreateOrderRequest): ApiHttpResponse<ApiResponse<OrderResponse>> =
+        call(HttpMethod.Post, "orders", requestBody = request)
+
+    suspend fun getOrder(id: String): ApiHttpResponse<ApiResponse<OrderResponse>> =
+        call(HttpMethod.Get, "orders/$id")
+
+    // ── Profile (auth required) ───────────────────────────────────────────
+    suspend fun getProfile(): ApiHttpResponse<ApiResponse<UserProfile>> =
+        call(HttpMethod.Get, "profile")
+
+    suspend fun updateProfile(request: UpdateProfileRequest): ApiHttpResponse<ApiResponse<UserProfile>> =
+        call(HttpMethod.Patch, "profile", requestBody = request)
+
+    suspend fun uploadAvatar(bytes: ByteArray, filename: String, contentType: String): ApiHttpResponse<ApiResponse<UserProfile>> {
+        val response = client.request(ApiConfig.BASE_URL + "profile/avatar") {
+            method = HttpMethod.Post
+            setBody(MultiPartFormDataContent(formData {
+                append("avatar", bytes, io.ktor.http.Headers.build {
+                    append(HttpHeaders.ContentType, contentType)
+                    append(HttpHeaders.ContentDisposition, "filename=\"$filename\"")
+                })
+            }))
+        }
+        return response.toApiHttpResponse()
+    }
+
+    suspend fun deleteAvatar(): ApiHttpResponse<ApiResponse<UserProfile>> =
+        call(HttpMethod.Delete, "profile/avatar")
+
+    suspend fun changePassword(request: ChangePasswordRequest): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "auth/change-password", requestBody = request)
+
+    // ── Favorites (auth required) ─────────────────────────────────────────
+    suspend fun getFavorites(): ApiHttpResponse<ApiResponse<List<Product>>> =
+        call(HttpMethod.Get, "favorites")
+
+    suspend fun addFavorite(productId: Int): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "favorites/$productId")
+
+    suspend fun removeFavorite(productId: Int): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Delete, "favorites/$productId")
+
+    // ── Loyalty (auth required) ───────────────────────────────────────────
+    suspend fun getLoyaltySummary(): ApiHttpResponse<ApiResponse<LoyaltySummaryResponse>> =
+        call(HttpMethod.Get, "loyalty")
+
+    suspend fun getLoyaltyLevels(): ApiHttpResponse<ApiResponse<List<LoyaltyLevelResponse>>> =
+        call(HttpMethod.Get, "loyalty/levels")
+
+    suspend fun getBonusTransactions(page: Int = 1, pageSize: Int = 20): ApiHttpResponse<ApiResponse<PagedResponse<BonusTransactionApiResponse>>> =
+        call(HttpMethod.Get, "loyalty/transactions", query = mapOf("page" to page, "pageSize" to pageSize))
+
+    suspend fun getAchievements(): ApiHttpResponse<ApiResponse<List<AchievementApiResponse>>> =
+        call(HttpMethod.Get, "loyalty/achievements")
+
+    suspend fun getQrToken(): ApiHttpResponse<ApiResponse<QrTokenResponse>> =
+        call(HttpMethod.Get, "loyalty/qr-token")
+
+    suspend fun updateFcmToken(request: UpdateFcmTokenRequest): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "profile/fcm-token", requestBody = request)
+
     // ── Promotions (public) ───────────────────────────────────────────────────
-    @GET("promotions")
-    suspend fun getPromotions(): Response<ApiResponse<List<PromotionResponse>>>
+    suspend fun getPromotions(): ApiHttpResponse<ApiResponse<List<PromotionResponse>>> =
+        call(HttpMethod.Get, "promotions")
 
     // ── Notifications (auth required) ─────────────────────────────────────────
-    @GET("notifications")
-    suspend fun getNotifications(
-        @Query("page") page: Int = 1,
-        @Query("pageSize") pageSize: Int = 50,
-    ): Response<ApiResponse<List<NotificationResponse>>>
+    suspend fun getNotifications(page: Int = 1, pageSize: Int = 50): ApiHttpResponse<ApiResponse<List<NotificationResponse>>> =
+        call(HttpMethod.Get, "notifications", query = mapOf("page" to page, "pageSize" to pageSize))
 
-    @POST("notifications/mark-all-read")
-    suspend fun markAllNotificationsRead(): Response<ApiResponse<Unit>>
+    suspend fun markAllNotificationsRead(): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "notifications/mark-all-read")
 
-    @GET("notifications/in-app")
-    suspend fun getInAppNotification(): Response<ApiResponse<NotificationResponse>>
+    suspend fun getInAppNotification(): ApiHttpResponse<ApiResponse<NotificationResponse>> =
+        call(HttpMethod.Get, "notifications/in-app")
 
-    @POST("notifications/{id}/read")
-    suspend fun markNotificationRead(@Path("id") id: Int): Response<ApiResponse<Unit>>
+    suspend fun markNotificationRead(id: Int): ApiHttpResponse<ApiResponse<Unit>> =
+        call(HttpMethod.Post, "notifications/$id/read")
 
-    @GET("notifications/unread-count")
-    suspend fun getUnreadNotificationsCount(): Response<ApiResponse<UnreadCountResponse>>
+    suspend fun getUnreadNotificationsCount(): ApiHttpResponse<ApiResponse<UnreadCountResponse>> =
+        call(HttpMethod.Get, "notifications/unread-count")
 }

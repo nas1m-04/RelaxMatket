@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class SupportTicket(
     val id: String,
     val message: String,
@@ -10,6 +13,7 @@ data class SupportTicket(
     val isResolved: Boolean get() = status.equals("Resolved", ignoreCase = true)
 }
 
+@Serializable
 data class CreateSupportTicketRequest(
     val message: String,
 )

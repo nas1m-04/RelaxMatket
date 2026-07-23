@@ -1,9 +1,6 @@
 ﻿package tj.relax.data
 
 import android.util.Log
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
 
@@ -17,7 +14,7 @@ class UserRepository(
         val response = api.getProfile()
         if (!response.isSuccessful) {
             localUserStore.get()?.let {
-                Log.w(TAG, "getOrCreate: failed code=${response.code()}, using local profile")
+                Log.w(TAG, "getOrCreate: failed code=${response.code}, using local profile")
                 return it
             }
         }
@@ -43,9 +40,7 @@ class UserRepository(
             "image/webp" -> "webp"
             else         -> "jpg"
         }
-        val body = bytes.toRequestBody(safeMimeType.toMediaType())
-        val part = MultipartBody.Part.createFormData("avatar", "avatar.$extension", body)
-        val profile = api.uploadAvatar(part).dataOrThrow()
+        val profile = api.uploadAvatar(bytes, "avatar.$extension", safeMimeType).dataOrThrow()
         val result = profile.copy(level = computeLevel(profile.totalSpent))
         localUserStore.save(result)
         return result

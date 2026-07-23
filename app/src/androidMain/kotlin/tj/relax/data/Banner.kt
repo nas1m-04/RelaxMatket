@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Banner(
     val id: Int = 0,
     val title: String = "",

@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class UserProfile(
     val uid: String = "",
     val name: String = "",
@@ -13,7 +16,7 @@ data class UserProfile(
     val favoriteIds: List<Int> = emptyList(),
     val preferredBranchId: Int? = null,
     val pushEnabled: Boolean = true,
-    @kotlin.jvm.Transient val level: LoyaltyLevel = LoyaltyLevel(
+    @kotlinx.serialization.Transient val level: LoyaltyLevel = LoyaltyLevel(
         "Старт", 0, 4999, 1f, 0xFFC0C0C0L, listOf("1% кэшбэк бонусами")
     ),
 )

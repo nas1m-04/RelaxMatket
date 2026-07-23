@@ -1,7 +1,9 @@
 package tj.relax.ui.screens.orders.data.dto.response
 
+import kotlinx.serialization.Serializable
 import tj.relax.data.Product
 
+@Serializable
 data class OrderResponse(
     val id: String = "",
     val userUid: String = "",
@@ -24,6 +26,7 @@ data class OrderResponse(
     val source: String = "app",
 )
 
+@Serializable
 data class OrderItemResponse(
     val id: Int = 0,
     val orderId: String = "",

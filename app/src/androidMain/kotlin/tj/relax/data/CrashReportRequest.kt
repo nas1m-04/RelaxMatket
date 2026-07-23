@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class CrashReportRequest(
     val uid: String? = null,
     val message: String,

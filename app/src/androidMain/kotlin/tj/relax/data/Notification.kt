@@ -1,5 +1,8 @@
 package tj.relax.data
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 data class Notification(
     val id: Int = 0,
     val title: String = "",
@@ -11,4 +14,5 @@ data class Notification(
     val displayMode: String = "INBOX",
 )
 
+@Serializable
 enum class NotificationType { PROMO, BONUS, ORDER, SYSTEM, NEWS }
