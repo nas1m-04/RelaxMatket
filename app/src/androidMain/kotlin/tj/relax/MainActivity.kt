@@ -19,7 +19,6 @@ import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import dagger.hilt.android.AndroidEntryPoint
 import tj.relax.core.navigation.RelaxNavGraph
 import tj.relax.ui.theme.RelaxTheme
 import tj.relax.ui.theme.RelaxBackground
@@ -28,7 +27,6 @@ object AppSession {
     var userCancelledUpdate = false
 }
 
-@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appUpdateManager: AppUpdateManager

@@ -7,15 +7,11 @@ import tj.relax.core.api.dataOrThrow
 import tj.relax.core.db.dao.CategoryDao
 import tj.relax.core.db.entity.toDomain
 import tj.relax.core.db.entity.toEntity
-import tj.relax.core.di.ApplicationScope
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class CategoryRepository @Inject constructor(
+class CategoryRepository(
     private val api: RelaxApiService,
     private val dao: CategoryDao,
-    @ApplicationScope private val appScope: CoroutineScope,
+    private val appScope: CoroutineScope,
 ) {
     private val memCache = MemoryCache<List<Category>>(ttlMs = 10 * 60_000L)
 

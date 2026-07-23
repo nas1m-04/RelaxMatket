@@ -8,20 +8,16 @@ import tj.relax.core.api.dataOrThrow
 import tj.relax.core.db.dao.CachedProductDao
 import tj.relax.core.db.entity.toDomain
 import tj.relax.core.db.entity.toEntity
-import tj.relax.core.di.ApplicationScope
 import tj.relax.ui.screens.catalog.data.dto.request.CatalogRequest
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val LIST_POPULAR = "popular"
 private const val LIST_NEW     = "new"
 private const val LIST_SALE    = "sale"
 
-@Singleton
-class ProductRepository @Inject constructor(
+class ProductRepository(
     private val api: RelaxApiService,
     private val dao: CachedProductDao,
-    @ApplicationScope private val appScope: CoroutineScope,
+    private val appScope: CoroutineScope,
 ) {
     // L1: RAM caches per list type
     private val popularMem = MemoryCache<List<Product>>(ttlMs = 3 * 60_000L)

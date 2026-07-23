@@ -33,7 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
 import tj.relax.R
 import tj.relax.ui.components.*
@@ -68,7 +68,7 @@ fun HomeScreen(
     onSeeAllPopular: () -> Unit,
     onSeeAllNew: () -> Unit,
     onSeeAllBestOffers: () -> Unit,
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = koinViewModel(),
     cartViewModel: CartViewModel = activityViewModel(),
     favoritesViewModel: FavoritesViewModel = activityViewModel(),
 ) {

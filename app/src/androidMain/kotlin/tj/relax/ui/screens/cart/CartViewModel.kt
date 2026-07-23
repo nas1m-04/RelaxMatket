@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.data.AuthRepository
 import tj.relax.data.CartItem
@@ -16,12 +15,10 @@ import tj.relax.data.Product
 import tj.relax.data.UserRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "CartViewModel"
 
-@HiltViewModel
-class CartViewModel @Inject constructor(
+class CartViewModel(
     private val cartRepository: CartRepository,
     private val userRepository: UserRepository,
     private val loyaltyRepository: LoyaltyRepository,

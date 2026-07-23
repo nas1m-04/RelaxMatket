@@ -5,15 +5,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.data.Notification
 import tj.relax.data.NotificationsRepository
-import javax.inject.Inject
 
-@HiltViewModel
-class NotificationsViewModel @Inject constructor(
+class NotificationsViewModel(
     private val repository: NotificationsRepository,
 ) : ViewModel() {
 

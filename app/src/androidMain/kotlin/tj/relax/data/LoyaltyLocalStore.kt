@@ -4,17 +4,13 @@ import android.content.Context
 import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import dagger.hilt.android.qualifiers.ApplicationContext
 import tj.relax.core.api.AchievementApiResponse
 import tj.relax.core.api.LoyaltyLevelResponse
 import tj.relax.core.api.LoyaltySummaryResponse
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Persists loyalty data locally so it's available instantly on next app open, without a network call. */
-@Singleton
-class LoyaltyLocalStore @Inject constructor(
-    @ApplicationContext context: Context,
+class LoyaltyLocalStore(
+    context: Context,
 ) {
     private val prefs = context.getSharedPreferences("loyalty_prefs", Context.MODE_PRIVATE)
     private val gson  = Gson()

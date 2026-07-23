@@ -6,19 +6,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.data.SupportRepository
-import javax.inject.Inject
 
 private const val TAG = "SupportViewModel"
 private const val PAGE_SIZE = 20
 
-@HiltViewModel
-class SupportViewModel @Inject constructor(
+class SupportViewModel(
     private val supportRepository: SupportRepository,
 ) : ViewModel() {
 

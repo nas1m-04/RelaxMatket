@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
 import androidx.core.content.ContextCompat
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.SubcomposeAsyncImage
 import tj.relax.BuildConfig
 import tj.relax.R
@@ -46,7 +46,7 @@ fun ProfileScreen(
     onLoggedOut: () -> Unit,
     onSupport: () -> Unit,
     onAbout: () -> Unit,
-    viewModel: ProfileViewModel = hiltViewModel(),
+    viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state   = viewModel.uiState
     val user    = state.profile

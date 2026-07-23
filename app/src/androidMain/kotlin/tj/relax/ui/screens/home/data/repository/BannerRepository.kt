@@ -7,17 +7,13 @@ import tj.relax.core.api.dataOrThrow
 import tj.relax.core.db.dao.BannerDao
 import tj.relax.core.db.entity.toDomain
 import tj.relax.core.db.entity.toEntity
-import tj.relax.core.di.ApplicationScope
 import tj.relax.data.Banner
 import tj.relax.data.MemoryCache
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class BannerRepository @Inject constructor(
+class BannerRepository(
     private val api: RelaxApiService,
     private val dao: BannerDao,
-    @ApplicationScope private val appScope: CoroutineScope,
+    private val appScope: CoroutineScope,
 ) {
     private val memCache = MemoryCache<List<Banner>>(ttlMs = 10 * 60_000L)
 

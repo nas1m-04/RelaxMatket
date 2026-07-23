@@ -6,7 +6,6 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.compose.multiplatform)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
 }
@@ -35,9 +34,14 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(platform(libs.koin.bom.get()))
+            implementation(libs.koin.core)
+            implementation(libs.koin.compose)
+            implementation(libs.koin.compose.viewmodel)
         }
 
         androidMain.dependencies {
+            implementation(libs.koin.android)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -57,8 +61,6 @@ kotlin {
             implementation(libs.zxing.core)
             implementation(libs.androidx.lifecycle.viewmodel.ktx)
             implementation(libs.androidx.lifecycle.viewmodel.compose)
-            implementation(libs.hilt.android)
-            implementation(libs.hilt.navigation.compose)
             implementation(platform(libs.firebase.bom.get()))
             implementation(libs.firebase.messaging.ktx)
             implementation(libs.okhttp)
@@ -123,7 +125,6 @@ android {
 }
 
 dependencies {
-    add("kspAndroid", libs.hilt.compiler)
     add("kspAndroid", libs.room.compiler)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)

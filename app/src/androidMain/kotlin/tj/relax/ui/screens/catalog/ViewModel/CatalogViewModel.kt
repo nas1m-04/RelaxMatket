@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -19,9 +18,8 @@ import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.ui.screens.catalog.data.dto.request.CatalogRequest
 import tj.relax.ui.screens.catalog.presentation.data.CatalogUiState
-import javax.inject.Inject
-@HiltViewModel
-class CatalogViewModel @Inject constructor(
+
+class CatalogViewModel(
     private val productRepository: ProductRepository,
     private val categoryRepository: CategoryRepository,
 ) : ViewModel() {

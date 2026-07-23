@@ -5,16 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.data.ProductRepository
 import tj.relax.data.PromotionsRepository
-import javax.inject.Inject
 
-@HiltViewModel
-class PromotionsViewModel @Inject constructor(
+class PromotionsViewModel(
     private val repository: PromotionsRepository,
     private val productRepository: ProductRepository,
 ) : ViewModel() {

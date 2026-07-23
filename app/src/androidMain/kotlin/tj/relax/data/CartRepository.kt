@@ -3,11 +3,8 @@
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
 import tj.relax.core.api.toApiException
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class CartRepository @Inject constructor(
+class CartRepository(
     private val api: RelaxApiService,
 ) {
     // The backend can end up with two cart rows for the same product (e.g. two rapid

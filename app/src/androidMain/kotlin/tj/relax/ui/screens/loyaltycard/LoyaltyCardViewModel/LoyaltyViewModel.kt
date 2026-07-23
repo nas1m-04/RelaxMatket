@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
@@ -19,14 +18,12 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import javax.inject.Inject
 
 // Credits and debits share one paginated feed and are split into tabs client-side, so a small
 // page size can make one tab look empty while the other hogs the whole page — keep this generous.
 private const val TX_PAGE_SIZE = 15
 
-@HiltViewModel
-class LoyaltyViewModel @Inject constructor(
+class LoyaltyViewModel(
     private val loyaltyRepository: LoyaltyRepository,
     private val localUserStore: LocalUserStore,
 ) : ViewModel() {

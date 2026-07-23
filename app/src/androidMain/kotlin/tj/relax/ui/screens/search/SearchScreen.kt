@@ -22,7 +22,7 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import tj.relax.R
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
@@ -33,7 +33,7 @@ import tj.relax.ui.theme.*
 fun SearchScreen(
     onBack: () -> Unit,
     onProduct: (Int) -> Unit,
-    viewModel: SearchViewModel = hiltViewModel(),
+    viewModel: SearchViewModel = koinViewModel(),
     cartViewModel: CartViewModel = activityViewModel(),
     favoritesViewModel: FavoritesViewModel = activityViewModel(),
 ) {

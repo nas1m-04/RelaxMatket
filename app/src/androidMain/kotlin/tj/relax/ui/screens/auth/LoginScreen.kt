@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import tj.relax.R
 import tj.relax.ui.components.RelaxButton
 import tj.relax.ui.theme.*
@@ -27,7 +27,7 @@ import tj.relax.ui.theme.*
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
     onNavigateToMain: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: AuthViewModel = koinViewModel(),
 ) {
     var phone           by remember { mutableStateOf("") }
     var password        by remember { mutableStateOf("") }

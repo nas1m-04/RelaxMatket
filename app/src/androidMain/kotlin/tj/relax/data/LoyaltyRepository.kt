@@ -8,11 +8,8 @@ import tj.relax.core.api.PagedResponse
 import tj.relax.core.api.QrTokenResponse
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class LoyaltyRepository @Inject constructor(
+class LoyaltyRepository(
     private val api: RelaxApiService,
     private val localStore: LoyaltyLocalStore,
 ) {

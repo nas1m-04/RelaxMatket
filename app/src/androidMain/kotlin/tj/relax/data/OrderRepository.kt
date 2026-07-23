@@ -4,11 +4,8 @@ import tj.relax.core.api.PagedResponse
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
 import tj.relax.ui.screens.orders.data.toDomain
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class OrderRepository @Inject constructor(
+class OrderRepository(
     private val api: RelaxApiService,
 ) {
     suspend fun getOrders(page: Int = 1, pageSize: Int = 20): PagedResponse<Order> {

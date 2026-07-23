@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -18,12 +17,10 @@ import tj.relax.data.NotificationsRepository
 import tj.relax.data.ProductRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "HomeViewModel"
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
+class HomeViewModel(
     private val productRepository: ProductRepository,
     private val categoryRepository: CategoryRepository,
     private val bannerRepository: BannerRepository,

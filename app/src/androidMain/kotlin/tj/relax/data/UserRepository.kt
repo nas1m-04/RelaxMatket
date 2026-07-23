@@ -6,13 +6,10 @@ import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "UserRepository"
 
-@Singleton
-class UserRepository @Inject constructor(
+class UserRepository(
     private val api: RelaxApiService,
     private val localUserStore: LocalUserStore,
 ) {

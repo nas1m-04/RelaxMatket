@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.data.AuthRepository
 import tj.relax.data.BranchRepository
@@ -16,12 +15,10 @@ import tj.relax.data.UserRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.data.UpdateProfileRequest
-import javax.inject.Inject
 
 private const val TAG = "ProfileViewModel"
 
-@HiltViewModel
-class ProfileViewModel @Inject constructor(
+class ProfileViewModel(
     private val userRepository: UserRepository,
     private val authRepository: AuthRepository,
     private val branchRepository: BranchRepository,

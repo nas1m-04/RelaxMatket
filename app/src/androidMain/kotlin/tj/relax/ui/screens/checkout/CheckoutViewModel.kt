@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.data.Branch
 import tj.relax.data.BranchRepository
@@ -19,12 +18,10 @@ import tj.relax.data.OrderRepository
 import tj.relax.data.UserRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "CheckoutViewModel"
 
-@HiltViewModel
-class CheckoutViewModel @Inject constructor(
+class CheckoutViewModel(
     private val orderRepository: OrderRepository,
     private val branchRepository: BranchRepository,
     private val userRepository: UserRepository,

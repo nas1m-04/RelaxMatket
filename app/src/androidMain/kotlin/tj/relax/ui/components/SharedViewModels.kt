@@ -3,8 +3,8 @@ package tj.relax.ui.components
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
+import org.koin.compose.viewmodel.koinViewModel
 
 /**
  * Returns a ViewModel scoped to the host Activity, so the same instance (and its
@@ -14,5 +14,5 @@ import androidx.lifecycle.ViewModel
 @Composable
 inline fun <reified T : ViewModel> activityViewModel(): T {
     val activity = LocalContext.current as ComponentActivity
-    return hiltViewModel(activity)
+    return koinViewModel<T>(viewModelStoreOwner = activity)
 }

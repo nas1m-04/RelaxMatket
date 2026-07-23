@@ -7,19 +7,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
 import tj.relax.data.AuthRepository
 import tj.relax.data.MockData
 import tj.relax.data.OrderRepository
-import javax.inject.Inject
 
 private const val TAG = "OrderDetailViewModel"
 
-@HiltViewModel
-class OrderDetailViewModel @Inject constructor(
+class OrderDetailViewModel(
     private val orderRepository: OrderRepository,
     private val authRepository: AuthRepository,
     savedStateHandle: SavedStateHandle,

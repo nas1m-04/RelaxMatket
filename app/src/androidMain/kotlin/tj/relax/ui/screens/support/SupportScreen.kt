@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import kotlinx.coroutines.launch
 import tj.relax.ui.components.RelaxTopBar
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatDayTime
@@ -30,7 +30,7 @@ import tj.relax.ui.theme.*
 @Composable
 fun SupportScreen(
     onBack: () -> Unit,
-    viewModel: SupportViewModel = hiltViewModel(),
+    viewModel: SupportViewModel = koinViewModel(),
 ) {
     val state = viewModel.uiState
     val scope = rememberCoroutineScope()

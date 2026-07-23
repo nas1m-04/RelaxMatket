@@ -2,14 +2,10 @@ package tj.relax.data
 
 import android.content.Context
 import androidx.core.content.edit
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Stores the JWT access/refresh tokens issued by the backend on login/registration. */
-@Singleton
-class TokenManager @Inject constructor(
-    @ApplicationContext context: Context,
+class TokenManager(
+    context: Context,
 ) {
     private val prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
 

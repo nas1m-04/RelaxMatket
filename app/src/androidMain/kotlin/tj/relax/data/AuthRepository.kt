@@ -9,13 +9,10 @@ import tj.relax.core.firebase.RelaxFcmTokenManager
 import tj.relax.ui.screens.auth.data.dto.request.ChangePasswordRequest
 import tj.relax.ui.screens.auth.data.dto.request.LoginRequest
 import tj.relax.ui.screens.auth.data.dto.request.RegisterRequest
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "AuthRepository"
 
-@Singleton
-class AuthRepository @Inject constructor(
+class AuthRepository(
     private val api: RelaxApiService,
     private val tokenManager: TokenManager,
     private val userRepository: UserRepository,

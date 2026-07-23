@@ -4,11 +4,10 @@ import android.util.Log
 import okhttp3.Interceptor
 import okhttp3.Response
 import tj.relax.data.TokenManager
-import javax.inject.Inject
 
 private const val TAG = "AuthInterceptor"
 
-class AuthInterceptor @Inject constructor(
+class AuthInterceptor(
     private val tokenManager: TokenManager,
 ) : Interceptor {
 

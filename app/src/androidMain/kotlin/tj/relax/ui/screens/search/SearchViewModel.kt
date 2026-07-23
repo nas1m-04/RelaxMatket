@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -14,13 +13,11 @@ import tj.relax.data.Product
 import tj.relax.data.ProductRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "SearchViewModel"
 private const val SEARCH_DEBOUNCE_MS = 400L
 
-@HiltViewModel
-class SearchViewModel @Inject constructor(
+class SearchViewModel(
     private val productRepository: ProductRepository,
 ) : ViewModel() {
 

@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import tj.relax.data.AuthRepository
@@ -14,13 +13,11 @@ import tj.relax.data.MockData
 import tj.relax.data.OrderRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "OrdersViewModel"
 private const val PAGE_SIZE = 20
 
-@HiltViewModel
-class OrdersViewModel @Inject constructor(
+class OrdersViewModel(
     private val orderRepository: OrderRepository,
     private val authRepository: AuthRepository,
 ) : ViewModel() {

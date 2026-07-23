@@ -6,7 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.data.Branch
 import tj.relax.data.BranchRepository
@@ -14,12 +13,10 @@ import tj.relax.data.UpdateProfileRequest
 import tj.relax.data.UserRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "SelectBranchViewModel"
 
-@HiltViewModel
-class SelectBranchViewModel @Inject constructor(
+class SelectBranchViewModel(
     private val branchRepository: BranchRepository,
     private val userRepository: UserRepository,
 ) : ViewModel() {

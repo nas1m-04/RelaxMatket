@@ -7,7 +7,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.data.Category
 import tj.relax.data.CategoryRepository
@@ -15,12 +14,10 @@ import tj.relax.data.Product
 import tj.relax.data.ProductRepository
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.api.friendlyErrorMessage
-import javax.inject.Inject
 
 private const val TAG = "ProductDetailViewModel"
 
-@HiltViewModel
-class ProductDetailViewModel @Inject constructor(
+class ProductDetailViewModel(
     private val productRepository: ProductRepository,
     private val categoryRepository: CategoryRepository,
     savedStateHandle: SavedStateHandle,

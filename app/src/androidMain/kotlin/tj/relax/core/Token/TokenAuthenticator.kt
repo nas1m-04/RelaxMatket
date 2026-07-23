@@ -16,7 +16,6 @@ import tj.relax.ui.screens.auth.data.dto.request.RefreshRequest
 import tj.relax.ui.screens.auth.data.dto.response.AuthResponse
 import tj.relax.data.SessionManager
 import tj.relax.data.TokenManager
-import javax.inject.Inject
 
 private const val TAG = "TokenAuthenticator"
 
@@ -27,7 +26,7 @@ private const val TAG = "TokenAuthenticator"
  * If the user had a session (a refresh token was stored) but it could no longer be
  * renewed, the session is cleared and [SessionManager] notifies the UI to return to login.
  */
-class TokenAuthenticator @Inject constructor(
+class TokenAuthenticator(
     private val tokenManager: TokenManager,
     private val sessionManager: SessionManager,
 ) : Authenticator {

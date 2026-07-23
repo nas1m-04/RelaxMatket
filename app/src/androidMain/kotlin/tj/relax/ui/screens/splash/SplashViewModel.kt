@@ -2,15 +2,12 @@
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.firebase.RelaxFcmTokenManager
 import tj.relax.data.AuthRepository
-import javax.inject.Inject
 
-@HiltViewModel
-class SplashViewModel @Inject constructor(
+class SplashViewModel(
     private val authRepository: AuthRepository,
     private val api: RelaxApiService,
 ) : ViewModel() {

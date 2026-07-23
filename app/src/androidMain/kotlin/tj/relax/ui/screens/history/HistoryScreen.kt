@@ -23,7 +23,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
 import tj.relax.R
@@ -40,7 +40,7 @@ import tj.relax.ui.theme.*
 @Composable
 fun HistoryScreen(
     onOrder: (String) -> Unit,
-    viewModel: OrdersViewModel = hiltViewModel(),
+    viewModel: OrdersViewModel = koinViewModel(),
 ) {
     val state = viewModel.uiState
 

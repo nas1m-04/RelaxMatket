@@ -3,14 +3,10 @@ package tj.relax.data
 import android.content.Context
 import androidx.core.content.edit
 import com.google.gson.Gson
-import dagger.hilt.android.qualifiers.ApplicationContext
-import javax.inject.Inject
-import javax.inject.Singleton
 
 /** Caches the user's profile locally so it's available instantly on app start, until logout. */
-@Singleton
-class LocalUserStore @Inject constructor(
-    @ApplicationContext context: Context,
+class LocalUserStore(
+    context: Context,
 ) {
     private val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
     private val gson  = Gson()

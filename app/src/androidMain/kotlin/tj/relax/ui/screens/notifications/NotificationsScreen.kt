@@ -18,7 +18,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import tj.relax.R
 import tj.relax.data.Notification
 import tj.relax.data.NotificationType
@@ -29,7 +29,7 @@ import tj.relax.ui.theme.*
 @Composable
 fun NotificationsScreen(
     onBack: () -> Unit,
-    viewModel: NotificationsViewModel = hiltViewModel(),
+    viewModel: NotificationsViewModel = koinViewModel(),
 ) {
     val state = viewModel.uiState
 

@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
 import tj.relax.R
 import tj.relax.data.Product
@@ -33,7 +33,7 @@ import tj.relax.ui.theme.*
 fun ProductDetailScreen(
     productId: Int,
     onBack: () -> Unit,
-    viewModel: ProductDetailViewModel = hiltViewModel(),
+    viewModel: ProductDetailViewModel = koinViewModel(),
     cartViewModel: CartViewModel = activityViewModel(),
     favoritesViewModel: FavoritesViewModel = activityViewModel(),
 ) {

@@ -18,7 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import tj.relax.R
 import tj.relax.ui.components.RelaxButton
 import tj.relax.ui.theme.*
@@ -27,7 +27,7 @@ import tj.relax.ui.theme.*
 fun RegisterScreen(
     onBack: () -> Unit,
     onNavigateToMain: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel(),
+    viewModel: AuthViewModel = koinViewModel(),
 ) {
     var name                   by remember { mutableStateOf("") }
     var phone                  by remember { mutableStateOf("") }

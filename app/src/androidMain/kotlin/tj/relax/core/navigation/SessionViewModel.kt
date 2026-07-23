@@ -1,13 +1,10 @@
 package tj.relax.core.navigation
 
 import androidx.lifecycle.ViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharedFlow
 import tj.relax.data.SessionManager
-import javax.inject.Inject
 
-@HiltViewModel
-class SessionViewModel @Inject constructor(
+class SessionViewModel(
     sessionManager: SessionManager,
 ) : ViewModel() {
     val sessionExpired: SharedFlow<Unit> = sessionManager.sessionExpired

@@ -13,7 +13,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
 import tj.relax.R
 import tj.relax.data.CartItem
@@ -27,7 +27,7 @@ import tj.relax.ui.theme.*
 @Composable
 fun OrderDetailScreen(
     onBack: () -> Unit,
-    viewModel: OrderDetailViewModel = hiltViewModel(),
+    viewModel: OrderDetailViewModel = koinViewModel(),
 ) {
     val state = viewModel.uiState
     val order = state.order

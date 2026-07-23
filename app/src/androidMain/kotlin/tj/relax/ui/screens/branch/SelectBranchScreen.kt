@@ -19,7 +19,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import tj.relax.R
 import tj.relax.data.Branch
 import tj.relax.ui.components.RelaxTopBar
@@ -30,7 +30,7 @@ fun SelectBranchScreen(
     isOnboarding: Boolean,
     onDone: () -> Unit,
     onBack: () -> Unit = {},
-    viewModel: SelectBranchViewModel = hiltViewModel(),
+    viewModel: SelectBranchViewModel = koinViewModel(),
 ) {
     val state = viewModel.uiState
 

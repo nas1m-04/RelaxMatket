@@ -4,7 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -33,7 +33,7 @@ import tj.relax.ui.components.ErrorAlertDialogHost
 
 @Composable
 fun RelaxNavGraph(navController: NavHostController) {
-    val sessionViewModel: SessionViewModel = hiltViewModel()
+    val sessionViewModel: SessionViewModel = koinViewModel()
     LaunchedEffect(Unit) {
         sessionViewModel.sessionExpired.collect {
             navController.navigate(Route.Login.route) {
@@ -75,7 +75,7 @@ fun RelaxNavGraph(navController: NavHostController) {
             enterTransition = { fadeIn(tween(500)) },
             exitTransition  = { fadeOut(tween(450)) },
         ) {
-            val splashViewModel: SplashViewModel = hiltViewModel()
+            val splashViewModel: SplashViewModel = koinViewModel()
             SplashScreen(onFinished = {
                 val destination = if (splashViewModel.isLoggedIn) Route.Main.route else Route.Onboarding.route
                 navController.navigate(destination) {

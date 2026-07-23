@@ -3,11 +3,8 @@ package tj.relax.data
 import tj.relax.core.api.PagedResponse
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SupportRepository @Inject constructor(
+class SupportRepository(
     private val api: RelaxApiService,
 ) {
     suspend fun createTicket(message: String): SupportTicket =

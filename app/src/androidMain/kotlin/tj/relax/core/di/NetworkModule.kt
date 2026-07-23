@@ -1,64 +1,50 @@
-﻿package tj.relax.core.di
+package tj.relax.core.di
 
 import android.util.Log
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import tj.relax.BuildConfig
-import tj.relax.core.api.ApiConfig
-import tj.relax.core.api.RelaxApiService
 import tj.relax.core.Interceptor.AuthInterceptor
 import tj.relax.core.Interceptor.LanguageInterceptor
 import tj.relax.core.Token.TokenAuthenticator
+import tj.relax.core.api.ApiConfig
+import tj.relax.core.api.RelaxApiService
 import java.util.concurrent.TimeUnit
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object NetworkModule {
+val networkModule = module {
+    single { AuthInterceptor(get()) }
+    single { LanguageInterceptor() }
+    single { TokenAuthenticator(get(), get()) }
 
-    @Provides
-    @Singleton
-    fun provideLoggingInterceptor(): HttpLoggingInterceptor =
-        HttpLoggingInterceptor { message ->
-            Log.d("OkHttp", message)
-        }.apply {
+    single<HttpLoggingInterceptor> {
+        HttpLoggingInterceptor { message -> Log.d("OkHttp", message) }.apply {
             level = if (BuildConfig.DEBUG) HttpLoggingInterceptor.Level.BODY
                     else HttpLoggingInterceptor.Level.NONE
         }
+    }
 
-    @Provides
-    @Singleton
-    fun provideOkHttpClient(
-        authInterceptor: AuthInterceptor,
-        languageInterceptor: LanguageInterceptor,
-        tokenAuthenticator: TokenAuthenticator,
-        loggingInterceptor: HttpLoggingInterceptor,
-    ): OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(authInterceptor)
-        .addInterceptor(languageInterceptor)
-        .authenticator(tokenAuthenticator)
-        .addInterceptor(loggingInterceptor)
-        .connectTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
-        .writeTimeout(30, TimeUnit.SECONDS)
-        .build()
+    single<OkHttpClient> {
+        OkHttpClient.Builder()
+            .addInterceptor(get<AuthInterceptor>())
+            .addInterceptor(get<LanguageInterceptor>())
+            .authenticator(get<TokenAuthenticator>())
+            .addInterceptor(get<HttpLoggingInterceptor>())
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
+    }
 
-    @Provides
-    @Singleton
-    fun provideRetrofit(client: OkHttpClient): Retrofit = Retrofit.Builder()
-        .baseUrl(ApiConfig.BASE_URL)
-        .client(client)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
+    single<Retrofit> {
+        Retrofit.Builder()
+            .baseUrl(ApiConfig.BASE_URL)
+            .client(get())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
 
-    @Provides
-    @Singleton
-    fun provideApiService(retrofit: Retrofit): RelaxApiService =
-        retrofit.create(RelaxApiService::class.java)
+    single<RelaxApiService> { get<Retrofit>().create(RelaxApiService::class.java) }
 }
