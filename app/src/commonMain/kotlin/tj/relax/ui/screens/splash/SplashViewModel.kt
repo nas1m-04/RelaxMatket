@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 import tj.relax.core.api.RelaxApiService
-import tj.relax.core.firebase.RelaxFcmTokenManager
+import tj.relax.core.firebase.requestFcmTokenUpload
 import tj.relax.data.AuthRepository
 
 class SplashViewModel(
@@ -23,7 +23,7 @@ class SplashViewModel(
     private fun uploadFcmTokenIfNeeded() {
         viewModelScope.launch {
             try {
-                RelaxFcmTokenManager.getTokenAndUpload { token ->
+                requestFcmTokenUpload { token ->
                     viewModelScope.launch {
                         try {
                             api.updateFcmToken(RelaxApiService.UpdateFcmTokenRequest(token))
