@@ -1,14 +1,5 @@
 package tj.relax.ui.screens.profile
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Matrix
-import androidx.exifinterface.media.ExifInterface
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,12 +15,10 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
-import androidx.core.content.ContextCompat
 import org.koin.compose.viewmodel.koinViewModel
 import coil3.compose.SubcomposeAsyncImage
 import tj.relax.BuildConfig
@@ -50,10 +39,9 @@ fun ProfileScreen(
 ) {
     val state   = viewModel.uiState
     val user    = state.profile
-    val context = LocalContext.current
     var showLogoutDialog  by remember { mutableStateOf(false) }
     var showAvatarSheet   by remember { mutableStateOf(false) }
-    var pendingCropBitmap by remember { mutableStateOf<Bitmap?>(null) }
+    var pendingCropBitmap by remember { mutableStateOf<ImageBitmap?>(null) }
     var showLanguageSheet by remember { mutableStateOf(false) }
     var showChangePasswordSheet by remember { mutableStateOf(false) }
     var currentLanguage   by remember { mutableStateOf(LocaleManager.getCurrentLanguage()) }
@@ -62,21 +50,12 @@ fun ProfileScreen(
     var email by remember(user?.email) { mutableStateOf(user?.email ?: "") }
     val hasChanges = user != null && (name.trim() != user.name || email.trim() != user.email)
     val nameError  = name.trim().length < 2 && name.isNotBlank()
-    val emailError = email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+    val emailError = email.isNotBlank() && !EmailRegex.matches(email)
 
-    val galleryLauncher = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
-        uri?.let { pendingCropBitmap = decodeBitmapWithExifRotation(context, it) }
+    val avatarPicker = rememberAvatarPickerLaunchers(onPicked = { bitmap ->
+        pendingCropBitmap = bitmap
         showAvatarSheet = false
-    }
-
-    val cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicturePreview()) { bitmap ->
-        bitmap?.let { pendingCropBitmap = it }
-        showAvatarSheet = false
-    }
-
-    val cameraPermissionLauncher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
-        if (granted) cameraLauncher.launch(null)
-    }
+    })
 
     LaunchedEffect(state.loggedOut) {
         if (state.loggedOut) onLoggedOut()
@@ -86,15 +65,14 @@ fun ProfileScreen(
         viewModel.load(forceRefresh = true)
     }
 
+    avatarPicker.overlay()
+
     if (showAvatarSheet) {
         AvatarPickerSheet(
             hasAvatar   = !user?.avatarUrl.isNullOrEmpty(),
             isUploading = state.isUploadingAvatar,
-            onCamera    = {
-                val granted = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED
-                if (granted) cameraLauncher.launch(null) else cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
-            },
-            onGallery   = { galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)) },
+            onCamera    = { avatarPicker.pickFromCamera(); showAvatarSheet = false },
+            onGallery   = { avatarPicker.pickFromGallery() },
             onDelete    = { viewModel.removeAvatar(); showAvatarSheet = false },
             onDismiss   = { showAvatarSheet = false },
         )
@@ -425,24 +403,4 @@ private fun languageDisplayName(code: String): String = when (code) {
 private val CircleShape = RoundedCornerShape(50)
 private val RelaxError  = Color(0xFFEF4444)
 
-// Gallery-picked photos often carry EXIF rotation metadata rather than pre-rotated pixels — the
-// crop dialog works directly on pixel data, so without this a portrait photo would show sideways
-// in the crop preview (and stay sideways in the final avatar).
-private fun decodeBitmapWithExifRotation(context: android.content.Context, uri: android.net.Uri): Bitmap? {
-    val resolver = context.contentResolver
-    val bitmap = resolver.openInputStream(uri)?.use { BitmapFactory.decodeStream(it) } ?: return null
-
-    val rotationDegrees = resolver.openInputStream(uri)?.use { input ->
-        when (ExifInterface(input).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL)) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> 90f
-            ExifInterface.ORIENTATION_ROTATE_180 -> 180f
-            ExifInterface.ORIENTATION_ROTATE_270 -> 270f
-            else -> 0f
-        }
-    } ?: 0f
-
-    if (rotationDegrees == 0f) return bitmap
-
-    val matrix = Matrix().apply { postRotate(rotationDegrees) }
-    return Bitmap.createBitmap(bitmap, 0, 0, bitmap.width, bitmap.height, matrix, true)
-}
+private val EmailRegex = Regex("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")

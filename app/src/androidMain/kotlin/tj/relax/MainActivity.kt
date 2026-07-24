@@ -8,20 +8,13 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import androidx.core.app.ActivityCompat
-import androidx.navigation.compose.rememberNavController
 import com.google.android.play.core.appupdate.AppUpdateManager
 import com.google.android.play.core.appupdate.AppUpdateManagerFactory
 import com.google.android.play.core.install.InstallStateUpdatedListener
 import com.google.android.play.core.install.model.AppUpdateType
 import com.google.android.play.core.install.model.InstallStatus
 import com.google.android.play.core.install.model.UpdateAvailability
-import tj.relax.core.navigation.RelaxNavGraph
-import tj.relax.ui.theme.RelaxTheme
-import tj.relax.ui.theme.RelaxBackground
 
 object AppSession {
     var userCancelledUpdate = false
@@ -72,15 +65,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setContent {
-            RelaxTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = RelaxBackground,
-                ) {
-                    val navController = rememberNavController()
-                    RelaxNavGraph(navController = navController)
-                }
-            }
+            App()
         }
     }
 

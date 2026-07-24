@@ -1,6 +1,5 @@
 package tj.relax.ui.screens.profile
 
-import android.graphics.Bitmap
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -30,9 +29,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.input.pointer.pointerInput
@@ -46,7 +45,6 @@ import androidx.compose.ui.window.DialogProperties
 import tj.relax.generated.resources.*
 import tj.relax.ui.theme.RelaxTextOnDarkSub
 import tj.relax.ui.theme.RelaxWhite
-import java.io.ByteArrayOutputStream
 import kotlin.math.min
 import kotlin.math.roundToInt
 
@@ -61,7 +59,7 @@ private const val OutputSize = 512
  */
 @Composable
 fun AvatarCropDialog(
-    bitmap: Bitmap,
+    bitmap: ImageBitmap,
     onConfirm: (ByteArray) -> Unit,
     onDismiss: () -> Unit,
 ) {
@@ -130,7 +128,7 @@ fun AvatarCropDialog(
                         },
                 ) {
                     Image(
-                        bitmap = bitmap.asImageBitmap(),
+                        bitmap = bitmap,
                         contentDescription = null,
                         modifier = Modifier
                             .size(imageWidthDp, imageHeightDp)
@@ -164,10 +162,8 @@ fun AvatarCropDialog(
                 }
                 Button(
                     onClick = {
-                        val cropped = cropToOutput(bitmap, boxSizePx, baseScale, zoom, offset)
-                        val stream = ByteArrayOutputStream()
-                        cropped.compress(Bitmap.CompressFormat.JPEG, 90, stream)
-                        onConfirm(stream.toByteArray())
+                        val cropRect = computeCropRect(bitmap, boxSizePx, baseScale, zoom, offset)
+                        onConfirm(cropAndEncodeAvatar(bitmap, cropRect, OutputSize))
                     },
                     modifier = Modifier.weight(1f),
                 ) {
@@ -176,15 +172,4 @@ fun AvatarCropDialog(
             }
         }
     }
-}
-
-private fun cropToOutput(source: Bitmap, boxSizePx: Float, baseScale: Float, zoom: Float, offset: Offset): Bitmap {
-    val displayScale = baseScale * zoom
-    val srcLeft = (-offset.x / displayScale).roundToInt().coerceIn(0, source.width - 1)
-    val srcTop = (-offset.y / displayScale).roundToInt().coerceIn(0, source.height - 1)
-    val rawSize = (boxSizePx / displayScale).roundToInt().coerceAtLeast(1)
-    val srcSize = minOf(rawSize, source.width - srcLeft, source.height - srcTop)
-
-    val cropped = Bitmap.createBitmap(source, srcLeft, srcTop, srcSize, srcSize)
-    return Bitmap.createScaledBitmap(cropped, OutputSize, OutputSize, true)
 }

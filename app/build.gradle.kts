@@ -35,6 +35,8 @@ kotlin {
             implementation(compose.material3)
             implementation(compose.ui)
             implementation(compose.components.resources)
+            implementation(compose.materialIconsExtended)
+            implementation(libs.androidx.navigation.compose)
             implementation(platform(libs.koin.bom.get()))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
@@ -69,8 +71,6 @@ kotlin {
             implementation(libs.androidx.ui.graphics)
             implementation(libs.androidx.ui.tooling.preview)
             implementation(libs.androidx.material3)
-            implementation(libs.androidx.material.icons.extended)
-            implementation(libs.androidx.navigation.compose)
             implementation(libs.androidx.compose.foundation)
             implementation(libs.play.app.update)
             implementation(libs.play.app.update.ktx)
@@ -83,6 +83,9 @@ kotlin {
 
         iosMain.dependencies {
             implementation(libs.ktor.client.darwin)
+            implementation(libs.qrcode.kotlin)
+            implementation(libs.peekaboo.image.picker)
+            implementation(libs.peekaboo.ui)
         }
 
         androidUnitTest.dependencies {

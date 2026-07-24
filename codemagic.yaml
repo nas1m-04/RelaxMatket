@@ -1,0 +1,41 @@
+workflows:
+  ios-device-build:
+    name: RelaxMarket iOS (device build)
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      groups:
+        - ios_signing
+      vars:
+        XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
+        XCODE_SCHEME: "iosApp"
+        BUNDLE_ID: "tj.relax"
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: CPM
+          include: true
+    scripts:
+      - name: Set up code signing
+        script: |
+          xcode-project use-profiles
+      - name: Build ipa for distribution
+        script: |
+          # The Xcode project's own "Compile Kotlin Framework" run-script build phase invokes
+          # `./gradlew :app:embedAndSignAppleFrameworkForXcode` automatically as part of this —
+          # no separate Gradle step needed here.
+          xcode-project build-ipa \
+            --project "$XCODE_PROJECT" \
+            --scheme "$XCODE_SCHEME"
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - "/tmp/xcodebuild_logs/*.log"
+    publishing:
+      email:
+        recipients:
+          - nasimisaodatsho@gmail.com
+        notify:
+          success: true
+          failure: true
