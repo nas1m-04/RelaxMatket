@@ -9,6 +9,12 @@ workflows:
         XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
         XCODE_SCHEME: "iosApp"
         BUNDLE_ID: "tj.relax"
+        # Force Kotlin/Native to use a build-scoped, always-fresh directory instead of the
+        # shared $HOME/.konan — wiping ~/.konan alone didn't fix a persistent "Can't find
+        # env_blacklist file" / ClassNotFoundException, which points at something wrong with
+        # that shared location itself (possibly a machine-image-level issue), not just leftover
+        # state from an earlier interrupted download.
+        KONAN_DATA_DIR: "/tmp/konan-data"
     triggering:
       events:
         - push
@@ -20,6 +26,7 @@ workflows:
         script: |
           rm -rf ~/Library/Developer/Xcode/DerivedData
           rm -rf ~/.konan
+          rm -rf "$KONAN_DATA_DIR"
       - name: Build for iOS Simulator
         script: |
           xcodebuild build \
@@ -71,6 +78,7 @@ workflows:
       vars:
         XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
         XCODE_SCHEME: "iosApp"
+        KONAN_DATA_DIR: "/tmp/konan-data"
     triggering:
       events:
         - push
@@ -82,6 +90,7 @@ workflows:
         script: |
           rm -rf ~/Library/Developer/Xcode/DerivedData
           rm -rf ~/.konan
+          rm -rf "$KONAN_DATA_DIR"
       - name: Set up code signing
         script: |
           xcode-project use-profiles
