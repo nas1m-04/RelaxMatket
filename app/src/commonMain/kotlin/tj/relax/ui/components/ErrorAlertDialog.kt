@@ -1,6 +1,5 @@
 package tj.relax.ui.components
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -17,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.CloudSync
 import androidx.compose.material.icons.rounded.ContentCopy
+import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ErrorOutline
 import androidx.compose.material.icons.rounded.ReportProblem
 import androidx.compose.material3.Button
@@ -28,6 +28,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +39,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
@@ -46,7 +46,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import tj.relax.BuildConfig
+import kotlinx.coroutines.delay
+import tj.relax.core.util.isDebugBuild
 import tj.relax.generated.resources.*
 import tj.relax.core.api.ApiException
 import tj.relax.core.api.ErrorPresenter
@@ -111,7 +112,7 @@ fun ErrorAlertDialog(error: ApiException, onDismiss: () -> Unit) {
     }
 
     val showDetailsToggle = error.isInternalError &&
-        BuildConfig.DEBUG &&
+        isDebugBuild &&
         (error.exceptionType != null || error.exceptionMessage != null)
 
     DialogFrame(
@@ -189,8 +190,14 @@ private fun DialogFrame(
 @Composable
 private fun TraceIdChip(traceId: String) {
     val clipboard = LocalClipboardManager.current
-    val context = LocalContext.current
-    val copiedMessage = stringResource(Res.string.error_trace_id_copied)
+    var justCopied by remember { mutableStateOf(false) }
+
+    LaunchedEffect(justCopied) {
+        if (justCopied) {
+            delay(1500L)
+            justCopied = false
+        }
+    }
 
     Row(
         modifier = Modifier
@@ -199,7 +206,7 @@ private fun TraceIdChip(traceId: String) {
             .background(RelaxSurfaceAlt)
             .clickable {
                 clipboard.setText(AnnotatedString(traceId))
-                Toast.makeText(context, copiedMessage, Toast.LENGTH_SHORT).show()
+                justCopied = true
             }
             .padding(horizontal = 12.dp, vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -211,14 +218,14 @@ private fun TraceIdChip(traceId: String) {
                 color = RelaxTextSecondary,
             )
             Text(
-                traceId,
+                if (justCopied) stringResource(Res.string.error_trace_id_copied) else traceId,
                 style = MaterialTheme.typography.labelMedium.copy(fontFamily = FontFamily.Monospace),
                 color = RelaxTextPrimary,
             )
         }
         Spacer(Modifier.width(8.dp))
         Icon(
-            Icons.Rounded.ContentCopy,
+            if (justCopied) Icons.Rounded.Check else Icons.Rounded.ContentCopy,
             contentDescription = stringResource(Res.string.error_trace_id_copied),
             tint = RelaxTextSecondary,
             modifier = Modifier.height(18.dp).width(18.dp),

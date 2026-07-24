@@ -34,8 +34,8 @@ fun SearchScreen(
     onBack: () -> Unit,
     onProduct: (Int) -> Unit,
     viewModel: SearchViewModel = koinViewModel(),
-    cartViewModel: CartViewModel = activityViewModel(),
-    favoritesViewModel: FavoritesViewModel = activityViewModel(),
+    cartViewModel: CartViewModel = sharedViewModel(),
+    favoritesViewModel: FavoritesViewModel = sharedViewModel(),
 ) {
     val state          = viewModel.uiState
     val cartState      = cartViewModel.uiState

@@ -26,7 +26,7 @@ class CatalogViewModel(
     var uiState by mutableStateOf(CatalogUiState())
         private set
 
-    // Fetching the whole catalog is expensive — this ViewModel is shared (activityViewModel()) and
+    // Fetching the whole catalog is expensive — this ViewModel is shared (sharedViewModel()) and
     // grabbed from the Home screen too (just to pre-set a quick filter before navigating here), so
     // it must NOT fetch on construction. The Catalog screen triggers the first load itself via
     // loadIfNeeded() when it actually appears.

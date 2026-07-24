@@ -19,8 +19,8 @@ import tj.relax.ui.theme.*
 fun FavoritesScreen(
     onBack: () -> Unit,
     onProduct: (Int) -> Unit,
-    viewModel: FavoritesViewModel = activityViewModel(),
-    cartViewModel: CartViewModel = activityViewModel(),
+    viewModel: FavoritesViewModel = sharedViewModel(),
+    cartViewModel: CartViewModel = sharedViewModel(),
 ) {
     val state     = viewModel.uiState
     val cartState = cartViewModel.uiState

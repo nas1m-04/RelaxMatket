@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import kotlinx.coroutines.launch
 import tj.relax.generated.resources.*
 import tj.relax.data.CartItem

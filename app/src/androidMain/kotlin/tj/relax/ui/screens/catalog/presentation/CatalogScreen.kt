@@ -35,9 +35,9 @@ import tj.relax.ui.theme.*
 fun CatalogScreen(
     onProduct: (Int) -> Unit,
     onCart: () -> Unit,
-    viewModel: CatalogViewModel = activityViewModel(),
-    cartViewModel: CartViewModel = activityViewModel(),
-    favoritesViewModel: FavoritesViewModel = activityViewModel(),
+    viewModel: CatalogViewModel = sharedViewModel(),
+    cartViewModel: CartViewModel = sharedViewModel(),
+    favoritesViewModel: FavoritesViewModel = sharedViewModel(),
 ) {
     val state          = viewModel.uiState
     val cartState      = cartViewModel.uiState

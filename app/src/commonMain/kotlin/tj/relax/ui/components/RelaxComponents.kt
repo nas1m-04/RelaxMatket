@@ -21,7 +21,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.ui.theme.*

@@ -29,7 +29,7 @@ import tj.relax.generated.resources.*
 import tj.relax.data.Branch
 import tj.relax.data.OrderItemRequest
 import tj.relax.ui.components.RelaxTopBar
-import tj.relax.ui.components.activityViewModel
+import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.screens.cart.CartViewModel
 import tj.relax.ui.theme.*
 
@@ -38,8 +38,8 @@ import tj.relax.ui.theme.*
 fun CheckoutScreen(
     onBack: () -> Unit,
     onSuccess: () -> Unit,
-    cartViewModel: CartViewModel = activityViewModel(),
-    viewModel: CheckoutViewModel = activityViewModel(),
+    cartViewModel: CartViewModel = sharedViewModel(),
+    viewModel: CheckoutViewModel = sharedViewModel(),
 ) {
     val cartState = cartViewModel.uiState
     val state     = viewModel.uiState

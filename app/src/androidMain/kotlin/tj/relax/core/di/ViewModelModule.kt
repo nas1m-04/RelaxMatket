@@ -25,19 +25,25 @@ val viewModelModule = module {
     viewModel { SessionViewModel(get()) }
     viewModel { AuthViewModel(get()) }
     viewModel { SelectBranchViewModel(get(), get()) }
-    viewModel { CartViewModel(get(), get(), get(), get()) }
-    viewModel { CatalogViewModel(get(), get()) }
-    viewModel { CheckoutViewModel(get(), get(), get(), get(), get()) }
-    viewModel { FavoritesViewModel(get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
-    viewModel { LoyaltyViewModel(get(), get()) }
     viewModel { NotificationsViewModel(get()) }
     viewModel { OrderDetailViewModel(get(), get(), get()) }
     viewModel { OrdersViewModel(get(), get()) }
     viewModel { ProductDetailViewModel(get(), get(), get()) }
     viewModel { ProfileViewModel(get(), get(), get()) }
-    viewModel { PromotionsViewModel(get(), get()) }
     viewModel { SearchViewModel(get()) }
     viewModel { SplashViewModel(get(), get()) }
     viewModel { SupportViewModel(get()) }
+
+    // Shared across many screens (not per-screen instances) — retrieved via
+    // tj.relax.ui.components.sharedViewModel() instead of koinViewModel(). A Koin `single`
+    // gives them the same app-lifetime, single-instance semantics the old Activity-scoped
+    // hiltViewModel(activity)/koinViewModel(viewModelStoreOwner = activity) pattern did,
+    // without needing a ComponentActivity (no Compose Multiplatform equivalent on iOS).
+    single { CartViewModel(get(), get(), get(), get()) }
+    single { CatalogViewModel(get(), get()) }
+    single { CheckoutViewModel(get(), get(), get(), get(), get()) }
+    single { FavoritesViewModel(get(), get()) }
+    single { LoyaltyViewModel(get(), get()) }
+    single { PromotionsViewModel(get(), get()) }
 }

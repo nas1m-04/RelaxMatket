@@ -5,9 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.toBitmap
-import coil.imageLoader
-import coil.request.ImageRequest
+import coil3.BitmapImage
+import coil3.imageLoader
+import coil3.request.ImageRequest
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.runBlocking
@@ -58,7 +58,7 @@ class RelaxFirebaseMessagingService : FirebaseMessagingService() {
             runCatching {
                 runBlocking {
                     val result = imageLoader.execute(ImageRequest.Builder(this@RelaxFirebaseMessagingService).data(url).build())
-                    result.drawable?.toBitmap()
+                    (result.image as? BitmapImage)?.bitmap
                 }
             }.getOrNull()
         }

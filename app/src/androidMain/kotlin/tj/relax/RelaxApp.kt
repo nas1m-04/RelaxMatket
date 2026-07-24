@@ -1,10 +1,10 @@
 package tj.relax
 
 import android.app.Application
-import coil.ImageLoader
-import coil.ImageLoaderFactory
-import coil.disk.DiskCache
-import coil.memory.MemoryCache
+import coil3.ImageLoader
+import coil3.SingletonImageLoader
+import coil3.network.ktor3.KtorNetworkFetcherFactory
+import coil3.request.crossfade
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import kotlinx.coroutines.CoroutineScope
@@ -25,7 +25,7 @@ import tj.relax.core.firebase.NotificationChannels
 import tj.relax.core.util.AndroidPlatformContext
 import tj.relax.data.LocalUserStore
 
-class RelaxApp : Application(), ImageLoaderFactory {
+class RelaxApp : Application() {
 
     private val apiService: RelaxApiService by inject()
     private val localUserStore: LocalUserStore by inject()
@@ -47,20 +47,12 @@ class RelaxApp : Application(), ImageLoaderFactory {
         appScope.launch {
             CrashReporter.sendPendingCrashIfAny(apiService, localUserStore.get()?.uid)
         }
-    }
 
-    override fun newImageLoader(): ImageLoader = ImageLoader.Builder(this)
-        .crossfade(250)
-        .memoryCache {
-            MemoryCache.Builder(this)
-                .maxSizePercent(0.20)
+        SingletonImageLoader.setSafe { context ->
+            ImageLoader.Builder(context)
+                .crossfade(true)
+                .components { add(KtorNetworkFetcherFactory()) }
                 .build()
         }
-        .diskCache {
-            DiskCache.Builder()
-                .directory(cacheDir.resolve("image_cache"))
-                .maxSizeBytes(50L * 1024 * 1024) // 50 MB
-                .build()
-        }
-        .build()
+    }
 }

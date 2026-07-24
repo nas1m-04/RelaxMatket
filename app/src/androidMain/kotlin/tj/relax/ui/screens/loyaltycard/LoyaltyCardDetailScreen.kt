@@ -23,7 +23,7 @@ import tj.relax.generated.resources.*
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.RelaxTopBar
-import tj.relax.ui.components.activityViewModel
+import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.LoyaltyViewModel
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatTransactionDate
 import tj.relax.ui.theme.*
@@ -32,7 +32,7 @@ import tj.relax.ui.theme.*
 @Composable
 fun LoyaltyCardDetailScreen(
     onBack: () -> Unit,
-    viewModel: LoyaltyViewModel = activityViewModel(),
+    viewModel: LoyaltyViewModel = sharedViewModel(),
 ) {
     val state   = viewModel.uiState
     val summary = state.summary

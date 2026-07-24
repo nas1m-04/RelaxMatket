@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.*
 import kotlinx.coroutines.launch
 import tj.relax.generated.resources.*
 import tj.relax.core.api.ErrorPresenter
-import tj.relax.ui.components.activityViewModel
+import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.LiveQrCode
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.LoyaltyViewModel
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatMemberSince
@@ -34,7 +34,7 @@ import tj.relax.ui.theme.*
 @Composable
 fun LoyaltyCardScreen(
     onDetails: () -> Unit = {},
-    viewModel: LoyaltyViewModel = activityViewModel(),
+    viewModel: LoyaltyViewModel = sharedViewModel(),
 ) {
     val state   = viewModel.uiState
     val summary = state.summary

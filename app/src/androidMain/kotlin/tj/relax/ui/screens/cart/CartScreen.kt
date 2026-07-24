@@ -18,19 +18,19 @@ import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import tj.relax.generated.resources.*
 import tj.relax.data.CartItem
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.RelaxTopBar
-import tj.relax.ui.components.activityViewModel
+import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.theme.*
 
 @Composable
 fun CartScreen(
     onBack: () -> Unit,
     onCheckout: () -> Unit,
-    viewModel: CartViewModel = activityViewModel(),
+    viewModel: CartViewModel = sharedViewModel(),
 ) {
     val state         = viewModel.uiState
     val subtotal      = state.items.sumOf { it.product.effectivePrice * it.quantity }

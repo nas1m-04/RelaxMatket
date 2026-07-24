@@ -36,7 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.resources.stringResource
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.ui.theme.RelaxDark

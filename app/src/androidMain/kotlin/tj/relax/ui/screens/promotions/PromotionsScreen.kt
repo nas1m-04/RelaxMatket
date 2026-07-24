@@ -19,13 +19,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.data.Promotion
 import tj.relax.ui.components.RelaxTopBar
 import tj.relax.ui.screens.cart.CartViewModel
-import tj.relax.ui.components.activityViewModel
+import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.theme.*
 
 @Composable
@@ -33,7 +33,7 @@ fun PromotionsScreen(
     onBack: () -> Unit,
     onProduct: (Int) -> Unit,
     viewModel: PromotionsViewModel = koinViewModel(),
-    cartViewModel: CartViewModel = activityViewModel(),
+    cartViewModel: CartViewModel = sharedViewModel(),
 ) {
     val state     = viewModel.uiState
     val cartState = cartViewModel.uiState

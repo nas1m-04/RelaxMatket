@@ -49,6 +49,8 @@ kotlin {
             implementation(libs.multiplatform.settings)
             implementation(libs.napier)
             implementation(libs.okio)
+            implementation(libs.coil3.compose)
+            implementation(libs.coil3.network.ktor3)
         }
 
         androidMain.dependencies {
@@ -67,7 +69,6 @@ kotlin {
             implementation(libs.androidx.material3)
             implementation(libs.androidx.material.icons.extended)
             implementation(libs.androidx.navigation.compose)
-            implementation(libs.coil.compose)
             implementation(libs.androidx.compose.foundation)
             implementation(libs.play.app.update)
             implementation(libs.play.app.update.ktx)

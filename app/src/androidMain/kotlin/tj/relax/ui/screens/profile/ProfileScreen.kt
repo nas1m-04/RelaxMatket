@@ -31,7 +31,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
 import androidx.core.content.ContextCompat
 import org.koin.compose.viewmodel.koinViewModel
-import coil.compose.SubcomposeAsyncImage
+import coil3.compose.SubcomposeAsyncImage
 import tj.relax.BuildConfig
 import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxDivider

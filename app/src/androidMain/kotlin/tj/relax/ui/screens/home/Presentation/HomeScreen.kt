@@ -34,7 +34,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import tj.relax.generated.resources.*
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
@@ -69,8 +69,8 @@ fun HomeScreen(
     onSeeAllNew: () -> Unit,
     onSeeAllBestOffers: () -> Unit,
     viewModel: HomeViewModel = koinViewModel(),
-    cartViewModel: CartViewModel = activityViewModel(),
-    favoritesViewModel: FavoritesViewModel = activityViewModel(),
+    cartViewModel: CartViewModel = sharedViewModel(),
+    favoritesViewModel: FavoritesViewModel = sharedViewModel(),
 ) {
     val state           = viewModel.uiState
     val cartState       = cartViewModel.uiState

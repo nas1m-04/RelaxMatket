@@ -24,7 +24,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
 import tj.relax.generated.resources.*
 import tj.relax.core.navigation.Route
-import tj.relax.ui.components.activityViewModel
+import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.screens.history.HistoryScreen
 import tj.relax.ui.screens.catalog.presentation.CatalogScreen
 import tj.relax.ui.screens.catalog.ViewModel.CatalogViewModel
@@ -80,7 +80,7 @@ fun MainScreen(rootNavController: NavHostController, onLoggedOut: () -> Unit) {
             popExitTransition   = { fadeOut(tween(200)) },
         ) {
             composable(Route.Home.route) {
-                val catalogViewModel: CatalogViewModel = activityViewModel()
+                val catalogViewModel: CatalogViewModel = sharedViewModel()
                 val goToCatalog: () -> Unit = {
                     bottomNavController.navigate(Route.Catalog.route) {
                         popUpTo(Route.Home.route) { saveState = true }
