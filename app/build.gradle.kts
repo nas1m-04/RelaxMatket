@@ -60,7 +60,6 @@ kotlin {
         androidMain.dependencies {
             implementation(libs.koin.android)
             implementation(libs.ktor.client.okhttp)
-            implementation(libs.gson)
             implementation(libs.androidx.core.ktx)
             implementation(libs.androidx.exifinterface)
             implementation(libs.androidx.lifecycle.runtime.ktx)
