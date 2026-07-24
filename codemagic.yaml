@@ -44,12 +44,20 @@ workflows:
           APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" -name "iosApp.app" -path "*iphonesimulator*" | head -1)
           echo "App path: $APP_PATH"
           xcrun simctl install "$DEVICE_ID" "$APP_PATH"
-          xcrun simctl launch "$DEVICE_ID" "$BUNDLE_ID"
-          sleep 8
           mkdir -p "$CM_BUILD_DIR/screenshots"
-          xcrun simctl io "$DEVICE_ID" screenshot "$CM_BUILD_DIR/screenshots/launch.png"
+          xcrun simctl launch "$DEVICE_ID" "$BUNDLE_ID" || echo "simctl launch reported an error (see above)"
+          sleep 5
+          xcrun simctl io "$DEVICE_ID" screenshot "$CM_BUILD_DIR/screenshots/launch_5s.png"
+          sleep 10
+          xcrun simctl io "$DEVICE_ID" screenshot "$CM_BUILD_DIR/screenshots/launch_15s.png"
+          # Capture the app's own console/crash output around launch so a silent crash-back-to-
+          # home-screen is visible in the logs instead of just an unexplained blank screenshot.
+          xcrun simctl spawn "$DEVICE_ID" log show --predicate 'process == "iosApp"' --last 2m > "$CM_BUILD_DIR/ios_app_console.log" 2>&1 || true
+          xcrun simctl listapps "$DEVICE_ID" | grep -A5 "\"$BUNDLE_ID\"" > "$CM_BUILD_DIR/app_install_info.txt" 2>&1 || true
     artifacts:
       - screenshots/*.png
+      - ios_app_console.log
+      - app_install_info.txt
     publishing:
       email:
         recipients:
