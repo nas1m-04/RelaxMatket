@@ -1,6 +1,5 @@
 ﻿package tj.relax.ui.screens.product
 
-import android.widget.Toast
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.pager.*
@@ -14,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
@@ -39,7 +37,6 @@ fun ProductDetailScreen(
 ) {
     val state   = viewModel.uiState
     val product = state.product
-    val context = LocalContext.current
     val cartState = cartViewModel.uiState
     val favoritesState = favoritesViewModel.uiState
 
