@@ -1,4 +1,52 @@
 workflows:
+  ios-simulator-build:
+    name: RelaxMarket iOS (simulator, no signing required)
+    max_build_duration: 30
+    instance_type: mac_mini_m2
+    environment:
+      xcode: latest
+      vars:
+        XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
+        XCODE_SCHEME: "iosApp"
+        BUNDLE_ID: "tj.relax"
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: CPM
+          include: true
+    scripts:
+      - name: Build for iOS Simulator
+        script: |
+          xcodebuild build \
+            -project "$XCODE_PROJECT" \
+            -scheme "$XCODE_SCHEME" \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Boot simulator, install app, and take a screenshot
+        script: |
+          set -e
+          DEVICE_ID=$(xcrun simctl list devices available | grep -m1 'iPhone' | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
+          echo "Using simulator: $DEVICE_ID"
+          xcrun simctl bootstatus "$DEVICE_ID" -b
+          APP_PATH=$(find "$HOME/Library/Developer/Xcode/DerivedData" -name "iosApp.app" -path "*iphonesimulator*" | head -1)
+          echo "App path: $APP_PATH"
+          xcrun simctl install "$DEVICE_ID" "$APP_PATH"
+          xcrun simctl launch "$DEVICE_ID" "$BUNDLE_ID"
+          sleep 8
+          mkdir -p "$CM_BUILD_DIR/screenshots"
+          xcrun simctl io "$DEVICE_ID" screenshot "$CM_BUILD_DIR/screenshots/launch.png"
+    artifacts:
+      - screenshots/*.png
+    publishing:
+      email:
+        recipients:
+          - nasimisaodatsho@gmail.com
+        notify:
+          success: true
+          failure: true
+
   ios-device-build:
     name: RelaxMarket iOS (device build)
     max_build_duration: 60
