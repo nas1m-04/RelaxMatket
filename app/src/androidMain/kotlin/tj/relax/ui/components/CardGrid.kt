@@ -38,8 +38,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
-import androidx.compose.ui.res.stringResource
-import tj.relax.R
+import org.jetbrains.compose.resources.stringResource
+import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.ui.theme.RelaxDark
 import tj.relax.ui.theme.RelaxGold
@@ -106,7 +106,7 @@ fun ProductCardGrid(
                             .align(Alignment.TopStart)
                     ) {
                         Text(
-                            stringResource(R.string.product_card_price_badge),
+                            stringResource(Res.string.product_card_price_badge),
                             color = RelaxWhite,
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Medium

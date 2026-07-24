@@ -37,13 +37,13 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.foundation.layout.offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.theme.RelaxTextOnDarkSub
 import tj.relax.ui.theme.RelaxWhite
 import java.io.ByteArrayOutputStream
@@ -96,13 +96,13 @@ fun AvatarCropDialog(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = stringResource(R.string.avatar_crop_title),
+                text = stringResource(Res.string.avatar_crop_title),
                 color = RelaxWhite,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 32.dp, bottom = 4.dp),
             )
             Text(
-                text = stringResource(R.string.avatar_crop_hint),
+                text = stringResource(Res.string.avatar_crop_hint),
                 color = RelaxTextOnDarkSub,
                 modifier = Modifier.padding(horizontal = 32.dp, vertical = 4.dp),
             )
@@ -160,7 +160,7 @@ fun AvatarCropDialog(
                     modifier = Modifier.weight(1f),
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = RelaxWhite),
                 ) {
-                    Text(stringResource(R.string.avatar_crop_cancel))
+                    Text(stringResource(Res.string.avatar_crop_cancel))
                 }
                 Button(
                     onClick = {
@@ -171,7 +171,7 @@ fun AvatarCropDialog(
                     },
                     modifier = Modifier.weight(1f),
                 ) {
-                    Text(stringResource(R.string.avatar_crop_confirm))
+                    Text(stringResource(Res.string.avatar_crop_confirm))
                 }
             }
         }

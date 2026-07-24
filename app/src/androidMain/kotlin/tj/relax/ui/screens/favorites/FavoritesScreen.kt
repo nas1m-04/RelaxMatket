@@ -8,9 +8,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.*
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
 import tj.relax.ui.theme.*
@@ -27,7 +27,7 @@ fun FavoritesScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = stringResource(R.string.menu_favorites), onBack = onBack)
+            RelaxTopBar(title = stringResource(Res.string.menu_favorites), onBack = onBack)
         }
 
         when {
@@ -38,8 +38,8 @@ fun FavoritesScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("❤️", fontSize = 64.sp)
                     Spacer(Modifier.height(16.dp))
-                    Text(stringResource(R.string.favorites_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
-                    Text(stringResource(R.string.favorites_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text(stringResource(Res.string.favorites_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                    Text(stringResource(Res.string.favorites_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                 }
             }
             else -> LazyVerticalGrid(
@@ -49,7 +49,7 @@ fun FavoritesScreen(
                 verticalArrangement   = Arrangement.spacedBy(12.dp),
             ) {
                 item(span = { GridItemSpan(2) }) {
-                    Text(stringResource(R.string.favorites_count, state.favorites.size), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text(stringResource(Res.string.favorites_count, state.favorites.size), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                 }
                 items(state.favorites) { product ->
                     ProductCardGrid(

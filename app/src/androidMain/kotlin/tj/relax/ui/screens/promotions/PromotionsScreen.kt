@@ -14,13 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.data.Promotion
 import tj.relax.ui.components.RelaxTopBar
@@ -40,7 +40,7 @@ fun PromotionsScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = stringResource(R.string.promo_title), onBack = onBack)
+            RelaxTopBar(title = stringResource(Res.string.promo_title), onBack = onBack)
         }
 
         if (state.isLoading) {
@@ -71,7 +71,7 @@ fun PromotionsScreen(
             if (state.saleProducts.isNotEmpty()) {
                 item {
                     Text(
-                        text  = stringResource(R.string.promo_discounted_products_title),
+                        text  = stringResource(Res.string.promo_discounted_products_title),
                         style = MaterialTheme.typography.headlineSmall,
                         color = RelaxTextPrimary,
                     )
@@ -197,7 +197,7 @@ private fun SaleProductCard(
                                 .background(RelaxGold)
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ) {
-                            Text(stringResource(R.string.product_card_price_badge), color = RelaxWhite, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(Res.string.product_card_price_badge), color = RelaxWhite, fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         }
                     } else if (product.oldPrice != null) {
                         Text(

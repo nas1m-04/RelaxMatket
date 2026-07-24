@@ -35,9 +35,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.ui.theme.RelaxDark
 import tj.relax.ui.theme.RelaxGold
@@ -89,7 +89,7 @@ fun ProductCardHorizontal(
                             .padding(horizontal = 6.dp, vertical = 3.dp)
                             .align(Alignment.TopStart)
                     ) {
-                        Text(stringResource(R.string.product_card_price_badge), color = RelaxWhite, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
+                        Text(stringResource(Res.string.product_card_price_badge), color = RelaxWhite, style = MaterialTheme.typography.labelSmall, fontWeight = FontWeight.Bold, fontSize = 9.sp)
                     }
                 } else if (product.oldPrice != null) {
                     val disc = ((1 - product.price / product.oldPrice) * 100).toInt()

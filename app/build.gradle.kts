@@ -34,6 +34,7 @@ kotlin {
             implementation(compose.foundation)
             implementation(compose.material3)
             implementation(compose.ui)
+            implementation(compose.components.resources)
             implementation(platform(libs.koin.bom.get()))
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
@@ -139,4 +140,9 @@ dependencies {
     add("kspAndroid", libs.room.compiler)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+compose.resources {
+    packageOfResClass = "tj.relax.generated.resources"
+    publicResClass = true
 }

@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.CartItem
 import tj.relax.data.Order
 import tj.relax.ui.components.RelaxDivider
@@ -34,7 +34,7 @@ fun OrderDetailScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = stringResource(R.string.order_detail_title), onBack = onBack)
+            RelaxTopBar(title = stringResource(Res.string.order_detail_title), onBack = onBack)
         }
 
         when {
@@ -70,7 +70,7 @@ private fun OrderHeaderCard(order: Order) {
         ) {
             Column {
                 Text(
-                    stringResource(R.string.order_number_label, order.id.take(8).uppercase()),
+                    stringResource(Res.string.order_number_label, order.id.take(8).uppercase()),
                     style      = MaterialTheme.typography.titleMedium,
                     color      = RelaxTextPrimary,
                     fontWeight = FontWeight.Bold,
@@ -115,7 +115,7 @@ private fun OrderItemsCard(order: Order) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             Text(
-                stringResource(R.string.order_detail_items_title),
+                stringResource(Res.string.order_detail_items_title),
                 style      = MaterialTheme.typography.titleSmall,
                 color      = RelaxTextPrimary,
                 fontWeight = FontWeight.Bold,
@@ -123,7 +123,7 @@ private fun OrderItemsCard(order: Order) {
             Spacer(Modifier.height(12.dp))
             if (order.items.isEmpty()) {
                 Text(
-                    stringResource(R.string.history_items_unavailable),
+                    stringResource(Res.string.history_items_unavailable),
                     style = MaterialTheme.typography.bodySmall,
                     color = RelaxTextHint,
                 )
@@ -157,7 +157,7 @@ private fun OrderItemRow(item: CartItem) {
             Text(item.product.name, style = MaterialTheme.typography.bodyMedium, color = RelaxTextPrimary, fontWeight = FontWeight.SemiBold, maxLines = 2)
             Spacer(Modifier.height(2.dp))
             Text(
-                stringResource(R.string.order_detail_item_qty_price, item.quantity, formatBonusAmount(item.product.price)),
+                stringResource(Res.string.order_detail_item_qty_price, item.quantity, formatBonusAmount(item.product.price)),
                 style = MaterialTheme.typography.bodySmall,
                 color = RelaxTextSecondary,
             )
@@ -182,10 +182,10 @@ private fun OrderSummaryCard(order: Order) {
     ) {
         Column(modifier = Modifier.padding(20.dp)) {
             if (order.discount > 0) {
-                SummaryRow(stringResource(R.string.cart_discount), "−${formatBonusAmount(order.discount)} TJS", valueColor = RelaxSuccess)
+                SummaryRow(stringResource(Res.string.cart_discount), "−${formatBonusAmount(order.discount)} TJS", valueColor = RelaxSuccess)
                 Spacer(Modifier.height(8.dp))
             }
-            SummaryRow(stringResource(R.string.checkout_total_label), "${formatBonusAmount(order.total)} TJS", bold = true)
+            SummaryRow(stringResource(Res.string.checkout_total_label), "${formatBonusAmount(order.total)} TJS", bold = true)
         }
     }
 }

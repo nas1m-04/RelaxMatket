@@ -16,13 +16,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.ui.theme.*
 
@@ -94,7 +94,7 @@ fun RatingRow(rating: Double, reviewCount: Int, modifier: Modifier = Modifier) {
     Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(4.dp)) {
         Icon(Icons.Rounded.Star, null, tint = Color(0xFFFBBC04), modifier = Modifier.size(16.dp))
         Text("$rating", style = MaterialTheme.typography.labelMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
-        Text(stringResource(R.string.relax_reviews_count_parens, reviewCount), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+        Text(stringResource(Res.string.relax_reviews_count_parens, reviewCount), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
     }
 }
 

@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Notification
 import tj.relax.data.NotificationType
 import tj.relax.ui.components.RelaxDivider
@@ -36,11 +36,11 @@ fun NotificationsScreen(
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
             RelaxTopBar(
-                title  = stringResource(R.string.notif_title),
+                title  = stringResource(Res.string.notif_title),
                 onBack = onBack,
                 actions = {
                     TextButton(onClick = { viewModel.markAllRead() }) {
-                        Text(stringResource(R.string.notif_mark_all_read), color = RelaxRed, style = MaterialTheme.typography.labelMedium)
+                        Text(stringResource(Res.string.notif_mark_all_read), color = RelaxRed, style = MaterialTheme.typography.labelMedium)
                     }
                 }
             )
@@ -68,7 +68,7 @@ fun NotificationsScreen(
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("🔔", fontSize = 64.sp)
                         Spacer(Modifier.height(16.dp))
-                        Text(stringResource(R.string.notif_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                        Text(stringResource(Res.string.notif_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
                     }
                 }
             }

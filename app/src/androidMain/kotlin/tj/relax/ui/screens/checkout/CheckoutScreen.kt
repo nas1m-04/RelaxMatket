@@ -18,14 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Dialog
 import java.util.Calendar
 import kotlin.math.abs
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Branch
 import tj.relax.data.OrderItemRequest
 import tj.relax.ui.components.RelaxTopBar
@@ -63,9 +63,9 @@ fun CheckoutScreen(
     }
     val payments = listOf(
         Triple("card_on_delivery", Icons.Rounded.CreditCard,
-            stringResource(R.string.checkout_payment_card_title) to stringResource(R.string.checkout_payment_card_sub)),
+            stringResource(Res.string.checkout_payment_card_title) to stringResource(Res.string.checkout_payment_card_sub)),
         Triple("cash", Icons.Rounded.Money,
-            stringResource(R.string.checkout_payment_cash_title) to stringResource(R.string.checkout_payment_cash_sub)),
+            stringResource(Res.string.checkout_payment_cash_title) to stringResource(Res.string.checkout_payment_cash_sub)),
     )
 
     LaunchedEffect(Unit) {
@@ -97,7 +97,7 @@ fun CheckoutScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = stringResource(R.string.checkout_title), onBack = onBack)
+            RelaxTopBar(title = stringResource(Res.string.checkout_title), onBack = onBack)
         }
 
         Column(
@@ -109,7 +109,7 @@ fun CheckoutScreen(
         ) {
 
             // ── 1. Delivery method ──────────────────────────────────────────
-            SectionCard(title = stringResource(R.string.checkout_delivery_method_title)) {
+            SectionCard(title = stringResource(Res.string.checkout_delivery_method_title)) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -118,8 +118,8 @@ fun CheckoutScreen(
                         .padding(4.dp),
                 ) {
                     listOf(
-                        "delivery" to stringResource(R.string.checkout_delivery_option),
-                        "pickup"   to stringResource(R.string.checkout_pickup_option),
+                        "delivery" to stringResource(Res.string.checkout_delivery_option),
+                        "pickup"   to stringResource(Res.string.checkout_pickup_option),
                     ).forEach { (type, label) ->
                         Box(
                             modifier = Modifier
@@ -151,8 +151,8 @@ fun CheckoutScreen(
                         OutlinedTextField(
                             value         = state.address,
                             onValueChange = { viewModel.setAddress(it) },
-                            label         = { Text(stringResource(R.string.checkout_delivery_address_label), color = RelaxTextSecondary) },
-                            placeholder   = { Text(stringResource(R.string.checkout_address_placeholder), color = RelaxTextHint, fontSize = 13.sp) },
+                            label         = { Text(stringResource(Res.string.checkout_delivery_address_label), color = RelaxTextSecondary) },
+                            placeholder   = { Text(stringResource(Res.string.checkout_address_placeholder), color = RelaxTextHint, fontSize = 13.sp) },
                             leadingIcon   = { Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed) },
                             singleLine    = true,
                             modifier      = Modifier.fillMaxWidth(),
@@ -188,7 +188,7 @@ fun CheckoutScreen(
                             )
                             Spacer(Modifier.width(8.dp))
                             Text(
-                                stringResource(R.string.checkout_save_address),
+                                stringResource(Res.string.checkout_save_address),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = RelaxTextSecondary,
                             )
@@ -198,7 +198,7 @@ fun CheckoutScreen(
             }
 
             // ── 2. Time slot ────────────────────────────────────────────────
-            SectionCard(title = stringResource(R.string.checkout_time_slot_title)) {
+            SectionCard(title = stringResource(Res.string.checkout_time_slot_title)) {
                 TimeSlotWheelPicker(
                     slots    = timeSlots,
                     selected = state.timeSlot,
@@ -207,7 +207,7 @@ fun CheckoutScreen(
             }
 
             // ── 3. Payment ──────────────────────────────────────────────────
-            SectionCard(title = stringResource(R.string.checkout_payment_method_title)) {
+            SectionCard(title = stringResource(Res.string.checkout_payment_method_title)) {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     payments.forEach { (value, icon, texts) ->
                         val (title, sub) = texts
@@ -245,11 +245,11 @@ fun CheckoutScreen(
             }
 
             // ── 4. Comment ──────────────────────────────────────────────────
-            SectionCard(title = stringResource(R.string.checkout_comment_title)) {
+            SectionCard(title = stringResource(Res.string.checkout_comment_title)) {
                 OutlinedTextField(
                     value         = state.comment,
                     onValueChange = { viewModel.setComment(it) },
-                    placeholder   = { Text(stringResource(R.string.checkout_comment_placeholder), color = RelaxTextHint, fontSize = 13.sp) },
+                    placeholder   = { Text(stringResource(Res.string.checkout_comment_placeholder), color = RelaxTextHint, fontSize = 13.sp) },
                     modifier      = Modifier.fillMaxWidth().height(96.dp),
                     shape         = RoundedCornerShape(12.dp),
                     colors        = OutlinedTextFieldDefaults.colors(
@@ -264,9 +264,9 @@ fun CheckoutScreen(
 
             // ── 5. Branch selection (bottom, beautiful dropdown) ────────────
             val branchTitle = if (state.deliveryType == "pickup")
-                stringResource(R.string.checkout_branch_pickup_title)
+                stringResource(Res.string.checkout_branch_pickup_title)
             else
-                stringResource(R.string.checkout_branch_delivery_title)
+                stringResource(Res.string.checkout_branch_delivery_title)
 
             SectionCard(title = branchTitle) {
                 BranchDropdown(
@@ -300,13 +300,13 @@ fun CheckoutScreen(
                             Icon(Icons.Rounded.Stars, null, tint = Color(0xFFD4AF37), modifier = Modifier.size(15.dp))
                             Spacer(Modifier.width(4.dp))
                             Text(
-                                stringResource(R.string.checkout_bonus_preview_label),
+                                stringResource(Res.string.checkout_bonus_preview_label),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = RelaxTextSecondary,
                             )
                         }
                         Text(
-                            stringResource(R.string.checkout_bonus_preview_value, "%.2f".format(estimatedBonus)),
+                            stringResource(Res.string.checkout_bonus_preview_value, "%.2f".format(estimatedBonus)),
                             style      = MaterialTheme.typography.bodySmall,
                             color      = Color(0xFFD4AF37),
                             fontWeight = FontWeight.Bold,
@@ -321,7 +321,7 @@ fun CheckoutScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment     = Alignment.CenterVertically,
                 ) {
-                    Text(stringResource(R.string.checkout_total_label), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text(stringResource(Res.string.checkout_total_label), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                     Text("${total.toInt()} TJS", style = MaterialTheme.typography.titleLarge, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                 }
 
@@ -345,7 +345,7 @@ fun CheckoutScreen(
                     if (state.isSubmitting) {
                         CircularProgressIndicator(modifier = Modifier.size(22.dp), color = RelaxWhite, strokeWidth = 2.dp)
                     } else {
-                        Text(stringResource(R.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(Res.string.checkout_confirm_button), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
             }
@@ -408,7 +408,7 @@ private fun BranchDropdown(
                         Text(selectedBranch.address, style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                     } else {
                         Text(
-                            text  = if (branches.isEmpty()) "Загрузка..." else stringResource(R.string.checkout_pickup_store_value),
+                            text  = if (branches.isEmpty()) "Загрузка..." else stringResource(Res.string.checkout_pickup_store_value),
                             style = MaterialTheme.typography.bodyMedium,
                             color = RelaxTextHint,
                         )
@@ -510,14 +510,14 @@ private fun OrderSuccessScreen(bonusEarned: Double, onDone: () -> Unit) {
             }
             Spacer(Modifier.height(24.dp))
             Text(
-                stringResource(R.string.checkout_success_title),
+                stringResource(Res.string.checkout_success_title),
                 style      = MaterialTheme.typography.displaySmall,
                 color      = RelaxTextPrimary,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(Modifier.height(8.dp))
             Text(
-                stringResource(R.string.checkout_success_subtitle),
+                stringResource(Res.string.checkout_success_subtitle),
                 color     = RelaxTextSecondary,
                 style     = MaterialTheme.typography.bodyLarge,
                 textAlign = TextAlign.Center,
@@ -536,7 +536,7 @@ private fun OrderSuccessScreen(bonusEarned: Double, onDone: () -> Unit) {
                         Icon(Icons.Rounded.Stars, null, tint = Color(0xFFD4AF37), modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            stringResource(R.string.checkout_bonus_earned, bonusDisplay),
+                            stringResource(Res.string.checkout_bonus_earned, bonusDisplay),
                             color      = Color(0xFFD4AF37),
                             style      = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Bold,
@@ -551,7 +551,7 @@ private fun OrderSuccessScreen(bonusEarned: Double, onDone: () -> Unit) {
                 shape    = RoundedCornerShape(16.dp),
                 colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
             ) {
-                Text(stringResource(R.string.checkout_go_home), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(Res.string.checkout_go_home), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
@@ -582,14 +582,14 @@ private fun AddressPromptDialog(
                 }
                 Spacer(Modifier.height(16.dp))
                 Text(
-                    stringResource(R.string.checkout_address_prompt_title),
+                    stringResource(Res.string.checkout_address_prompt_title),
                     style      = MaterialTheme.typography.titleLarge,
                     color      = RelaxTextPrimary,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    stringResource(R.string.checkout_address_prompt_subtitle),
+                    stringResource(Res.string.checkout_address_prompt_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = RelaxTextSecondary,
                 )
@@ -597,8 +597,8 @@ private fun AddressPromptDialog(
                 OutlinedTextField(
                     value         = address,
                     onValueChange = { address = it },
-                    label         = { Text(stringResource(R.string.checkout_delivery_address_label)) },
-                    placeholder   = { Text(stringResource(R.string.checkout_address_placeholder), fontSize = 13.sp) },
+                    label         = { Text(stringResource(Res.string.checkout_delivery_address_label)) },
+                    placeholder   = { Text(stringResource(Res.string.checkout_address_placeholder), fontSize = 13.sp) },
                     leadingIcon   = { Icon(Icons.Rounded.LocationOn, null, tint = RelaxRed) },
                     singleLine    = true,
                     modifier      = Modifier.fillMaxWidth(),
@@ -613,7 +613,7 @@ private fun AddressPromptDialog(
                 Spacer(Modifier.height(20.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancel), color = RelaxTextSecondary)
+                        Text(stringResource(Res.string.cancel), color = RelaxTextSecondary)
                     }
                     Spacer(Modifier.width(8.dp))
                     Button(
@@ -622,7 +622,7 @@ private fun AddressPromptDialog(
                         shape    = RoundedCornerShape(12.dp),
                         colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
                     ) {
-                        Text(stringResource(R.string.checkout_address_prompt_confirm), fontWeight = FontWeight.Bold)
+                        Text(stringResource(Res.string.checkout_address_prompt_confirm), fontWeight = FontWeight.Bold)
                     }
                 }
             }

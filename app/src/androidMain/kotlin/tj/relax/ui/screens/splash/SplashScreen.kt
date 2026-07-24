@@ -10,13 +10,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.delay
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.TelegramLinkRow
 import tj.relax.ui.theme.*
 
@@ -78,7 +78,7 @@ fun SplashScreen(onFinished: () -> Unit) {
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Image(
-                        painter = painterResource(R.drawable.logo_mark),
+                        painter = painterResource(Res.drawable.logo_mark),
                         contentDescription = null,
                         modifier = Modifier.size(88.dp),
                     )
@@ -101,7 +101,7 @@ fun SplashScreen(onFinished: () -> Unit) {
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
-                    text      = stringResource(R.string.app_tagline),
+                    text      = stringResource(Res.string.app_tagline),
                     color     = RelaxTextOnDarkSub,
                     fontSize  = 14.sp,
                     textAlign = TextAlign.Center,

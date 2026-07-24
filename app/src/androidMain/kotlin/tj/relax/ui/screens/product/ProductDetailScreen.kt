@@ -15,13 +15,13 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Product
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
@@ -94,11 +94,11 @@ fun ProductDetailScreen(
                 }
                 if (product.hasCardDiscount) {
                     Box(modifier = Modifier.padding(20.dp).clip(RoundedCornerShape(10.dp)).background(RelaxGold).padding(horizontal = 12.dp, vertical = 6.dp).align(Alignment.BottomStart)) {
-                        Text(stringResource(R.string.product_card_price_badge), color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                        Text(stringResource(Res.string.product_card_price_badge), color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
                     }
                 } else if (product.oldPrice != null) {
                     Box(modifier = Modifier.padding(20.dp).clip(RoundedCornerShape(10.dp)).background(RelaxRed).padding(horizontal = 12.dp, vertical = 6.dp).align(Alignment.BottomStart)) {
-                        Text(stringResource(R.string.product_discount_badge, discount), color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
+                        Text(stringResource(Res.string.product_discount_badge, discount), color = RelaxWhite, fontWeight = FontWeight.Black, fontSize = 16.sp)
                     }
                 }
                 if (images.size > 1) {
@@ -139,12 +139,12 @@ fun ProductDetailScreen(
                     if (product.hasCardDiscount) {
                         Column {
                             Text("${product.price.toInt()} TJS", style = MaterialTheme.typography.bodyLarge, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
-                            Text(stringResource(R.string.product_card_price_label), style = MaterialTheme.typography.bodySmall, color = RelaxGold, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(Res.string.product_card_price_label), style = MaterialTheme.typography.bodySmall, color = RelaxGold, fontWeight = FontWeight.SemiBold)
                         }
                     } else if (product.oldPrice != null) {
                         Column {
                             Text("${product.oldPrice.toInt()} TJS", style = MaterialTheme.typography.bodyLarge, color = RelaxTextHint, textDecoration = TextDecoration.LineThrough)
-                            Text(stringResource(R.string.product_savings, (product.oldPrice - product.price).toInt()), style = MaterialTheme.typography.bodySmall, color = RelaxSuccess, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(Res.string.product_savings, (product.oldPrice - product.price).toInt()), style = MaterialTheme.typography.bodySmall, color = RelaxSuccess, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -185,7 +185,7 @@ fun ProductDetailScreen(
                 .navigationBarsPadding().padding(horizontal = 20.dp, vertical = 16.dp)
         ) {
             val cartQuantity = cartState.items.find { it.product.id == product.id }?.quantity ?: 0
-            val addedToCartMessage = stringResource(R.string.product_added_to_cart)
+            val addedToCartMessage = stringResource(Res.string.product_added_to_cart)
             Button(
                 onClick   = {
                     cartViewModel.add(product)
@@ -197,7 +197,7 @@ fun ProductDetailScreen(
             ) {
                 Icon(Icons.Rounded.ShoppingCart, null, tint = RelaxWhite, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(10.dp))
-                Text(stringResource(R.string.product_add_to_cart_price, (product.effectivePrice * cartQuantity.coerceAtLeast(1)).toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(Res.string.product_add_to_cart_price, (product.effectivePrice * cartQuantity.coerceAtLeast(1)).toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
         */
@@ -208,9 +208,9 @@ fun ProductDetailScreen(
 private fun ProductTabs(product: Product, categoryName: String?) {
     var activeTab by remember { mutableStateOf(0) }
     val tabLabels = listOf(
-        stringResource(R.string.product_tab_description),
-        stringResource(R.string.product_tab_composition),
-        stringResource(R.string.product_tab_reviews),
+        stringResource(Res.string.product_tab_description),
+        stringResource(Res.string.product_tab_composition),
+        stringResource(Res.string.product_tab_reviews),
     )
     Row(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(14.dp)).background(RelaxSurfaceAlt).padding(4.dp)) {
         tabLabels.forEachIndexed { idx, label ->
@@ -227,24 +227,24 @@ private fun ProductTabs(product: Product, categoryName: String?) {
     Spacer(Modifier.height(20.dp))
     when (activeTab) {
         0 -> {
-            Text(product.description.orEmpty().ifEmpty { stringResource(R.string.product_default_description) }, style = MaterialTheme.typography.bodyLarge, color = RelaxTextSecondary, lineHeight = 26.sp)
+            Text(product.description.orEmpty().ifEmpty { stringResource(Res.string.product_default_description) }, style = MaterialTheme.typography.bodyLarge, color = RelaxTextSecondary, lineHeight = 26.sp)
             Spacer(Modifier.height(16.dp))
             CharacteristicsTable(product = product, categoryName = categoryName)
         }
-        1 -> Text(product.composition.orEmpty().ifEmpty { stringResource(R.string.product_no_composition_info) }, style = MaterialTheme.typography.bodyLarge, color = RelaxTextSecondary, lineHeight = 26.sp)
+        1 -> Text(product.composition.orEmpty().ifEmpty { stringResource(Res.string.product_no_composition_info) }, style = MaterialTheme.typography.bodyLarge, color = RelaxTextSecondary, lineHeight = 26.sp)
         2 -> ReviewsSection(product.rating, product.reviewCount)
     }
 }
 
 @Composable
 private fun CharacteristicsTable(product: Product, categoryName: String?) {
-    val brandLabel    = stringResource(R.string.product_char_brand)
-    val weightLabel   = stringResource(R.string.product_char_weight)
-    val unitLabel     = stringResource(R.string.product_char_unit)
-    val inStockLabel  = stringResource(R.string.product_char_in_stock)
-    val categoryLabel = stringResource(R.string.product_char_category)
-    val inStockYes    = stringResource(R.string.product_in_stock_yes)
-    val inStockNo     = stringResource(R.string.product_in_stock_no)
+    val brandLabel    = stringResource(Res.string.product_char_brand)
+    val weightLabel   = stringResource(Res.string.product_char_weight)
+    val unitLabel     = stringResource(Res.string.product_char_unit)
+    val inStockLabel  = stringResource(Res.string.product_char_in_stock)
+    val categoryLabel = stringResource(Res.string.product_char_category)
+    val inStockYes    = stringResource(Res.string.product_in_stock_yes)
+    val inStockNo     = stringResource(Res.string.product_in_stock_no)
     val rows = buildList {
         if (!product.brand.isNullOrEmpty())  add(Pair(brandLabel, product.brand ?: ""))
         if (!product.weight.isNullOrEmpty()) add(Pair(weightLabel, product.weight ?: ""))
@@ -269,31 +269,31 @@ private fun CharacteristicsTable(product: Product, categoryName: String?) {
 private fun ReviewsSection(rating: Double, count: Int) {
     if (count == 0) {
         Box(modifier = Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-            Text(stringResource(R.string.product_no_reviews), color = RelaxTextSecondary)
+            Text(stringResource(Res.string.product_no_reviews), color = RelaxTextSecondary)
         }
         return
     }
     val reviewNames = listOf(
-        stringResource(R.string.product_review_name_1),
-        stringResource(R.string.product_review_name_2),
-        stringResource(R.string.product_review_name_3),
+        stringResource(Res.string.product_review_name_1),
+        stringResource(Res.string.product_review_name_2),
+        stringResource(Res.string.product_review_name_3),
     )
     val reviewTexts = listOf(
-        stringResource(R.string.product_review_text_1),
-        stringResource(R.string.product_review_text_2),
-        stringResource(R.string.product_review_text_3),
+        stringResource(Res.string.product_review_text_1),
+        stringResource(Res.string.product_review_text_2),
+        stringResource(Res.string.product_review_text_3),
     )
     val reviewDates = listOf(
-        stringResource(R.string.product_review_date_1),
-        stringResource(R.string.product_review_date_2),
-        stringResource(R.string.product_review_date_3),
+        stringResource(Res.string.product_review_date_1),
+        stringResource(Res.string.product_review_date_2),
+        stringResource(Res.string.product_review_date_3),
     )
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         Row(horizontalArrangement = Arrangement.spacedBy(20.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(rating.toString(), fontSize = 48.sp, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
                 Row { repeat(5) { i -> Icon(if (i < rating.toInt()) Icons.Rounded.Star else Icons.Rounded.StarBorder, null, tint = Color(0xFFFBBC04), modifier = Modifier.size(18.dp)) } }
-                Text(stringResource(R.string.product_reviews_count, count), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                Text(stringResource(Res.string.product_reviews_count, count), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
             }
         }
         repeat(3) { idx ->

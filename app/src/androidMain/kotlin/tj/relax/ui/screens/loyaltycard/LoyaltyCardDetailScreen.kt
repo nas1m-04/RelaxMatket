@@ -14,12 +14,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.RelaxTopBar
@@ -42,7 +42,7 @@ fun LoyaltyCardDetailScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.background(RelaxWhite)) {
-            RelaxTopBar(title = stringResource(R.string.loyalty_details_title), onBack = onBack)
+            RelaxTopBar(title = stringResource(Res.string.loyalty_details_title), onBack = onBack)
         }
 
         if (summary == null) {
@@ -94,7 +94,7 @@ fun LoyaltyCardDetailScreen(
                                 verticalAlignment     = Alignment.CenterVertically,
                             ) {
                                 Column {
-                                    Text(stringResource(R.string.loyalty_level_label), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                    Text(stringResource(Res.string.loyalty_level_label), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                                         Box(
                                             modifier = Modifier
@@ -107,7 +107,7 @@ fun LoyaltyCardDetailScreen(
                                 }
                                 if (nextLevel != null) {
                                     Column(horizontalAlignment = Alignment.End) {
-                                        Text(stringResource(R.string.loyalty_next_level_label), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                                        Text(stringResource(Res.string.loyalty_next_level_label), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                                         Text(nextLevel.name, style = MaterialTheme.typography.titleMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                                     }
                                 }
@@ -125,7 +125,7 @@ fun LoyaltyCardDetailScreen(
                             if (nextLevel != null) {
                                 Spacer(Modifier.height(8.dp))
                                 Text(
-                                    stringResource(R.string.loyalty_progress_to_level, nextLevel.name, summary.amountToNextLevel.toInt()),
+                                    stringResource(Res.string.loyalty_progress_to_level, nextLevel.name, summary.amountToNextLevel.toInt()),
                                     style = MaterialTheme.typography.bodySmall,
                                     color = RelaxTextSecondary,
                                 )
@@ -133,7 +133,7 @@ fun LoyaltyCardDetailScreen(
 
                             Spacer(Modifier.height(16.dp))
 
-                            Text(stringResource(R.string.loyalty_benefits_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                            Text(stringResource(Res.string.loyalty_benefits_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
                             Spacer(Modifier.height(10.dp))
                             level.benefits.forEach { benefit ->
                                 Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
@@ -159,7 +159,7 @@ fun LoyaltyCardDetailScreen(
                     item {
                         Spacer(Modifier.height(24.dp))
                         Text(
-                            stringResource(R.string.bonuses_levels_title),
+                            stringResource(Res.string.bonuses_levels_title),
                             style    = MaterialTheme.typography.headlineSmall,
                             color    = RelaxTextPrimary,
                             modifier = Modifier.padding(horizontal = 20.dp),
@@ -190,7 +190,7 @@ fun LoyaltyCardDetailScreen(
                     item {
                         Spacer(Modifier.height(24.dp))
                         Text(
-                            stringResource(R.string.bonuses_achievements_title),
+                            stringResource(Res.string.bonuses_achievements_title),
                             style    = MaterialTheme.typography.headlineSmall,
                             color    = RelaxTextPrimary,
                             modifier = Modifier.padding(horizontal = 20.dp),
@@ -215,7 +215,7 @@ fun LoyaltyCardDetailScreen(
                     item {
                         Spacer(Modifier.height(24.dp))
                         Text(
-                            stringResource(R.string.loyalty_history_title),
+                            stringResource(Res.string.loyalty_history_title),
                             style      = MaterialTheme.typography.headlineSmall,
                             color      = RelaxTextPrimary,
                             fontWeight = FontWeight.Bold,
@@ -230,7 +230,7 @@ fun LoyaltyCardDetailScreen(
                                 .background(RelaxSurfaceAlt)
                                 .padding(4.dp),
                         ) {
-                            listOf(stringResource(R.string.bonuses_tab_credits), stringResource(R.string.bonuses_tab_debits)).forEachIndexed { idx, label ->
+                            listOf(stringResource(Res.string.bonuses_tab_credits), stringResource(Res.string.bonuses_tab_debits)).forEachIndexed { idx, label ->
                                 Box(
                                     modifier = Modifier
                                         .weight(1f)
@@ -266,7 +266,7 @@ fun LoyaltyCardDetailScreen(
                     if (state.transactions.isNotEmpty() && filteredTx.isEmpty() && !state.hasMoreTx) {
                         item {
                             Text(
-                                stringResource(R.string.loyalty_history_empty_tab),
+                                stringResource(Res.string.loyalty_history_empty_tab),
                                 style     = MaterialTheme.typography.bodySmall,
                                 color     = RelaxTextHint,
                                 modifier  = Modifier.fillMaxWidth().padding(horizontal = 20.dp, vertical = 12.dp),
@@ -286,7 +286,7 @@ fun LoyaltyCardDetailScreen(
                         item {
                             Box(modifier = Modifier.fillMaxWidth().padding(12.dp), contentAlignment = Alignment.Center) {
                                 TextButton(onClick = { viewModel.loadMoreTransactions() }) {
-                                    Text(stringResource(R.string.loyalty_history_load_more), color = RelaxDark, fontWeight = FontWeight.SemiBold)
+                                    Text(stringResource(Res.string.loyalty_history_load_more), color = RelaxDark, fontWeight = FontWeight.SemiBold)
                                 }
                             }
                         }
@@ -366,14 +366,14 @@ private fun LevelCard(name: String, cashback: Double, minSpent: Double, color: C
                 fontWeight = FontWeight.Black,
             )
             Text(
-                stringResource(R.string.bonuses_cashback_suffix),
+                stringResource(Res.string.bonuses_cashback_suffix),
                 color = if (isCurrent) RelaxWhite.copy(alpha = 0.7f) else RelaxTextSecondary,
                 fontSize = 11.sp,
             )
             if (minSpent > 0) {
                 Spacer(Modifier.height(8.dp))
                 Text(
-                    stringResource(R.string.bonuses_min_points_from, minSpent.toInt()),
+                    stringResource(Res.string.bonuses_min_points_from, minSpent.toInt()),
                     color    = if (isCurrent) RelaxWhite.copy(alpha = 0.6f) else RelaxTextHint,
                     fontSize = 10.sp,
                 )
@@ -386,7 +386,7 @@ private fun LevelCard(name: String, cashback: Double, minSpent: Double, color: C
                         .background(RelaxRed)
                         .padding(horizontal = 8.dp, vertical = 3.dp)
                 ) {
-                    Text(stringResource(R.string.bonuses_your_level), color = RelaxWhite, fontSize = 9.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.bonuses_your_level), color = RelaxWhite, fontSize = 9.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }

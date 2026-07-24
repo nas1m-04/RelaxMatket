@@ -19,11 +19,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
 import tj.relax.ui.screens.favorites.FavoritesViewModel
@@ -66,7 +66,7 @@ fun SearchScreen(
                         Spacer(Modifier.width(8.dp))
                         Box(modifier = Modifier.weight(1f)) {
                             if (state.query.isEmpty()) {
-                                Text(stringResource(R.string.home_search_placeholder), color = RelaxTextHint, style = MaterialTheme.typography.bodyMedium)
+                                Text(stringResource(Res.string.home_search_placeholder), color = RelaxTextHint, style = MaterialTheme.typography.bodyMedium)
                             }
                             BasicTextField(
                                 value         = state.query,
@@ -91,15 +91,15 @@ fun SearchScreen(
 
         when {
             state.query.isBlank() -> SearchMessage(
-                title    = stringResource(R.string.search_hint_title),
-                subtitle = stringResource(R.string.search_hint_subtitle),
+                title    = stringResource(Res.string.search_hint_title),
+                subtitle = stringResource(Res.string.search_hint_subtitle),
             )
             state.isLoading -> Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator(color = RelaxDark)
             }
             state.results.isEmpty() && state.hasSearched -> SearchMessage(
-                title    = stringResource(R.string.catalog_empty_title),
-                subtitle = stringResource(R.string.search_empty_subtitle),
+                title    = stringResource(Res.string.catalog_empty_title),
+                subtitle = stringResource(Res.string.search_empty_subtitle),
             )
             else -> LazyVerticalGrid(
                 columns               = GridCells.Fixed(2),
@@ -109,7 +109,7 @@ fun SearchScreen(
                 verticalArrangement   = Arrangement.spacedBy(12.dp),
             ) {
                 item(span = { GridItemSpan(2) }) {
-                    Text(stringResource(R.string.catalog_products_count, state.results.size), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text(stringResource(Res.string.catalog_products_count, state.results.size), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                 }
                 items(state.results) { product ->
                     ProductCardGrid(

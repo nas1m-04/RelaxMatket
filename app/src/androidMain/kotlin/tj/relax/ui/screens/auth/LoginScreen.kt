@@ -12,14 +12,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxButton
 import tj.relax.ui.theme.*
 
@@ -64,7 +64,7 @@ fun LoginScreen(
 
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Image(
-                    painter = painterResource(R.drawable.logo_mark),
+                    painter = painterResource(Res.drawable.logo_mark),
                     contentDescription = null,
                     modifier = Modifier.size(72.dp),
                 )
@@ -82,7 +82,7 @@ fun LoginScreen(
                 Spacer(Modifier.height(6.dp))
 
                 Text(
-                    text     = stringResource(R.string.app_tagline),
+                    text     = stringResource(Res.string.app_tagline),
                     color    = RelaxTextOnDarkSub,
                     fontSize = 13.sp
                 )
@@ -103,7 +103,7 @@ fun LoginScreen(
                 .padding(top = 32.dp, bottom = 40.dp),
         ) {
             Text(
-                text       = stringResource(R.string.login_title),
+                text       = stringResource(Res.string.login_title),
                 style      = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color      = RelaxTextPrimary
@@ -112,7 +112,7 @@ fun LoginScreen(
             Spacer(Modifier.height(4.dp))
 
             Text(
-                text       = stringResource(R.string.login_subtitle),
+                text       = stringResource(Res.string.login_subtitle),
                 color      = RelaxTextSecondary,
                 style      = MaterialTheme.typography.bodyMedium,
                 lineHeight = 20.sp
@@ -123,7 +123,7 @@ fun LoginScreen(
             AuthField(
                 value       = phone,
                 onChange    = { if (it.length <= 18) phone = it },
-                placeholder = stringResource(R.string.auth_phone_placeholder),
+                placeholder = stringResource(Res.string.auth_phone_placeholder),
                 icon        = Icons.Rounded.Phone,
                 keyboard    = KeyboardType.Phone,
             )
@@ -133,7 +133,7 @@ fun LoginScreen(
             AuthField(
                 value            = password,
                 onChange         = { password = it },
-                placeholder      = stringResource(R.string.login_password_placeholder),
+                placeholder      = stringResource(Res.string.login_password_placeholder),
                 icon             = Icons.Rounded.Lock,
                 keyboard         = KeyboardType.Password,
                 isPassword       = true,
@@ -144,7 +144,7 @@ fun LoginScreen(
             Spacer(Modifier.height(28.dp))
 
             RelaxButton(
-                text      = stringResource(R.string.login_button),
+                text      = stringResource(Res.string.login_button),
                 onClick   = { viewModel.login(phone, password) },
                 modifier  = Modifier.fillMaxWidth(),
                 isLoading = state.isLoading,
@@ -168,12 +168,12 @@ fun LoginScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text  = stringResource(R.string.login_no_account),
+                    text  = stringResource(Res.string.login_no_account),
                     color = RelaxTextSecondary,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    text       = stringResource(R.string.login_register_link),
+                    text       = stringResource(Res.string.login_register_link),
                     color      = RelaxRed,
                     fontWeight = FontWeight.SemiBold,
                     style      = MaterialTheme.typography.bodyMedium,
@@ -184,7 +184,7 @@ fun LoginScreen(
             Spacer(Modifier.height(20.dp))
 
             Text(
-                text       = stringResource(R.string.login_terms),
+                text       = stringResource(Res.string.login_terms),
                 color      = RelaxTextHint,
                 style      = MaterialTheme.typography.bodySmall,
                 textAlign  = TextAlign.Center,

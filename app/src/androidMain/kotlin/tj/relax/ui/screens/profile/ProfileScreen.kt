@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
@@ -33,7 +33,7 @@ import androidx.core.content.ContextCompat
 import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.SubcomposeAsyncImage
 import tj.relax.BuildConfig
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.ShimmerBox
 import tj.relax.ui.theme.*
@@ -138,16 +138,16 @@ fun ProfileScreen(
         AlertDialog(
             onDismissRequest = { showLogoutDialog = false },
             icon             = { Icon(Icons.Rounded.Logout, null, tint = RelaxError) },
-            title            = { Text(stringResource(R.string.logout_dialog_title)) },
-            text             = { Text(stringResource(R.string.logout_dialog_text)) },
+            title            = { Text(stringResource(Res.string.logout_dialog_title)) },
+            text             = { Text(stringResource(Res.string.logout_dialog_text)) },
             confirmButton    = {
                 TextButton(onClick = { showLogoutDialog = false; viewModel.logout() }) {
-                    Text(stringResource(R.string.logout_confirm), color = RelaxError, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.logout_confirm), color = RelaxError, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton    = {
                 TextButton(onClick = { showLogoutDialog = false }) {
-                    Text(stringResource(R.string.logout_cancel))
+                    Text(stringResource(Res.string.logout_cancel))
                 }
             },
         )
@@ -206,7 +206,7 @@ fun ProfileScreen(
                 }
             }
             Spacer(Modifier.height(12.dp))
-            Text(user.name.ifEmpty { stringResource(R.string.profile_user_default) }, color = RelaxTextPrimary, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+            Text(user.name.ifEmpty { stringResource(Res.string.profile_user_default) }, color = RelaxTextPrimary, style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(Modifier.height(4.dp))
             Text(user.phone, color = RelaxTextSecondary, style = MaterialTheme.typography.bodyMedium)
         }
@@ -214,14 +214,14 @@ fun ProfileScreen(
         Spacer(Modifier.height(20.dp))
 
         // ── Personal data — inline, no separate screen ──
-        ProfileSection(title = stringResource(R.string.menu_personal_data)) {
+        ProfileSection(title = stringResource(Res.string.menu_personal_data)) {
             Column(modifier = Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 ProfileField(
-                    label       = stringResource(R.string.register_name_label),
+                    label       = stringResource(Res.string.register_name_label),
                     value       = name,
                     onChange    = { name = it },
                     icon        = Icons.Rounded.Person,
-                    placeholder = stringResource(R.string.register_name_placeholder),
+                    placeholder = stringResource(Res.string.register_name_placeholder),
                     isError     = nameError,
                 )
                 ProfileField(
@@ -234,7 +234,7 @@ fun ProfileScreen(
                     isError     = emailError,
                 )
                 ProfileFieldReadOnly(
-                    label = stringResource(R.string.auth_phone_label),
+                    label = stringResource(Res.string.auth_phone_label),
                     value = user.phone,
                     icon  = Icons.Rounded.Phone,
                 )
@@ -248,7 +248,7 @@ fun ProfileScreen(
                     ) {
                         Icon(Icons.Rounded.Check, null, tint = RelaxWhite, modifier = Modifier.size(18.dp))
                         Spacer(Modifier.width(8.dp))
-                        Text(stringResource(R.string.save_changes), color = RelaxWhite, fontWeight = FontWeight.Bold)
+                        Text(stringResource(Res.string.save_changes), color = RelaxWhite, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -256,12 +256,12 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        ProfileSection(title = stringResource(R.string.section_account)) {
-            ProfileMenuItem(Icons.Rounded.Store,         stringResource(R.string.menu_branch),         state.branchName ?: stringResource(R.string.menu_branch_not_selected), onClick = onSelectBranch)
+        ProfileSection(title = stringResource(Res.string.section_account)) {
+            ProfileMenuItem(Icons.Rounded.Store,         stringResource(Res.string.menu_branch),         state.branchName ?: stringResource(Res.string.menu_branch_not_selected), onClick = onSelectBranch)
             ProfileSwitchItem(
                 icon     = Icons.Rounded.Notifications,
-                title    = stringResource(R.string.menu_notifications),
-                subtitle = stringResource(if (state.profile?.pushEnabled != false) R.string.menu_notifications_on else R.string.menu_notifications_off),
+                title    = stringResource(Res.string.menu_notifications),
+                subtitle = stringResource(if (state.profile?.pushEnabled != false) Res.string.menu_notifications_on else Res.string.menu_notifications_off),
                 checked  = state.profile?.pushEnabled != false,
                 onCheckedChange = { viewModel.setPushEnabled(it) },
             )
@@ -269,16 +269,16 @@ fun ProfileScreen(
 
         Spacer(Modifier.height(12.dp))
 
-        ProfileSection(title = stringResource(R.string.section_settings)) {
-            ProfileMenuItem(Icons.Rounded.Language, stringResource(R.string.menu_language), languageDisplayName(currentLanguage), onClick = { showLanguageSheet = true })
-            ProfileMenuItem(Icons.Rounded.Lock, stringResource(R.string.menu_change_password), "", onClick = { showChangePasswordSheet = true })
+        ProfileSection(title = stringResource(Res.string.section_settings)) {
+            ProfileMenuItem(Icons.Rounded.Language, stringResource(Res.string.menu_language), languageDisplayName(currentLanguage), onClick = { showLanguageSheet = true })
+            ProfileMenuItem(Icons.Rounded.Lock, stringResource(Res.string.menu_change_password), "", onClick = { showChangePasswordSheet = true })
         }
 
         Spacer(Modifier.height(12.dp))
 
-        ProfileSection(title = stringResource(R.string.about_title)) {
-            ProfileMenuItem(Icons.Rounded.SupportAgent, stringResource(R.string.menu_support), "", onClick = onSupport)
-            ProfileMenuItem(Icons.Rounded.Info, stringResource(R.string.about_title), "", onClick = onAbout)
+        ProfileSection(title = stringResource(Res.string.about_title)) {
+            ProfileMenuItem(Icons.Rounded.SupportAgent, stringResource(Res.string.menu_support), "", onClick = onSupport)
+            ProfileMenuItem(Icons.Rounded.Info, stringResource(Res.string.about_title), "", onClick = onAbout)
         }
 
         Spacer(Modifier.height(16.dp))
@@ -291,7 +291,7 @@ fun ProfileScreen(
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
                 Icon(Icons.Rounded.Logout, null, tint = RelaxError, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.logout_button), color = RelaxError, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
+                Text(stringResource(Res.string.logout_button), color = RelaxError, fontWeight = FontWeight.SemiBold, fontSize = 15.sp)
             }
         }
 
@@ -417,9 +417,9 @@ private fun ProfileFieldReadOnly(label: String, value: String, icon: ImageVector
 
 @Composable
 private fun languageDisplayName(code: String): String = when (code) {
-    LocaleManager.ENGLISH -> stringResource(R.string.language_english)
-    LocaleManager.TAJIK   -> stringResource(R.string.language_tajik)
-    else                  -> stringResource(R.string.language_russian)
+    LocaleManager.ENGLISH -> stringResource(Res.string.language_english)
+    LocaleManager.TAJIK   -> stringResource(Res.string.language_tajik)
+    else                  -> stringResource(Res.string.language_russian)
 }
 
 private val CircleShape = RoundedCornerShape(50)

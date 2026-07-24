@@ -9,8 +9,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
-import tj.relax.R
+import org.jetbrains.compose.resources.stringResource
+import tj.relax.generated.resources.*
 import tj.relax.ui.theme.RelaxRed
 import tj.relax.ui.theme.RelaxTextPrimary
 
@@ -35,7 +35,7 @@ fun SectionHeader(
         if (onSeeAll != null) {
             TextButton(onClick = onSeeAll) {
                 Text(
-                    text  = stringResource(R.string.relax_see_all),
+                    text  = stringResource(Res.string.relax_see_all),
                     style = MaterialTheme.typography.labelLarge,
                     color = RelaxRed,
                 )

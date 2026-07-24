@@ -15,11 +15,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.theme.RelaxError
 import tj.relax.ui.theme.RelaxSurfaceAlt
 import tj.relax.ui.theme.RelaxTextPrimary
@@ -40,20 +40,20 @@ fun AvatarPickerSheet(
 
     ModalBottomSheet(onDismissRequest = onDismiss, sheetState = sheetState, containerColor = RelaxWhite) {
         Column(modifier = Modifier.padding(horizontal = 20.dp).padding(bottom = 24.dp)) {
-            Text(stringResource(R.string.avatar_sheet_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = RelaxTextPrimary)
+            Text(stringResource(Res.string.avatar_sheet_title), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = RelaxTextPrimary)
             Spacer(Modifier.height(8.dp))
 
-            AvatarSheetOption(icon = Icons.Rounded.PhotoCamera, label = stringResource(R.string.avatar_take_selfie), enabled = !isUploading, onClick = onCamera)
-            AvatarSheetOption(icon = Icons.Rounded.PhotoLibrary, label = stringResource(R.string.avatar_choose_gallery), enabled = !isUploading, onClick = onGallery)
+            AvatarSheetOption(icon = Icons.Rounded.PhotoCamera, label = stringResource(Res.string.avatar_take_selfie), enabled = !isUploading, onClick = onCamera)
+            AvatarSheetOption(icon = Icons.Rounded.PhotoLibrary, label = stringResource(Res.string.avatar_choose_gallery), enabled = !isUploading, onClick = onGallery)
             if (hasAvatar) {
-                AvatarSheetOption(icon = Icons.Rounded.DeleteOutline, label = stringResource(R.string.avatar_delete_photo), enabled = !isUploading, color = RelaxError, onClick = onDelete)
+                AvatarSheetOption(icon = Icons.Rounded.DeleteOutline, label = stringResource(Res.string.avatar_delete_photo), enabled = !isUploading, color = RelaxError, onClick = onDelete)
             }
 
             if (isUploading) {
                 Spacer(Modifier.height(12.dp))
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                     CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
-                    Text(stringResource(R.string.avatar_uploading), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text(stringResource(Res.string.avatar_uploading), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                 }
             }
         }

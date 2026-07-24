@@ -18,12 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
 import tj.relax.ui.screens.catalog.ViewModel.CatalogViewModel
@@ -48,7 +48,7 @@ fun CatalogScreen(
 
     LaunchedEffect(Unit) { viewModel.loadIfNeeded() }
 
-    val categories = listOf(Pair(0, stringResource(R.string.catalog_category_all))) +
+    val categories = listOf(Pair(0, stringResource(Res.string.catalog_category_all))) +
             state.categories.map { Pair(it.id, it.name) }
 
     val pullState = rememberPullToRefreshState()
@@ -81,7 +81,7 @@ fun CatalogScreen(
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text  = stringResource(R.string.catalog_title),
+                        text  = stringResource(Res.string.catalog_title),
                         style = MaterialTheme.typography.headlineLarge,
                         color = RelaxTextPrimary,
                         modifier = Modifier.weight(1f)
@@ -131,7 +131,7 @@ fun CatalogScreen(
                             Box {
                                 if (state.searchQuery.isEmpty()) {
                                     Text(
-                                        text  = stringResource(R.string.catalog_search_placeholder),
+                                        text  = stringResource(Res.string.catalog_search_placeholder),
                                         color = RelaxTextHint,
                                         style = MaterialTheme.typography.bodyMedium
                                     )
@@ -233,7 +233,7 @@ fun CatalogScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp),
                 ) {
                     Text(
-                        text       = stringResource(R.string.home_section_new),
+                        text       = stringResource(Res.string.home_section_new),
                         fontSize   = 13.sp,
                         fontWeight = FontWeight.Bold,
                         color      = RelaxWhite
@@ -278,7 +278,7 @@ fun CatalogScreen(
                         // Счётчик товаров
                         item(span = { GridItemSpan(2) }) {
                             Text(
-                                text  = stringResource(R.string.catalog_products_count, state.products.size),
+                                text  = stringResource(Res.string.catalog_products_count, state.products.size),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = RelaxTextSecondary
                             )
@@ -358,13 +358,13 @@ private fun EmptyState() {
             Text("🔍", fontSize = 56.sp)
             Spacer(Modifier.height(16.dp))
             Text(
-                text  = stringResource(R.string.catalog_empty_title),
+                text  = stringResource(Res.string.catalog_empty_title),
                 style = MaterialTheme.typography.headlineSmall,
                 color = RelaxTextPrimary
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                text  = stringResource(R.string.catalog_empty_subtitle),
+                text  = stringResource(Res.string.catalog_empty_subtitle),
                 style = MaterialTheme.typography.bodyMedium,
                 color = RelaxTextSecondary
             )

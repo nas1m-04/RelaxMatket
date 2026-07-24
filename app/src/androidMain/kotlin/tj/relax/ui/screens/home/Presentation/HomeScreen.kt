@@ -27,15 +27,15 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.*
 import tj.relax.ui.screens.cart.CartViewModel
 import tj.relax.ui.screens.favorites.FavoritesViewModel
@@ -181,7 +181,7 @@ fun HomeScreen(
                                 Spacer(Modifier.width(10.dp))
 
                                 Text(
-                                    text = stringResource(R.string.home_search_placeholder),
+                                    text = stringResource(Res.string.home_search_placeholder),
                                     color = RelaxTextHint,
                                     style = MaterialTheme.typography.bodyMedium
                                 )
@@ -243,7 +243,7 @@ fun HomeScreen(
                     item {
                         Column(modifier = Modifier.padding(top = 28.dp)) {
                             SectionHeader(
-                                title = stringResource(R.string.home_section_categories),
+                                title = stringResource(Res.string.home_section_categories),
                                 modifier = Modifier.padding(horizontal = 20.dp),
                             )
                             Spacer(Modifier.height(16.dp))
@@ -264,7 +264,7 @@ fun HomeScreen(
                     item {
                         Column(modifier = Modifier.padding(top = 32.dp)) {
                             SectionHeader(
-                                title = stringResource(R.string.home_section_popular),
+                                title = stringResource(Res.string.home_section_popular),
                                 onSeeAll = onSeeAllPopular,
                                 modifier = Modifier.padding(horizontal = 20.dp),
                             )
@@ -304,7 +304,7 @@ fun HomeScreen(
                     item {
                         Column(modifier = Modifier.padding(top = 32.dp)) {
                             SectionHeader(
-                                title = stringResource(R.string.home_section_new),
+                                title = stringResource(Res.string.home_section_new),
                                 onSeeAll = onSeeAllNew,
                                 modifier = Modifier.padding(horizontal = 20.dp),
                             )
@@ -332,7 +332,7 @@ fun HomeScreen(
                     item {
                         Column(modifier = Modifier.padding(top = 32.dp)) {
                             SectionHeader(
-                                title = stringResource(R.string.home_section_sale_week),
+                                title = stringResource(Res.string.home_section_sale_week),
                                 onSeeAll = onPromotions,
                                 modifier = Modifier.padding(horizontal = 20.dp),
                             )
@@ -360,7 +360,7 @@ fun HomeScreen(
                     item {
                         Spacer(Modifier.height(32.dp))
                         SectionHeader(
-                            title = stringResource(R.string.home_section_best_offers),
+                            title = stringResource(Res.string.home_section_best_offers),
                             onSeeAll = onSeeAllBestOffers,
                             modifier = Modifier.padding(horizontal = 20.dp),
                         )
@@ -436,7 +436,7 @@ private fun HomeTopBar(
                 // Logo row
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Image(
-                        painter = painterResource(R.drawable.logo_mark),
+                        painter = painterResource(Res.drawable.logo_mark),
                         contentDescription = null,
                         modifier = Modifier.size(38.dp),
                     )
@@ -468,7 +468,7 @@ private fun HomeTopBar(
                     )
                     Spacer(Modifier.width(5.dp))
                     Text(
-                        text     = address.ifBlank { stringResource(R.string.home_address_not_set) },
+                        text     = address.ifBlank { stringResource(Res.string.home_address_not_set) },
                         color    = if (address.isBlank()) RelaxTextOnDarkSub.copy(alpha = 0.5f) else RelaxTextOnDarkSub,
                         fontSize = 12.sp,
                         maxLines = 1,
@@ -692,14 +692,14 @@ private fun PromoStrip(onClick: () -> Unit) {
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text       = stringResource(R.string.home_promo_title),
+                    text       = stringResource(Res.string.home_promo_title),
                     color      = RelaxWhite,
                     fontSize   = 20.sp,
                     fontWeight = FontWeight.Bold,
                 )
                 Spacer(Modifier.height(4.dp))
                 Text(
-                    text  = stringResource(R.string.home_promo_subtitle),
+                    text  = stringResource(Res.string.home_promo_subtitle),
                     color = RelaxWhite.copy(alpha = 0.88f),
                     fontSize = 13.sp,
                 )
@@ -766,14 +766,14 @@ private fun AddressBottomSheet(
                 Spacer(Modifier.width(16.dp))
                 Column {
                     Text(
-                        text       = stringResource(R.string.home_address_sheet_title),
+                        text       = stringResource(Res.string.home_address_sheet_title),
                         fontSize   = 18.sp,
                         fontWeight = FontWeight.Bold,
                         color      = RelaxTextPrimary,
                     )
                     Spacer(Modifier.height(2.dp))
                     Text(
-                        text  = stringResource(R.string.home_address_sheet_subtitle),
+                        text  = stringResource(Res.string.home_address_sheet_subtitle),
                         style = MaterialTheme.typography.bodySmall,
                         color = RelaxTextSecondary,
                     )
@@ -788,10 +788,10 @@ private fun AddressBottomSheet(
             OutlinedTextField(
                 value         = address,
                 onValueChange = { address = it },
-                label         = { Text(stringResource(R.string.checkout_delivery_address_label)) },
+                label         = { Text(stringResource(Res.string.checkout_delivery_address_label)) },
                 placeholder   = {
                     Text(
-                        text     = stringResource(R.string.checkout_address_placeholder),
+                        text     = stringResource(Res.string.checkout_address_placeholder),
                         fontSize = 13.sp,
                     )
                 },
@@ -827,7 +827,7 @@ private fun AddressBottomSheet(
 
             Spacer(Modifier.height(8.dp))
             Text(
-                text  = stringResource(R.string.home_address_hint),
+                text  = stringResource(Res.string.home_address_hint),
                 style = MaterialTheme.typography.bodySmall,
                 color = RelaxTextHint,
             )
@@ -859,7 +859,7 @@ private fun AddressBottomSheet(
                 )
                 Spacer(Modifier.width(10.dp))
                 Text(
-                    text       = stringResource(R.string.home_address_save),
+                    text       = stringResource(Res.string.home_address_save),
                     fontWeight = FontWeight.Bold,
                     fontSize   = 16.sp,
                 )

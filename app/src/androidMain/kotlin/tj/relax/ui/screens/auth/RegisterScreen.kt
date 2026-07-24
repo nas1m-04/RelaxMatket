@@ -13,13 +13,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxButton
 import tj.relax.ui.theme.*
 
@@ -121,14 +121,14 @@ fun RegisterScreen(
                 .padding(top = 32.dp, bottom = 40.dp),
         ) {
             Text(
-                stringResource(R.string.register_title),
+                stringResource(Res.string.register_title),
                 style      = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
                 color      = RelaxTextPrimary
             )
             Spacer(Modifier.height(4.dp))
             Text(
-                stringResource(R.string.register_subtitle),
+                stringResource(Res.string.register_subtitle),
                 color      = RelaxTextSecondary,
                 style      = MaterialTheme.typography.bodyMedium,
                 lineHeight = 20.sp
@@ -139,14 +139,14 @@ fun RegisterScreen(
             AuthField(
                 value       = name,
                 onChange    = { name = it },
-                placeholder = stringResource(R.string.register_name_placeholder),
+                placeholder = stringResource(Res.string.register_name_placeholder),
                 icon        = Icons.Rounded.Person,
             )
             Spacer(Modifier.height(14.dp))
             AuthField(
                 value       = phone,
                 onChange    = { if (it.length <= 18) phone = it },
-                placeholder = stringResource(R.string.auth_phone_placeholder),
+                placeholder = stringResource(Res.string.auth_phone_placeholder),
                 icon        = Icons.Rounded.Phone,
                 keyboard    = KeyboardType.Phone,
             )
@@ -154,7 +154,7 @@ fun RegisterScreen(
             AuthField(
                 value              = password,
                 onChange           = { password = it },
-                placeholder        = stringResource(R.string.register_password_placeholder),
+                placeholder        = stringResource(Res.string.register_password_placeholder),
                 icon               = Icons.Rounded.Lock,
                 keyboard           = KeyboardType.Password,
                 isPassword         = true,
@@ -165,7 +165,7 @@ fun RegisterScreen(
             AuthField(
                 value              = confirmPassword,
                 onChange           = { confirmPassword = it },
-                placeholder        = stringResource(R.string.register_confirm_password_placeholder),
+                placeholder        = stringResource(Res.string.register_confirm_password_placeholder),
                 icon               = Icons.Rounded.Lock,
                 keyboard           = KeyboardType.Password,
                 isPassword         = true,
@@ -175,7 +175,7 @@ fun RegisterScreen(
 
             Spacer(Modifier.height(18.dp))
             Text(
-                stringResource(R.string.register_secret_hint),
+                stringResource(Res.string.register_secret_hint),
                 color      = RelaxTextHint,
                 style      = MaterialTheme.typography.bodySmall,
                 lineHeight = 16.sp,
@@ -184,14 +184,14 @@ fun RegisterScreen(
             AuthField(
                 value       = secretQuestion,
                 onChange    = { secretQuestion = it },
-                placeholder = stringResource(R.string.register_secret_question_placeholder),
+                placeholder = stringResource(Res.string.register_secret_question_placeholder),
                 icon        = Icons.Rounded.HelpOutline,
             )
             Spacer(Modifier.height(14.dp))
             AuthField(
                 value       = secretAnswer,
                 onChange    = { secretAnswer = it },
-                placeholder = stringResource(R.string.register_secret_answer_placeholder),
+                placeholder = stringResource(Res.string.register_secret_answer_placeholder),
                 icon        = Icons.Rounded.QuestionAnswer,
             )
 
@@ -207,7 +207,7 @@ fun RegisterScreen(
                 Icon(Icons.Rounded.WarningAmber, null, tint = RelaxWarning, modifier = Modifier.size(18.dp))
                 Spacer(Modifier.width(8.dp))
                 Text(
-                    stringResource(R.string.register_secret_warning),
+                    stringResource(Res.string.register_secret_warning),
                     color      = RelaxWarning,
                     style      = MaterialTheme.typography.bodySmall,
                     lineHeight = 16.sp,
@@ -217,7 +217,7 @@ fun RegisterScreen(
             Spacer(Modifier.height(28.dp))
 
             RelaxButton(
-                text      = stringResource(R.string.register_button),
+                text      = stringResource(Res.string.register_button),
                 onClick   = { viewModel.register(name, phone, password, confirmPassword, secretQuestion, secretAnswer) },
                 modifier  = Modifier.fillMaxWidth(),
                 isLoading = state.isLoading,
@@ -241,12 +241,12 @@ fun RegisterScreen(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    stringResource(R.string.register_have_account),
+                    stringResource(Res.string.register_have_account),
                     color = RelaxTextSecondary,
                     style = MaterialTheme.typography.bodyMedium
                 )
                 Text(
-                    stringResource(R.string.register_login_link),
+                    stringResource(Res.string.register_login_link),
                     color      = RelaxRed,
                     fontWeight = FontWeight.SemiBold,
                     style      = MaterialTheme.typography.bodyMedium,
@@ -257,7 +257,7 @@ fun RegisterScreen(
             Spacer(Modifier.height(20.dp))
 
             Text(
-                text      = stringResource(R.string.register_terms),
+                text      = stringResource(Res.string.register_terms),
                 color     = RelaxTextHint,
                 style     = MaterialTheme.typography.bodySmall,
                 textAlign = TextAlign.Center,

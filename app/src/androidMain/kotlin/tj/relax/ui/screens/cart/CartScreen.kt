@@ -14,12 +14,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.*
 import coil.compose.AsyncImage
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.CartItem
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.RelaxTopBar
@@ -46,12 +46,12 @@ fun CartScreen(
     Column(modifier = Modifier.fillMaxSize().background(RelaxBackground)) {
         Box(modifier = Modifier.fillMaxWidth().background(RelaxWhite)) {
             RelaxTopBar(
-                title  = stringResource(R.string.cart_title),
+                title  = stringResource(Res.string.cart_title),
                 onBack = onBack,
                 actions = {
                     if (state.items.isNotEmpty()) {
                         TextButton(onClick = { viewModel.clear() }) {
-                            Text(stringResource(R.string.cart_clear), color = RelaxRed, style = MaterialTheme.typography.labelLarge)
+                            Text(stringResource(Res.string.cart_clear), color = RelaxRed, style = MaterialTheme.typography.labelLarge)
                         }
                     }
                 }
@@ -87,13 +87,13 @@ fun CartScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text(stringResource(R.string.cart_promo_code_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
+                        Text(stringResource(Res.string.cart_promo_code_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
                         Spacer(Modifier.height(10.dp))
                         Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                             OutlinedTextField(
                                 value         = state.promoCode,
                                 onValueChange = { viewModel.setPromoCode(it.uppercase()) },
-                                placeholder   = { Text(stringResource(R.string.cart_promo_code_placeholder), color = RelaxTextHint, fontSize = 14.sp) },
+                                placeholder   = { Text(stringResource(Res.string.cart_promo_code_placeholder), color = RelaxTextHint, fontSize = 14.sp) },
                                 singleLine    = true,
                                 modifier      = Modifier.weight(1f).height(50.dp),
                                 shape         = RoundedCornerShape(12.dp),
@@ -101,12 +101,12 @@ fun CartScreen(
                                 textStyle     = MaterialTheme.typography.bodyMedium.copy(color = RelaxTextPrimary, fontWeight = FontWeight.Bold),
                             )
                             Button(onClick = { viewModel.togglePromo() }, shape = RoundedCornerShape(12.dp), modifier = Modifier.height(50.dp), colors = ButtonDefaults.buttonColors(containerColor = RelaxDark)) {
-                                Text(if (state.promoApplied) "✓" else stringResource(R.string.cart_promo_ok), fontWeight = FontWeight.Bold)
+                                Text(if (state.promoApplied) "✓" else stringResource(Res.string.cart_promo_ok), fontWeight = FontWeight.Bold)
                             }
                         }
                         if (state.promoApplied) {
                             Spacer(Modifier.height(8.dp))
-                            Text(stringResource(R.string.cart_promo_applied), color = RelaxSuccess, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
+                            Text(stringResource(Res.string.cart_promo_applied), color = RelaxSuccess, style = MaterialTheme.typography.bodySmall, fontWeight = FontWeight.SemiBold)
                         }
                     }
                 }
@@ -120,8 +120,8 @@ fun CartScreen(
                         }
                         Spacer(Modifier.width(12.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(stringResource(R.string.cart_bonus_points_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
-                            Text(stringResource(R.string.cart_bonus_available, state.bonusBalance.toInt()), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
+                            Text(stringResource(Res.string.cart_bonus_points_title), style = MaterialTheme.typography.titleSmall, color = RelaxTextPrimary)
+                            Text(stringResource(Res.string.cart_bonus_available, state.bonusBalance.toInt()), style = MaterialTheme.typography.bodySmall, color = RelaxTextSecondary)
                         }
                         Switch(checked = state.useBonuses, onCheckedChange = { viewModel.toggleBonuses(it) }, colors = SwitchDefaults.colors(checkedThumbColor = RelaxWhite, checkedTrackColor = RelaxDark, uncheckedThumbColor = RelaxWhite, uncheckedTrackColor = RelaxDivider))
                     }
@@ -131,19 +131,19 @@ fun CartScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(18.dp), colors = CardDefaults.cardColors(containerColor = RelaxWhite), elevation = CardDefaults.cardElevation(0.dp)) {
                     Column(modifier = Modifier.padding(20.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                        Text(stringResource(R.string.cart_order_summary_title), style = MaterialTheme.typography.titleMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
-                        SummaryRow(stringResource(R.string.cart_items_count, state.items.size), "${subtotal.toInt()} TJS")
-                        if (savings > 0) SummaryRow(stringResource(R.string.cart_discount), "−${savings.toInt()} TJS", RelaxSuccess)
-                        if (state.promoApplied) SummaryRow(stringResource(R.string.cart_promo_discount), "−${promoDiscount.toInt()} TJS", RelaxSuccess)
-                        if (state.useBonuses) SummaryRow(stringResource(R.string.cart_bonus_discount), "−${bonusDiscount.toInt()} TJS", Color(0xFFD4AF37))
+                        Text(stringResource(Res.string.cart_order_summary_title), style = MaterialTheme.typography.titleMedium, color = RelaxTextPrimary, fontWeight = FontWeight.Bold)
+                        SummaryRow(stringResource(Res.string.cart_items_count, state.items.size), "${subtotal.toInt()} TJS")
+                        if (savings > 0) SummaryRow(stringResource(Res.string.cart_discount), "−${savings.toInt()} TJS", RelaxSuccess)
+                        if (state.promoApplied) SummaryRow(stringResource(Res.string.cart_promo_discount), "−${promoDiscount.toInt()} TJS", RelaxSuccess)
+                        if (state.useBonuses) SummaryRow(stringResource(Res.string.cart_bonus_discount), "−${bonusDiscount.toInt()} TJS", Color(0xFFD4AF37))
                         RelaxDivider()
                         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                            Text(stringResource(R.string.cart_total_to_pay), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                            Text(stringResource(Res.string.cart_total_to_pay), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
                             Text("${total.toInt()} TJS", fontSize = 26.sp, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
                         }
                         if (savings + promoDiscount + bonusDiscount > 0) {
                             Box(modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(10.dp)).background(RelaxSuccessBg).padding(12.dp)) {
-                                Text(stringResource(R.string.cart_savings_message, (savings + promoDiscount + bonusDiscount).toInt()), color = RelaxSuccess, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
+                                Text(stringResource(Res.string.cart_savings_message, (savings + promoDiscount + bonusDiscount).toInt()), color = RelaxSuccess, style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.SemiBold)
                             }
                         }
                     }
@@ -153,7 +153,7 @@ fun CartScreen(
 
         Box(modifier = Modifier.fillMaxWidth().background(RelaxWhite).navigationBarsPadding().padding(horizontal = 20.dp, vertical = 16.dp)) {
             Button(onClick = onCheckout, modifier = Modifier.fillMaxWidth().height(56.dp), shape = RoundedCornerShape(16.dp), colors = ButtonDefaults.buttonColors(containerColor = RelaxRed)) {
-                Text(stringResource(R.string.cart_checkout_button, total.toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                Text(stringResource(Res.string.cart_checkout_button, total.toInt()), fontWeight = FontWeight.Bold, fontSize = 16.sp)
             }
         }
     }
@@ -217,8 +217,8 @@ private fun EmptyCart() {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text("🛒", fontSize = 64.sp)
             Spacer(Modifier.height(16.dp))
-            Text(stringResource(R.string.cart_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
-            Text(stringResource(R.string.cart_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+            Text(stringResource(Res.string.cart_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+            Text(stringResource(Res.string.cart_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
         }
     }
 }

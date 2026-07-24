@@ -15,12 +15,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.koin.compose.viewmodel.koinViewModel
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.Branch
 import tj.relax.ui.components.RelaxTopBar
 import tj.relax.ui.theme.*
@@ -43,14 +43,14 @@ fun SelectBranchScreen(
             Box(modifier = Modifier.fillMaxWidth().background(RelaxWhite)) {
                 Column(modifier = Modifier.statusBarsPadding().padding(20.dp)) {
                     Text(
-                        stringResource(R.string.select_branch_title),
+                        stringResource(Res.string.select_branch_title),
                         style = MaterialTheme.typography.headlineSmall,
                         color = RelaxTextPrimary,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(Modifier.height(4.dp))
                     Text(
-                        stringResource(R.string.select_branch_subtitle),
+                        stringResource(Res.string.select_branch_subtitle),
                         style = MaterialTheme.typography.bodyMedium,
                         color = RelaxTextSecondary,
                     )
@@ -58,7 +58,7 @@ fun SelectBranchScreen(
             }
         } else {
             Box(modifier = Modifier.background(RelaxWhite)) {
-                RelaxTopBar(title = stringResource(R.string.select_branch_title), onBack = onBack)
+                RelaxTopBar(title = stringResource(Res.string.select_branch_title), onBack = onBack)
             }
         }
 
@@ -85,7 +85,7 @@ fun SelectBranchScreen(
             }
             if (state.branches.isEmpty()) {
                 Text(
-                    stringResource(R.string.select_branch_empty),
+                    stringResource(Res.string.select_branch_empty),
                     style = MaterialTheme.typography.bodyMedium,
                     color = RelaxTextSecondary,
                 )
@@ -113,12 +113,12 @@ fun SelectBranchScreen(
                     if (state.isSaving) {
                         CircularProgressIndicator(modifier = Modifier.size(22.dp), color = RelaxWhite, strokeWidth = 2.dp)
                     } else {
-                        Text(stringResource(R.string.select_branch_confirm), fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        Text(stringResource(Res.string.select_branch_confirm), fontWeight = FontWeight.Bold, fontSize = 16.sp)
                     }
                 }
                 if (isOnboarding) {
                     TextButton(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(R.string.select_branch_skip), color = RelaxTextSecondary)
+                        Text(stringResource(Res.string.select_branch_skip), color = RelaxTextSecondary)
                     }
                 }
             }

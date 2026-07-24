@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.*
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.*
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.core.navigation.Route
 import tj.relax.ui.components.activityViewModel
 import tj.relax.ui.screens.history.HistoryScreen
@@ -37,16 +37,16 @@ private data class NavItem(
     val route: String,
     val icon: ImageVector,
     val iconSelected: ImageVector,
-    val labelRes: Int,
+    val labelRes: org.jetbrains.compose.resources.StringResource,
     val isCenter: Boolean = false,
 )
 
 private val navItems = listOf(
-    NavItem(Route.Home.route,        Icons.Rounded.Home,           Icons.Rounded.Home,           R.string.nav_home),
-    NavItem(Route.Catalog.route,     Icons.Rounded.GridView,       Icons.Rounded.GridView,       R.string.nav_catalog),
-    NavItem(Route.LoyaltyCard.route, Icons.Rounded.CreditCard,     Icons.Rounded.CreditCard,     R.string.nav_card, true),
-    NavItem(Route.History.route,     Icons.Rounded.Receipt,        Icons.Rounded.Receipt,        R.string.nav_history),
-    NavItem(Route.Profile.route,     Icons.Rounded.PersonOutline,  Icons.Rounded.Person,         R.string.nav_profile),
+    NavItem(Route.Home.route,        Icons.Rounded.Home,           Icons.Rounded.Home,           Res.string.nav_home),
+    NavItem(Route.Catalog.route,     Icons.Rounded.GridView,       Icons.Rounded.GridView,       Res.string.nav_catalog),
+    NavItem(Route.LoyaltyCard.route, Icons.Rounded.CreditCard,     Icons.Rounded.CreditCard,     Res.string.nav_card, true),
+    NavItem(Route.History.route,     Icons.Rounded.Receipt,        Icons.Rounded.Receipt,        Res.string.nav_history),
+    NavItem(Route.Profile.route,     Icons.Rounded.PersonOutline,  Icons.Rounded.Person,         Res.string.nav_profile),
 )
 
 @Composable

@@ -11,19 +11,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.launch
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxButton
 import tj.relax.ui.theme.*
 
 private data class OnboardingPage(
     val emoji: String,
-    val titleRes: Int,
-    val subtitleRes: Int,
+    val titleRes: org.jetbrains.compose.resources.StringResource,
+    val subtitleRes: org.jetbrains.compose.resources.StringResource,
     val bg: List<Color>,
     val accent: Color,
 )
@@ -31,22 +31,22 @@ private data class OnboardingPage(
 private val pages = listOf(
     OnboardingPage(
         emoji       = "🛒",
-        titleRes    = R.string.onboarding_title_1,
-        subtitleRes = R.string.onboarding_subtitle_1,
+        titleRes    = Res.string.onboarding_title_1,
+        subtitleRes = Res.string.onboarding_subtitle_1,
         bg          = listOf(RelaxDark, RelaxDarkSecondary),
         accent      = RelaxRed,
     ),
     OnboardingPage(
         emoji       = "💎",
-        titleRes    = R.string.onboarding_title_2,
-        subtitleRes = R.string.onboarding_subtitle_2,
+        titleRes    = Res.string.onboarding_title_2,
+        subtitleRes = Res.string.onboarding_subtitle_2,
         bg          = listOf(RelaxBlack, RelaxDark),
         accent      = Color(0xFFD4AF37),
     ),
     OnboardingPage(
         emoji       = "🔥",
-        titleRes    = R.string.onboarding_title_3,
-        subtitleRes = R.string.onboarding_subtitle_3,
+        titleRes    = Res.string.onboarding_title_3,
+        subtitleRes = Res.string.onboarding_subtitle_3,
         bg          = listOf(Color(0xFF08080B), RelaxBlack),
         accent      = RelaxRed,
     ),
@@ -98,7 +98,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TextButton(onClick = onFinished) {
-                        Text(stringResource(R.string.onboarding_skip), color = RelaxWhite.copy(alpha = 0.6f), style = MaterialTheme.typography.labelLarge)
+                        Text(stringResource(Res.string.onboarding_skip), color = RelaxWhite.copy(alpha = 0.6f), style = MaterialTheme.typography.labelLarge)
                     }
                     Button(
                         onClick = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
@@ -106,7 +106,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                         colors  = ButtonDefaults.buttonColors(containerColor = RelaxWhite),
                         modifier = Modifier.height(50.dp).padding(start = 8.dp),
                     ) {
-                        Text(stringResource(R.string.onboarding_next), color = RelaxTextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                        Text(stringResource(Res.string.onboarding_next), color = RelaxTextPrimary, fontWeight = FontWeight.Bold, fontSize = 15.sp)
                         Spacer(Modifier.width(6.dp))
                         Text("→", color = RelaxTextPrimary, fontSize = 18.sp)
                     }
@@ -118,7 +118,7 @@ fun OnboardingScreen(onFinished: () -> Unit) {
                     shape    = RoundedCornerShape(16.dp),
                     colors   = ButtonDefaults.buttonColors(containerColor = RelaxRed),
                 ) {
-                    Text(stringResource(R.string.onboarding_start_shopping), color = RelaxWhite, fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                    Text(stringResource(Res.string.onboarding_start_shopping), color = RelaxWhite, fontWeight = FontWeight.Bold, fontSize = 16.sp)
                 }
             }
         }

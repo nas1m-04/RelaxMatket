@@ -20,13 +20,13 @@ import androidx.compose.ui.graphics.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
 import coil.compose.AsyncImage
 import kotlinx.coroutines.launch
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.data.CartItem
 import tj.relax.data.Order
 import tj.relax.data.OrderStatus
@@ -61,8 +61,8 @@ fun HistoryScreen(
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text("🧾", fontSize = 56.sp)
                     Spacer(Modifier.height(16.dp))
-                    Text(stringResource(R.string.order_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
-                    Text(stringResource(R.string.order_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
+                    Text(stringResource(Res.string.order_empty_title), style = MaterialTheme.typography.headlineSmall, color = RelaxTextPrimary)
+                    Text(stringResource(Res.string.order_empty_subtitle), style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary)
                 }
             }
             else -> {
@@ -102,7 +102,7 @@ fun HistoryScreen(
                                         CircularProgressIndicator(color = RelaxDark, modifier = Modifier.size(24.dp), strokeWidth = 2.dp)
                                     } else {
                                         TextButton(onClick = { viewModel.loadMore() }) {
-                                            Text(stringResource(R.string.loyalty_history_load_more), color = RelaxDark, fontWeight = FontWeight.SemiBold)
+                                            Text(stringResource(Res.string.loyalty_history_load_more), color = RelaxDark, fontWeight = FontWeight.SemiBold)
                                         }
                                     }
                                 }
@@ -132,7 +132,7 @@ private fun HistoryHeader(orders: List<Order>, totalCount: Int, modifier: Modifi
     ) {
         Column {
             Text(
-                stringResource(R.string.history_title),
+                stringResource(Res.string.history_title),
                 color      = RelaxWhite,
                 style      = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Black,
@@ -152,7 +152,7 @@ private fun HistoryHeader(orders: List<Order>, totalCount: Int, modifier: Modifi
                         iconTint  = RelaxWhite,
                         iconBg    = RelaxWhite.copy(alpha = 0.16f),
                         value     = totalCount.toString(),
-                        label     = stringResource(R.string.history_stat_orders),
+                        label     = stringResource(Res.string.history_stat_orders),
                         modifier  = Modifier.weight(1f),
                     )
                     HeaderStatBadge(
@@ -160,7 +160,7 @@ private fun HistoryHeader(orders: List<Order>, totalCount: Int, modifier: Modifi
                         iconTint  = RelaxDark,
                         iconBg    = RelaxGold,
                         value     = formatAmount(orders.sumOf { it.bonusEarned }),
-                        label     = stringResource(R.string.history_stat_cashback),
+                        label     = stringResource(Res.string.history_stat_cashback),
                         modifier  = Modifier.weight(1f),
                     )
                 }
@@ -213,7 +213,7 @@ private fun HistoryCard(order: Order, onClick: () -> Unit) {
                 Column {
                     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         Text(
-                            stringResource(R.string.order_number_label, order.id.take(8).uppercase()),
+                            stringResource(Res.string.order_number_label, order.id.take(8).uppercase()),
                             style = MaterialTheme.typography.titleSmall,
                             color = RelaxTextPrimary,
                         )
@@ -234,7 +234,7 @@ private fun HistoryCard(order: Order, onClick: () -> Unit) {
                     order.items.take(3).forEach { item -> ItemThumb(item) }
                     if (order.items.size > 3) {
                         Box(modifier = Modifier.size(52.dp).clip(RoundedCornerShape(12.dp)).background(RelaxSurfaceAlt).border(2.dp, RelaxWhite, RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-                            Text(stringResource(R.string.order_more_items, order.items.size - 3), fontWeight = FontWeight.Bold, fontSize = 13.sp, color = RelaxTextSecondary)
+                            Text(stringResource(Res.string.order_more_items, order.items.size - 3), fontWeight = FontWeight.Bold, fontSize = 13.sp, color = RelaxTextSecondary)
                         }
                     }
                 }
@@ -242,7 +242,7 @@ private fun HistoryCard(order: Order, onClick: () -> Unit) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(Icons.Rounded.Receipt, null, tint = RelaxTextHint, modifier = Modifier.size(18.dp))
                     Spacer(Modifier.width(6.dp))
-                    Text(stringResource(R.string.history_items_unavailable), style = MaterialTheme.typography.bodySmall, color = RelaxTextHint)
+                    Text(stringResource(Res.string.history_items_unavailable), style = MaterialTheme.typography.bodySmall, color = RelaxTextHint)
                 }
             }
 
@@ -251,7 +251,7 @@ private fun HistoryCard(order: Order, onClick: () -> Unit) {
             Spacer(Modifier.height(12.dp))
 
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                Text(stringResource(R.string.order_total_label, formatAmount(order.total)), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
+                Text(stringResource(Res.string.order_total_label, formatAmount(order.total)), fontWeight = FontWeight.Bold, fontSize = 16.sp, color = RelaxTextPrimary)
                 when {
                     order.bonusEarned > 0 -> BonusPill("+${formatAmount(order.bonusEarned)}", RelaxSuccess)
                     order.bonusesUsed > 0 -> BonusPill("−${formatAmount(order.bonusesUsed)}", RelaxRed)
@@ -299,7 +299,7 @@ private fun SourceBadge() {
     ) {
         Icon(Icons.Rounded.Storefront, null, tint = RelaxTextSecondary, modifier = Modifier.size(11.dp))
         Spacer(Modifier.width(3.dp))
-        Text(stringResource(R.string.history_source_pos), color = RelaxTextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
+        Text(stringResource(Res.string.history_source_pos), color = RelaxTextSecondary, fontSize = 10.sp, fontWeight = FontWeight.Bold)
     }
 }
 
@@ -312,13 +312,13 @@ internal fun OrderStatusBadge(status: OrderStatus) {
     }
 }
 
-internal fun orderStatusLabel(status: OrderStatus): Int = when (status) {
-    OrderStatus.PENDING    -> R.string.order_status_pending
-    OrderStatus.CONFIRMED  -> R.string.order_status_confirmed
-    OrderStatus.PREPARING  -> R.string.order_status_preparing
-    OrderStatus.DELIVERING -> R.string.order_status_in_progress
-    OrderStatus.DELIVERED  -> R.string.order_status_delivered
-    OrderStatus.CANCELLED  -> R.string.order_status_cancelled
+internal fun orderStatusLabel(status: OrderStatus): org.jetbrains.compose.resources.StringResource = when (status) {
+    OrderStatus.PENDING    -> Res.string.order_status_pending
+    OrderStatus.CONFIRMED  -> Res.string.order_status_confirmed
+    OrderStatus.PREPARING  -> Res.string.order_status_preparing
+    OrderStatus.DELIVERING -> Res.string.order_status_in_progress
+    OrderStatus.DELIVERED  -> Res.string.order_status_delivered
+    OrderStatus.CANCELLED  -> Res.string.order_status_cancelled
 }
 
 private fun dayLabel(rawDate: String): String = formatFullDate(rawDate)

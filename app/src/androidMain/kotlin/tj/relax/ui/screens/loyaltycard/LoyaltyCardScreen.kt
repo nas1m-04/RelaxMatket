@@ -17,12 +17,12 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.*
 import kotlinx.coroutines.launch
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.ui.components.activityViewModel
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.LiveQrCode
@@ -94,7 +94,7 @@ fun LoyaltyCardScreen(
                         .padding(horizontal = 20.dp, vertical = 20.dp)
                 ) {
                     Text(
-                        stringResource(R.string.loyalty_title),
+                        stringResource(Res.string.loyalty_title),
                         color      = RelaxWhite,
                         style      = MaterialTheme.typography.headlineMedium,
                         fontWeight = FontWeight.Bold,
@@ -204,7 +204,7 @@ fun LoyaltyCardScreen(
                         Spacer(Modifier.weight(1f))
 
                         Column {
-                            Text(stringResource(R.string.loyalty_bonus_balance), color = RelaxTextOnDarkSub, fontSize = 11.sp, letterSpacing = 0.5.sp)
+                            Text(stringResource(Res.string.loyalty_bonus_balance), color = RelaxTextOnDarkSub, fontSize = 11.sp, letterSpacing = 0.5.sp)
                             Spacer(Modifier.height(2.dp))
                             Row(verticalAlignment = Alignment.Bottom) {
                                 Text(
@@ -216,7 +216,7 @@ fun LoyaltyCardScreen(
                                 )
                                 Spacer(Modifier.width(6.dp))
                                 Text(
-                                    stringResource(R.string.loyalty_points_suffix),
+                                    stringResource(Res.string.loyalty_points_suffix),
                                     color    = RelaxTextOnDarkSub,
                                     fontSize = 14.sp,
                                     modifier = Modifier.padding(bottom = 8.dp),
@@ -232,11 +232,11 @@ fun LoyaltyCardScreen(
                             verticalAlignment     = Alignment.Bottom,
                         ) {
                             Column {
-                                Text(stringResource(R.string.loyalty_owner_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
+                                Text(stringResource(Res.string.loyalty_owner_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
                                 Text(viewModel.userName, color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
                             }
                             Column(horizontalAlignment = Alignment.End) {
-                                Text(stringResource(R.string.loyalty_member_since_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
+                                Text(stringResource(Res.string.loyalty_member_since_label), color = RelaxTextOnDarkSub, fontSize = 9.sp, letterSpacing = 1.sp)
                                 Text(formatMemberSince(summary.memberSince).uppercase(), color = RelaxWhite, fontSize = 13.sp, fontWeight = FontWeight.Bold)
                             }
                         }
@@ -283,7 +283,7 @@ fun LoyaltyCardScreen(
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
-                            stringResource(R.string.loyalty_qr_title),
+                            stringResource(Res.string.loyalty_qr_title),
                             style = MaterialTheme.typography.titleSmall,
                             color = RelaxTextSecondary,
                         )
@@ -293,7 +293,7 @@ fun LoyaltyCardScreen(
 
                         Spacer(Modifier.height(16.dp))
                         Text(
-                            stringResource(R.string.loyalty_barcode_title),
+                            stringResource(Res.string.loyalty_barcode_title),
                             style = MaterialTheme.typography.bodySmall,
                             color = RelaxTextHint,
                         )

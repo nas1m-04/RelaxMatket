@@ -39,7 +39,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import org.jetbrains.compose.resources.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -47,7 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import tj.relax.BuildConfig
-import tj.relax.R
+import tj.relax.generated.resources.*
 import tj.relax.core.api.ApiException
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.ui.theme.RelaxDark
@@ -74,11 +74,11 @@ fun ErrorAlertDialog(error: ApiException, onDismiss: () -> Unit) {
         DialogFrame(
             icon        = Icons.Rounded.CloudSync,
             iconTint    = RelaxDark,
-            title       = stringResource(R.string.error_server_updating_title),
+            title       = stringResource(Res.string.error_server_updating_title),
             onDismiss   = onDismiss,
         ) {
             Text(
-                stringResource(R.string.error_server_updating_message),
+                stringResource(Res.string.error_server_updating_message),
                 style      = MaterialTheme.typography.bodyMedium,
                 color      = RelaxTextSecondary,
                 textAlign  = TextAlign.Center,
@@ -91,11 +91,11 @@ fun ErrorAlertDialog(error: ApiException, onDismiss: () -> Unit) {
         DialogFrame(
             icon      = Icons.Rounded.ReportProblem,
             iconTint  = RelaxWarning,
-            title     = stringResource(R.string.error_validation_title),
+            title     = stringResource(Res.string.error_validation_title),
             onDismiss = onDismiss,
         ) {
             Text(
-                error.message ?: stringResource(R.string.error_generic_message),
+                error.message ?: stringResource(Res.string.error_generic_message),
                 style     = MaterialTheme.typography.bodyMedium,
                 color     = RelaxTextSecondary,
                 textAlign = TextAlign.Center,
@@ -105,9 +105,9 @@ fun ErrorAlertDialog(error: ApiException, onDismiss: () -> Unit) {
     }
 
     val mainMessage = if (error.isInternalError) {
-        stringResource(R.string.error_generic_message)
+        stringResource(Res.string.error_generic_message)
     } else {
-        error.message ?: stringResource(R.string.error_generic_message)
+        error.message ?: stringResource(Res.string.error_generic_message)
     }
 
     val showDetailsToggle = error.isInternalError &&
@@ -117,7 +117,7 @@ fun ErrorAlertDialog(error: ApiException, onDismiss: () -> Unit) {
     DialogFrame(
         icon      = Icons.Rounded.ErrorOutline,
         iconTint  = RelaxError,
-        title     = stringResource(R.string.error_dialog_title),
+        title     = stringResource(Res.string.error_dialog_title),
         onDismiss = onDismiss,
     ) {
         Text(mainMessage, style = MaterialTheme.typography.bodyMedium, color = RelaxTextSecondary, textAlign = TextAlign.Center)
@@ -125,7 +125,7 @@ fun ErrorAlertDialog(error: ApiException, onDismiss: () -> Unit) {
         if (showDetailsToggle) {
             Spacer(Modifier.height(8.dp))
             TextButton(onClick = { detailsExpanded = !detailsExpanded }) {
-                Text(stringResource(if (detailsExpanded) R.string.error_details_hide else R.string.error_details_show))
+                Text(stringResource(if (detailsExpanded) Res.string.error_details_hide else Res.string.error_details_show))
             }
             if (detailsExpanded) {
                 error.exceptionType?.let {
@@ -179,7 +179,7 @@ private fun DialogFrame(
                     shape    = RoundedCornerShape(14.dp),
                     colors   = ButtonDefaults.buttonColors(containerColor = RelaxDark),
                 ) {
-                    Text(stringResource(R.string.error_dialog_ok), color = RelaxWhite, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.error_dialog_ok), color = RelaxWhite, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -190,7 +190,7 @@ private fun DialogFrame(
 private fun TraceIdChip(traceId: String) {
     val clipboard = LocalClipboardManager.current
     val context = LocalContext.current
-    val copiedMessage = stringResource(R.string.error_trace_id_copied)
+    val copiedMessage = stringResource(Res.string.error_trace_id_copied)
 
     Row(
         modifier = Modifier
@@ -206,7 +206,7 @@ private fun TraceIdChip(traceId: String) {
     ) {
         Column(modifier = Modifier.weight(1f)) {
             Text(
-                stringResource(R.string.error_trace_id_label),
+                stringResource(Res.string.error_trace_id_label),
                 style = MaterialTheme.typography.labelSmall,
                 color = RelaxTextSecondary,
             )
@@ -219,7 +219,7 @@ private fun TraceIdChip(traceId: String) {
         Spacer(Modifier.width(8.dp))
         Icon(
             Icons.Rounded.ContentCopy,
-            contentDescription = stringResource(R.string.error_trace_id_copied),
+            contentDescription = stringResource(Res.string.error_trace_id_copied),
             tint = RelaxTextSecondary,
             modifier = Modifier.height(18.dp).width(18.dp),
         )
