@@ -21,6 +21,7 @@ import tj.relax.core.di.networkModule
 import tj.relax.core.di.platformModule
 import tj.relax.core.di.viewModelModule
 import tj.relax.core.firebase.NotificationChannels
+import tj.relax.core.util.AndroidPlatformContext
 import tj.relax.data.LocalUserStore
 
 class RelaxApp : Application(), ImageLoaderFactory {
@@ -32,6 +33,7 @@ class RelaxApp : Application(), ImageLoaderFactory {
 
     override fun onCreate() {
         super.onCreate()
+        AndroidPlatformContext.init(this)
         if (BuildConfig.DEBUG) {
             Napier.base(DebugAntilog())
         }
@@ -40,9 +42,9 @@ class RelaxApp : Application(), ImageLoaderFactory {
             modules(platformModule(), networkModule, appModule, viewModelModule)
         }
         NotificationChannels.ensureCreated(this)
-        CrashReporter.install(this)
+        CrashReporter.install()
         appScope.launch {
-            CrashReporter.sendPendingCrashIfAny(this@RelaxApp, apiService, localUserStore.get()?.uid)
+            CrashReporter.sendPendingCrashIfAny(apiService, localUserStore.get()?.uid)
         }
     }
 

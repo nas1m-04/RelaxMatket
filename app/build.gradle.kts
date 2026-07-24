@@ -48,6 +48,7 @@ kotlin {
             implementation(libs.kotlinx.datetime)
             implementation(libs.multiplatform.settings)
             implementation(libs.napier)
+            implementation(libs.okio)
         }
 
         androidMain.dependencies {

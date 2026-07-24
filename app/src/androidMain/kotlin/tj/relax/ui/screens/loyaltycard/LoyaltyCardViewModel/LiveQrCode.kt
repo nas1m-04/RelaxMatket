@@ -31,11 +31,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
-import tj.relax.core.util.generateQrBitmap
+import tj.relax.core.util.generateQrImageBitmap
 import tj.relax.ui.theme.RelaxDark
 import tj.relax.ui.theme.RelaxDivider
 import tj.relax.ui.theme.RelaxRed
@@ -75,7 +74,7 @@ fun LiveQrCode(viewModel: LoyaltyViewModel) {
 
             // Генерируем bitmap только когда токен меняется
             val bitmap = remember(state.token) {
-                generateQrBitmap(state.token).asImageBitmap()
+                generateQrImageBitmap(state.token)
             }
 
             Column (horizontalAlignment = Alignment.CenterHorizontally) {

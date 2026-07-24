@@ -28,6 +28,7 @@ kotlinxSerializationJson = "1.7.3"
 kotlinxDatetime = "0.6.1"
 multiplatformSettings = "1.2.0"
 napier = "2.7.1"
+okio = "3.9.1"
 
 [libraries]
 androidx-exifinterface = { group = "androidx.exifinterface", name = "exifinterface", version.ref = "exifinterface" }
@@ -59,6 +60,7 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinxDatetime" }
 multiplatform-settings = { group = "com.russhwolf", name = "multiplatform-settings", version.ref = "multiplatformSettings" }
 napier = { group = "io.github.aakira", name = "napier", version.ref = "napier" }
+okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
