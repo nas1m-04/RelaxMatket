@@ -16,7 +16,6 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.crash.CrashReporter
-import tj.relax.core.di.androidAppModule
 import tj.relax.core.di.appModule
 import tj.relax.core.di.networkModule
 import tj.relax.core.di.platformModule
@@ -40,7 +39,7 @@ class RelaxApp : Application() {
         }
         startKoin {
             androidContext(this@RelaxApp)
-            modules(platformModule(), networkModule, appModule, androidAppModule, viewModelModule)
+            modules(platformModule(), networkModule, appModule, viewModelModule)
         }
         NotificationChannels.ensureCreated(this)
         CrashReporter.install()

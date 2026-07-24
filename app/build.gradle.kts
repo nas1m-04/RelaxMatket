@@ -51,6 +51,8 @@ kotlin {
             implementation(libs.okio)
             implementation(libs.coil3.compose)
             implementation(libs.coil3.network.ktor3)
+            implementation(libs.room.runtime)
+            implementation(libs.androidx.sqlite.bundled)
         }
 
         androidMain.dependencies {
@@ -77,8 +79,6 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodel.compose)
             implementation(platform(libs.firebase.bom.get()))
             implementation(libs.firebase.messaging.ktx)
-            implementation(libs.room.runtime)
-            implementation(libs.room.ktx)
         }
 
         iosMain.dependencies {
@@ -140,6 +140,9 @@ android {
 
 dependencies {
     add("kspAndroid", libs.room.compiler)
+    add("kspIosX64", libs.room.compiler)
+    add("kspIosArm64", libs.room.compiler)
+    add("kspIosSimulatorArm64", libs.room.compiler)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 }

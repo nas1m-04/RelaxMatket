@@ -1,25 +1,24 @@
 package tj.relax.core.di
 
-import android.content.Context
-import com.russhwolf.settings.SharedPreferencesSettings
+import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.Settings
-import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.Module
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
+import platform.Foundation.NSUserDefaults
 import tj.relax.data.LocalUserStore
 import tj.relax.data.LoyaltyLocalStore
 import tj.relax.data.TokenManager
 
 actual fun platformModule(): Module = module {
     single<Settings>(named("auth")) {
-        SharedPreferencesSettings(androidContext().getSharedPreferences("auth_prefs", Context.MODE_PRIVATE))
+        NSUserDefaultsSettings(NSUserDefaults(suiteName = "auth_prefs"))
     }
     single<Settings>(named("user")) {
-        SharedPreferencesSettings(androidContext().getSharedPreferences("user_prefs", Context.MODE_PRIVATE))
+        NSUserDefaultsSettings(NSUserDefaults(suiteName = "user_prefs"))
     }
     single<Settings>(named("loyalty")) {
-        SharedPreferencesSettings(androidContext().getSharedPreferences("loyalty_prefs", Context.MODE_PRIVATE))
+        NSUserDefaultsSettings(NSUserDefaults(suiteName = "loyalty_prefs"))
     }
 
     single { TokenManager(get(named("auth"))) }

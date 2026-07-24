@@ -1,8 +1,9 @@
 package tj.relax.core.db.entity
 
 import androidx.room.Entity
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import tj.relax.data.Product
 
 @Entity(tableName = "cached_products", primaryKeys = ["id", "listType"])
@@ -27,15 +28,14 @@ data class CachedProductEntity(
     val inStock: Boolean,
 )
 
-private val gson = Gson()
-private val stringListType = object : TypeToken<List<String>>() {}.type
+private val json = Json { ignoreUnknownKeys = true }
 
 fun CachedProductEntity.toDomain() = Product(
     id           = id,
     name         = name,
     brand        = brand,
     imageUrl     = imageUrl,
-    images       = try { gson.fromJson(imagesJson, stringListType) } catch (_: Exception) { emptyList() },
+    images       = try { json.decodeFromString<List<String>>(imagesJson) } catch (_: Exception) { emptyList() },
     price        = price,
     oldPrice     = oldPrice,
     cardPrice    = cardPrice,
@@ -57,7 +57,7 @@ fun Product.toEntity(listType: String) = CachedProductEntity(
     name        = name,
     brand       = brand,
     imageUrl    = imageUrl,
-    imagesJson  = gson.toJson(images),
+    imagesJson  = json.encodeToString(images),
     price       = price,
     oldPrice    = oldPrice,
     cardPrice   = cardPrice,
