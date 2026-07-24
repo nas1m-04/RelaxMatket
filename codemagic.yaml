@@ -5,12 +5,20 @@ workflows:
     instance_type: mac_mini_m2
     environment:
       xcode: latest
-      groups:
-        - ios_signing
+      # Requires a Codemagic team integration named "relax-appstore" under
+      # Team settings -> Integrations -> Apple Developer Portal (App Store Connect API key),
+      # generated at https://appstoreconnect.apple.com/access/integrations/api. Codemagic uses
+      # it to auto-create a development signing certificate + provisioning profile for the
+      # devices registered on your Apple Developer account — no manual .p12/.mobileprovision
+      # export needed. Rename "relax-appstore" below to whatever name you give the integration.
+      integrations:
+        app_store_connect: relax-appstore
+      ios_signing:
+        distribution_type: development
+        bundle_identifier: tj.relax
       vars:
         XCODE_PROJECT: "iosApp/iosApp.xcodeproj"
         XCODE_SCHEME: "iosApp"
-        BUNDLE_ID: "tj.relax"
     triggering:
       events:
         - push
@@ -39,3 +47,17 @@ workflows:
         notify:
           success: true
           failure: true
+
+# Before this builds an installable IPA you need to, once, in the Apple Developer portal
+# (developer.apple.com/account/resources/devices) and Codemagic dashboard:
+#   1. Register your iPhone's UDID as a development device on your Apple Developer account.
+#      Easiest way to get the UDID: plug the iPhone into a Mac and check Finder, or use
+#      https://codemagic.io/apps -> your app -> "iOS device registration" (Codemagic can host
+#      a self-enrollment page that reads the UDID straight off the phone).
+#   2. Create an App Store Connect API key (App Store Connect -> Users and Access ->
+#      Integrations -> Keys) and add it in Codemagic under Team settings -> Integrations ->
+#      Apple Developer Portal, naming the integration to match "app_store_connect:" above.
+#   3. Re-run the workflow. `xcode-project use-profiles` will then fetch/generate a matching
+#      development certificate + provisioning profile automatically — no manual signing files.
+# Without step 1, the build will keep failing the same way even with signing configured,
+# because a development profile can't be issued for a device Apple doesn't know about yet.
