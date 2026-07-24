@@ -16,8 +16,10 @@ workflows:
         - pattern: CPM
           include: true
     scripts:
-      - name: Clean Xcode DerivedData (avoid a stale cached build plan/script)
-        script: rm -rf ~/Library/Developer/Xcode/DerivedData
+      - name: Clean Xcode DerivedData and Kotlin/Native toolchain cache
+        script: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf ~/.konan
       - name: Build for iOS Simulator
         script: |
           xcodebuild build \
@@ -76,8 +78,10 @@ workflows:
         - pattern: CPM
           include: true
     scripts:
-      - name: Clean Xcode DerivedData (avoid a stale cached build plan/script)
-        script: rm -rf ~/Library/Developer/Xcode/DerivedData
+      - name: Clean Xcode DerivedData and Kotlin/Native toolchain cache
+        script: |
+          rm -rf ~/Library/Developer/Xcode/DerivedData
+          rm -rf ~/.konan
       - name: Set up code signing
         script: |
           xcode-project use-profiles
