@@ -3,16 +3,16 @@ workflows:
     name: RelaxMarket iOS (device build)
     max_build_duration: 60
     instance_type: mac_mini_m2
+    # Requires a Codemagic team integration named "relax-appstore" under
+    # Team settings -> Integrations -> Apple Developer Portal (App Store Connect API key),
+    # generated at https://appstoreconnect.apple.com/access/integrations/api. Codemagic uses
+    # it to auto-create a development signing certificate + provisioning profile for the
+    # devices registered on your Apple Developer account — no manual .p12/.mobileprovision
+    # export needed. Rename "relax-appstore" below to whatever name you give the integration.
+    integrations:
+      app_store_connect: relax-appstore
     environment:
       xcode: latest
-      # Requires a Codemagic team integration named "relax-appstore" under
-      # Team settings -> Integrations -> Apple Developer Portal (App Store Connect API key),
-      # generated at https://appstoreconnect.apple.com/access/integrations/api. Codemagic uses
-      # it to auto-create a development signing certificate + provisioning profile for the
-      # devices registered on your Apple Developer account — no manual .p12/.mobileprovision
-      # export needed. Rename "relax-appstore" below to whatever name you give the integration.
-      integrations:
-        app_store_connect: relax-appstore
       ios_signing:
         distribution_type: development
         bundle_identifier: tj.relax
