@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlinx.datetime.Clock
 import tj.relax.core.util.generateQrImageBitmap
+import tj.relax.core.util.twoDigits
 import tj.relax.ui.theme.RelaxDark
 import tj.relax.ui.theme.RelaxDivider
 import tj.relax.ui.theme.RelaxRed
@@ -108,7 +109,7 @@ fun LiveQrCode(viewModel: LoyaltyViewModel) {
                     )
                     Spacer(Modifier.width(4.dp))
                     Text(
-                        text  = "Обновится через %d:%02d".format(minutes, seconds),
+                        text  = "Обновится через $minutes:${seconds.twoDigits()}",
                         style = MaterialTheme.typography.bodySmall,
                         color = if (isExpiring) RelaxRed else RelaxTextHint,
                     )

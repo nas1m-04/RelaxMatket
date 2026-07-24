@@ -23,8 +23,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.*
 import androidx.compose.ui.window.Dialog
-import java.util.Calendar
 import kotlin.math.abs
+import kotlinx.datetime.Clock
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
+import tj.relax.core.util.toFixed
+import tj.relax.core.util.twoDigits
 import tj.relax.generated.resources.*
 import tj.relax.data.Branch
 import tj.relax.data.OrderItemRequest
@@ -54,11 +58,10 @@ fun CheckoutScreen(
 
     val timeSlots = remember {
         val slots = mutableListOf<String>()
-        val now = Calendar.getInstance()
-        val currentHour = now.get(Calendar.HOUR_OF_DAY)
+        val currentHour = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).hour
         val startHour = maxOf(9, currentHour + 1)
-        for (h in startHour..21) slots.add("Сегодня, %02d:00".format(h))
-        for (h in 9..21) slots.add("Завтра, %02d:00".format(h))
+        for (h in startHour..21) slots.add("Сегодня, ${h.twoDigits()}:00")
+        for (h in 9..21) slots.add("Завтра, ${h.twoDigits()}:00")
         slots
     }
     val payments = listOf(
@@ -306,7 +309,7 @@ fun CheckoutScreen(
                             )
                         }
                         Text(
-                            stringResource(Res.string.checkout_bonus_preview_value, "%.2f".format(estimatedBonus)),
+                            stringResource(Res.string.checkout_bonus_preview_value, estimatedBonus.toFixed(2)),
                             style      = MaterialTheme.typography.bodySmall,
                             color      = Color(0xFFD4AF37),
                             fontWeight = FontWeight.Bold,
@@ -525,7 +528,7 @@ private fun OrderSuccessScreen(bonusEarned: Double, onDone: () -> Unit) {
             )
             Spacer(Modifier.height(32.dp))
             if (bonusEarned > 0.0) {
-                val bonusDisplay = "%.2f".format(bonusEarned)
+                val bonusDisplay = bonusEarned.toFixed(2)
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(12.dp))

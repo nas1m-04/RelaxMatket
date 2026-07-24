@@ -48,8 +48,13 @@ import tj.relax.ui.screens.home.ViewModel.HomeViewModel
 private fun parseHexColor(hex: String?, default: Color = Color(0xFFF3F4F6)): Color {
     if (hex.isNullOrBlank()) return default
     return try {
-        val normalized = if (hex.startsWith("#")) hex else "#$hex"
-        Color(android.graphics.Color.parseColor(normalized))
+        val digits = hex.removePrefix("#")
+        val argb = when (digits.length) {
+            6 -> "FF$digits"
+            8 -> digits
+            else -> return default
+        }
+        Color(argb.toLong(16).toInt())
     } catch (e: Exception) {
         default
     }

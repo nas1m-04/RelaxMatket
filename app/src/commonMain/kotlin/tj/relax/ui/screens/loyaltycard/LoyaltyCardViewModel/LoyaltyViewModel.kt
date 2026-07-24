@@ -93,7 +93,7 @@ class LoyaltyViewModel(
                 txTotalPages = txPage.totalPages,
                 isLoading    = false,
                 isRefreshing = false,
-                lastUpdated  = System.currentTimeMillis(),
+                lastUpdated  = Clock.System.now().toEpochMilliseconds(),
             )
         }
     }

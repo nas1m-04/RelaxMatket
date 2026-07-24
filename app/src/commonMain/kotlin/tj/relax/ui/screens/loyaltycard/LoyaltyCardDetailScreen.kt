@@ -22,6 +22,7 @@ import kotlinx.coroutines.launch
 import tj.relax.generated.resources.*
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.ui.components.RelaxDivider
+import tj.relax.core.util.toFixed
 import tj.relax.ui.components.RelaxTopBar
 import tj.relax.ui.components.sharedViewModel
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.LoyaltyViewModel
@@ -333,7 +334,7 @@ private fun BonusTransactionItem(tx: tj.relax.core.api.BonusTransactionApiRespon
     }
 }
 
-private fun formatBonus(amount: Double): String = "%.2f".format(amount).trimEnd('0').trimEnd('.')
+private fun formatBonus(amount: Double): String = amount.toFixed(2).trimEnd('0').trimEnd('.')
 
 private val RelaxErrorBg = Color(0xFFFEE2E2)
 

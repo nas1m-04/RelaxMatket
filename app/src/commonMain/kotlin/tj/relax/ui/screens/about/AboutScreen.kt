@@ -14,7 +14,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import tj.relax.BuildConfig
+import tj.relax.core.util.appVersionName
 import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.RelaxTopBar
@@ -40,7 +40,7 @@ fun AboutScreen(onBack: () -> Unit) {
             Text("RELAX", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Black, color = RelaxTextPrimary)
             Spacer(Modifier.height(4.dp))
             Text(
-                stringResource(Res.string.about_version, BuildConfig.VERSION_NAME),
+                stringResource(Res.string.about_version, appVersionName),
                 style = MaterialTheme.typography.bodyMedium,
                 color = RelaxTextSecondary,
             )

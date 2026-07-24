@@ -1,12 +1,16 @@
 package tj.relax.ui.screens.notifications.data
 
+import kotlinx.datetime.Clock
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.minus
+import kotlinx.datetime.toLocalDateTime
+import tj.relax.core.util.parseToLocalDateTime
+import tj.relax.core.util.russianMonthGenitive
+import tj.relax.core.util.twoDigits
 import tj.relax.data.Notification
 import tj.relax.data.NotificationType
 import tj.relax.ui.screens.notifications.data.dto.response.NotificationResponse
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Locale
-import java.util.TimeZone
 
 fun NotificationResponse.toDomain() = Notification(
     id          = id,
@@ -19,27 +23,20 @@ fun NotificationResponse.toDomain() = Notification(
     displayMode = displayMode,
 )
 
+// The backend sends a naive "yyyy-MM-dd'T'HH:mm:ss" timestamp with no zone marker, which is
+// always UTC — appending "Z" makes it a valid ISO instant, then parseToLocalDateTime converts
+// it to the device's local time for display, matching what the old SimpleDateFormat-based
+// version did (parse as UTC, format in the device's default zone).
 private fun formatNotificationTime(isoString: String): String {
     if (isoString.isBlank()) return ""
     return try {
-        val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault()).apply {
-            timeZone = TimeZone.getTimeZone("UTC")
-        }
-        val date = sdf.parse(isoString.take(19)) ?: return isoString
-        val now = Calendar.getInstance()
-        val cal = Calendar.getInstance().apply { time = date }
-        val isToday = now.get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
-                now.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
-        val isYesterday = run {
-            val yesterday = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -1) }
-            yesterday.get(Calendar.YEAR) == cal.get(Calendar.YEAR) &&
-                    yesterday.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
-        }
-        val timePart = SimpleDateFormat("HH:mm", Locale.getDefault()).format(date)
-        when {
-            isToday -> "Сегодня, $timePart"
-            isYesterday -> "Вчера, $timePart"
-            else -> SimpleDateFormat("d MMMM", Locale("ru")).format(date)
+        val dateTime = parseToLocalDateTime("${isoString.take(19)}Z")
+        val nowDateTime = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+        val timePart = "${dateTime.hour.twoDigits()}:${dateTime.minute.twoDigits()}"
+        when (dateTime.date) {
+            nowDateTime.date -> "Сегодня, $timePart"
+            nowDateTime.date.minus(1, DateTimeUnit.DAY) -> "Вчера, $timePart"
+            else -> "${dateTime.dayOfMonth} ${russianMonthGenitive(dateTime.monthNumber)}"
         }
     } catch (e: Exception) {
         isoString

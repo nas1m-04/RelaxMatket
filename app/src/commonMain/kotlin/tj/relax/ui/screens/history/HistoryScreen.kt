@@ -30,6 +30,7 @@ import tj.relax.generated.resources.*
 import tj.relax.data.CartItem
 import tj.relax.data.Order
 import tj.relax.data.OrderStatus
+import tj.relax.core.util.toFixed
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatFullDate
 import tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel.formatTimeOnly
@@ -325,4 +326,4 @@ private fun dayLabel(rawDate: String): String = formatFullDate(rawDate)
 
 // Bonus amounts (cashback % of a purchase) are often fractional — .toInt() would silently
 // truncate e.g. 0.15 down to "0". Show up to 2 decimals, trimmed of trailing zeros.
-private fun formatAmount(value: Double): String = "%.2f".format(value).trimEnd('0').trimEnd('.')
+private fun formatAmount(value: Double): String = value.toFixed(2).trimEnd('0').trimEnd('.')

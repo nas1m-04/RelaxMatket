@@ -21,12 +21,12 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.*
 import org.koin.compose.viewmodel.koinViewModel
 import coil3.compose.SubcomposeAsyncImage
-import tj.relax.BuildConfig
 import tj.relax.generated.resources.*
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.ShimmerBox
 import tj.relax.ui.theme.*
 import tj.relax.core.util.LocaleManager
+import tj.relax.core.util.appVersionName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -276,7 +276,7 @@ fun ProfileScreen(
         Spacer(Modifier.height(20.dp))
 
         Text(
-            "RELAX · v${BuildConfig.VERSION_NAME}",
+            "RELAX · v$appVersionName",
             style     = MaterialTheme.typography.bodySmall,
             color     = RelaxTextHint,
             modifier  = Modifier.fillMaxWidth(),

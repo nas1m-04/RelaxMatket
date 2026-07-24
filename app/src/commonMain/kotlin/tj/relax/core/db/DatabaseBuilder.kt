@@ -9,5 +9,5 @@ expect fun getDatabaseBuilder(): RoomDatabase.Builder<AppDatabase>
 fun buildAppDatabase(): AppDatabase =
     getDatabaseBuilder()
         .setDriver(BundledSQLiteDriver())
-        .setQueryCoroutineContext(Dispatchers.IO)
+        .setQueryCoroutineContext(Dispatchers.Default)
         .build()

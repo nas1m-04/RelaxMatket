@@ -18,6 +18,7 @@ import coil3.compose.AsyncImage
 import tj.relax.generated.resources.*
 import tj.relax.data.CartItem
 import tj.relax.data.Order
+import tj.relax.core.util.toFixed
 import tj.relax.ui.components.RelaxDivider
 import tj.relax.ui.components.RelaxTopBar
 import tj.relax.ui.screens.history.OrderStatusBadge
@@ -209,4 +210,4 @@ private fun SummaryRow(label: String, value: String, bold: Boolean = false, valu
 
 // Bonus amounts (cashback % of a purchase) are often fractional — .toInt() would silently
 // truncate e.g. 0.15 down to "0". Show up to 2 decimals, trimmed of trailing zeros.
-private fun formatBonusAmount(value: Double): String = "%.2f".format(value).trimEnd('0').trimEnd('.')
+private fun formatBonusAmount(value: Double): String = value.toFixed(2).trimEnd('0').trimEnd('.')
