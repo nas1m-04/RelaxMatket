@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.checkout
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -54,7 +54,7 @@ class CheckoutViewModel(
                     address          = if (uiState.address.isBlank()) savedAddress else uiState.address,
                 )
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
             }
         }
     }
@@ -96,7 +96,7 @@ class CheckoutViewModel(
                 loyaltyRepository.invalidateCache() // balance changed after purchase
                 uiState = uiState.copy(isSubmitting = false, order = order)
             } catch (e: Exception) {
-                Log.e(TAG, "submitOrder: error", e)
+                Napier.e("submitOrder: error", e, tag = TAG)
                 uiState = uiState.copy(isSubmitting = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }

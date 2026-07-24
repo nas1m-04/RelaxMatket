@@ -1,6 +1,6 @@
 package tj.relax.core.Token
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.auth.providers.BearerTokens
@@ -37,7 +37,7 @@ class TokenAuthenticator(
     suspend fun refreshTokens(refreshClient: HttpClient): BearerTokens? {
         val refreshToken = tokenManager.getRefreshToken()
         if (refreshToken.isNullOrEmpty()) {
-            Log.d(TAG, "No refresh token — treating as guest request")
+            Napier.d("No refresh token — treating as guest request", tag = TAG)
             return null
         }
         return try {
@@ -46,7 +46,7 @@ class TokenAuthenticator(
                 setBody(RefreshRequest(refreshToken))
             }
             if (!response.status.isSuccess()) {
-                Log.w(TAG, "auth/refresh returned ${response.status}")
+                Napier.w("auth/refresh returned ${response.status}", tag = TAG)
                 tokenManager.clearTokens()
                 sessionManager.notifySessionExpired()
                 return null
@@ -55,16 +55,16 @@ class TokenAuthenticator(
             val auth = body.data
             if (body.success && auth != null) {
                 tokenManager.saveTokens(auth.accessToken, auth.refreshToken)
-                Log.i(TAG, "Token refreshed successfully")
+                Napier.i("Token refreshed successfully", tag = TAG)
                 BearerTokens(auth.accessToken, auth.refreshToken)
             } else {
-                Log.w(TAG, "auth/refresh responded with success=false: ${body.error}")
+                Napier.w("auth/refresh responded with success=false: ${body.error}", tag = TAG)
                 tokenManager.clearTokens()
                 sessionManager.notifySessionExpired()
                 null
             }
         } catch (e: Exception) {
-            Log.e(TAG, "auth/refresh request failed", e)
+            Napier.e("auth/refresh request failed", e, tag = TAG)
             null
         }
     }

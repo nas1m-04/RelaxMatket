@@ -1,6 +1,6 @@
 ﻿package tj.relax.data
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.dataOrThrow
 
@@ -14,7 +14,7 @@ class UserRepository(
         val response = api.getProfile()
         if (!response.isSuccessful) {
             localUserStore.get()?.let {
-                Log.w(TAG, "getOrCreate: failed code=${response.code}, using local profile")
+                Napier.w("getOrCreate: failed code=${response.code}, using local profile", tag = TAG)
                 return it
             }
         }

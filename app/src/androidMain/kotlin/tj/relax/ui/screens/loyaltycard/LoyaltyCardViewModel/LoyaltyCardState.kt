@@ -1,5 +1,6 @@
 package tj.relax.ui.screens.loyaltycard.LoyaltyCardViewModel
 
+import kotlinx.datetime.Instant
 import tj.relax.core.api.AchievementApiResponse
 import tj.relax.core.api.BonusTransactionApiResponse
 import tj.relax.core.api.LoyaltyLevelResponse
@@ -26,7 +27,7 @@ sealed class QrState {
     object Loading : QrState()
     data class Ready(
         val token: String,
-        val expiresAt: java.time.Instant,
+        val expiresAt: Instant,
     ) : QrState()
     object Error : QrState()
 }

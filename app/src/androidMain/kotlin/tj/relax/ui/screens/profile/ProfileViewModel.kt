@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.profile
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -41,7 +41,7 @@ class ProfileViewModel(
                 val branch = branchRepository.getAll().firstOrNull { it.id == branchId }
                 uiState = uiState.copy(branchName = branch?.name)
             } catch (e: Exception) {
-                Log.e(TAG, "loadBranchName: error", e)
+                Napier.e("loadBranchName: error", e, tag = TAG)
             }
         }
     }
@@ -55,7 +55,7 @@ class ProfileViewModel(
                 uiState = uiState.copy(profile = profile, isLoading = false)
                 loadBranchName()
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -75,7 +75,7 @@ class ProfileViewModel(
                 val profile = userRepository.uploadAvatar(bytes, mimeType)
                 uiState = uiState.copy(profile = profile, isUploadingAvatar = false)
             } catch (e: Exception) {
-                Log.e(TAG, "uploadAvatar: error", e)
+                Napier.e("uploadAvatar: error", e, tag = TAG)
                 uiState = uiState.copy(isUploadingAvatar = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -102,7 +102,7 @@ class ProfileViewModel(
                 val profile = userRepository.removeAvatar()
                 uiState = uiState.copy(profile = profile, isUploadingAvatar = false)
             } catch (e: Exception) {
-                Log.e(TAG, "removeAvatar: error", e)
+                Napier.e("removeAvatar: error", e, tag = TAG)
                 uiState = uiState.copy(isUploadingAvatar = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -117,7 +117,7 @@ class ProfileViewModel(
             try {
                 userRepository.updateProfile(UpdateProfileRequest(pushEnabled = enabled))
             } catch (e: Exception) {
-                Log.e(TAG, "setPushEnabled: error", e)
+                Napier.e("setPushEnabled: error", e, tag = TAG)
                 uiState = uiState.copy(profile = current, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }

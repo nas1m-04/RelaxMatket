@@ -1,7 +1,7 @@
 ﻿package tj.relax.core.firebase
 
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import com.google.firebase.messaging.FirebaseMessaging
 
 object RelaxFcmTokenManager {
@@ -10,7 +10,7 @@ object RelaxFcmTokenManager {
     private var uploadCallback: ((String) -> Unit)? = null
 
     fun onTokenRefresh(token: String) {
-        Log.d("FCM", "New token: $token")
+        Napier.d("New token: $token", tag = "FCM")
         val cb = uploadCallback
         if (cb != null) {
             cb(token)

@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.orders
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -37,7 +37,7 @@ class OrderDetailViewModel(
                             else MockData.orders.firstOrNull { it.id == orderId }
                 uiState = uiState.copy(order = order, isLoading = false)
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }

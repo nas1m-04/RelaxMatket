@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.product
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -39,7 +39,7 @@ class ProductDetailViewModel(
                 val category   = categories.find { it.id == product.categoryId }
                 uiState = uiState.copy(product = product, category = category, isLoading = false)
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }

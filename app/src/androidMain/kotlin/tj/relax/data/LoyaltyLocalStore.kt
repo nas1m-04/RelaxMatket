@@ -1,51 +1,48 @@
 package tj.relax.data
 
-import android.content.Context
-import androidx.core.content.edit
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import com.russhwolf.settings.Settings
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import tj.relax.core.api.AchievementApiResponse
 import tj.relax.core.api.LoyaltyLevelResponse
 import tj.relax.core.api.LoyaltySummaryResponse
 
 /** Persists loyalty data locally so it's available instantly on next app open, without a network call. */
 class LoyaltyLocalStore(
-    context: Context,
+    private val settings: Settings,
 ) {
-    private val prefs = context.getSharedPreferences("loyalty_prefs", Context.MODE_PRIVATE)
-    private val gson  = Gson()
+    private val json = Json { ignoreUnknownKeys = true }
 
     fun saveSummary(summary: LoyaltySummaryResponse) =
-        prefs.edit { putString(KEY_SUMMARY, gson.toJson(summary)) }
+        settings.putString(KEY_SUMMARY, json.encodeToString<LoyaltySummaryResponse>(summary))
 
     fun getSummary(): LoyaltySummaryResponse? =
-        prefs.getString(KEY_SUMMARY, null)?.let {
-            try { gson.fromJson(it, LoyaltySummaryResponse::class.java) } catch (_: Exception) { null }
+        settings.getStringOrNull(KEY_SUMMARY)?.let {
+            try { json.decodeFromString<LoyaltySummaryResponse>(it) } catch (e: Exception) { null }
         }
 
     fun saveLevels(levels: List<LoyaltyLevelResponse>) =
-        prefs.edit { putString(KEY_LEVELS, gson.toJson(levels)) }
+        settings.putString(KEY_LEVELS, json.encodeToString<List<LoyaltyLevelResponse>>(levels))
 
     fun getLevels(): List<LoyaltyLevelResponse>? =
-        prefs.getString(KEY_LEVELS, null)?.let {
-            try {
-                val type = object : TypeToken<List<LoyaltyLevelResponse>>() {}.type
-                gson.fromJson(it, type)
-            } catch (_: Exception) { null }
+        settings.getStringOrNull(KEY_LEVELS)?.let {
+            try { json.decodeFromString<List<LoyaltyLevelResponse>>(it) } catch (e: Exception) { null }
         }
 
     fun saveAchievements(achievements: List<AchievementApiResponse>) =
-        prefs.edit { putString(KEY_ACHIEVEMENTS, gson.toJson(achievements)) }
+        settings.putString(KEY_ACHIEVEMENTS, json.encodeToString<List<AchievementApiResponse>>(achievements))
 
     fun getAchievements(): List<AchievementApiResponse>? =
-        prefs.getString(KEY_ACHIEVEMENTS, null)?.let {
-            try {
-                val type = object : TypeToken<List<AchievementApiResponse>>() {}.type
-                gson.fromJson(it, type)
-            } catch (_: Exception) { null }
+        settings.getStringOrNull(KEY_ACHIEVEMENTS)?.let {
+            try { json.decodeFromString<List<AchievementApiResponse>>(it) } catch (e: Exception) { null }
         }
 
-    fun clear() = prefs.edit { clear() }
+    fun clear() {
+        settings.remove(KEY_SUMMARY)
+        settings.remove(KEY_LEVELS)
+        settings.remove(KEY_ACHIEVEMENTS)
+    }
 
     companion object {
         private const val KEY_SUMMARY      = "summary"

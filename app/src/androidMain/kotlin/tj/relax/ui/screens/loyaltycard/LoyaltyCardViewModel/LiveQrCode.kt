@@ -34,6 +34,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import kotlinx.datetime.Clock
 import tj.relax.core.util.generateQrBitmap
 import tj.relax.ui.theme.RelaxDark
 import tj.relax.ui.theme.RelaxDivider
@@ -65,8 +66,7 @@ fun LiveQrCode(viewModel: LoyaltyViewModel) {
             var secondsLeft by remember { mutableIntStateOf(0) }
             LaunchedEffect (state.expiresAt) {
                 while (true) {
-                    secondsLeft = java.time.Instant.now()
-                        .until(state.expiresAt, java.time.temporal.ChronoUnit.SECONDS)
+                    secondsLeft = (state.expiresAt - Clock.System.now()).inWholeSeconds
                         .toInt()
                         .coerceAtLeast(0)
                     delay(1_000L)

@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.support
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,7 +34,7 @@ class SupportViewModel(
                 val result = supportRepository.getTickets(page = 1, pageSize = PAGE_SIZE)
                 uiState = uiState.copy(tickets = result.items, page = 1, totalPages = result.totalPages, isLoading = false)
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -48,7 +48,7 @@ class SupportViewModel(
             val result = supportRepository.getTickets(page = 1, pageSize = PAGE_SIZE)
             uiState = uiState.copy(tickets = result.items, page = 1, totalPages = result.totalPages, isRefreshing = false)
         } catch (e: Exception) {
-            Log.e(TAG, "refresh: error", e)
+            Napier.e("refresh: error", e, tag = TAG)
             uiState = uiState.copy(isRefreshing = false)
             ErrorPresenter.report(e)
         }
@@ -70,7 +70,7 @@ class SupportViewModel(
                     isLoadingMore = false,
                 )
             } catch (e: Exception) {
-                Log.e(TAG, "loadMore: error", e)
+                Napier.e("loadMore: error", e, tag = TAG)
                 uiState = uiState.copy(isLoadingMore = false)
                 ErrorPresenter.report(e)
             }
@@ -87,7 +87,7 @@ class SupportViewModel(
                 onSuccess()
                 load()
             } catch (e: Exception) {
-                Log.e(TAG, "submitTicket: error", e)
+                Napier.e("submitTicket: error", e, tag = TAG)
                 uiState = uiState.copy(isSubmitting = false)
                 ErrorPresenter.report(e)
             }

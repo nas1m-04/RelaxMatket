@@ -1,30 +1,23 @@
 package tj.relax.data
 
-import android.content.Context
-import androidx.core.content.edit
+import com.russhwolf.settings.Settings
 
 /** Stores the JWT access/refresh tokens issued by the backend on login/registration. */
 class TokenManager(
-    context: Context,
+    private val settings: Settings,
 ) {
-    private val prefs = context.getSharedPreferences("auth_prefs", Context.MODE_PRIVATE)
-
     fun saveTokens(accessToken: String, refreshToken: String) {
-        prefs.edit {
-            putString(KEY_ACCESS_TOKEN, accessToken)
-            putString(KEY_REFRESH_TOKEN, refreshToken)
-        }
+        settings.putString(KEY_ACCESS_TOKEN, accessToken)
+        settings.putString(KEY_REFRESH_TOKEN, refreshToken)
     }
 
-    fun getAccessToken(): String? = prefs.getString(KEY_ACCESS_TOKEN, null)
+    fun getAccessToken(): String? = settings.getStringOrNull(KEY_ACCESS_TOKEN)
 
-    fun getRefreshToken(): String? = prefs.getString(KEY_REFRESH_TOKEN, null)
+    fun getRefreshToken(): String? = settings.getStringOrNull(KEY_REFRESH_TOKEN)
 
     fun clearTokens() {
-        prefs.edit {
-            remove(KEY_ACCESS_TOKEN)
-            remove(KEY_REFRESH_TOKEN)
-        }
+        settings.remove(KEY_ACCESS_TOKEN)
+        settings.remove(KEY_REFRESH_TOKEN)
     }
 
     fun isLoggedIn(): Boolean = !getAccessToken().isNullOrEmpty()

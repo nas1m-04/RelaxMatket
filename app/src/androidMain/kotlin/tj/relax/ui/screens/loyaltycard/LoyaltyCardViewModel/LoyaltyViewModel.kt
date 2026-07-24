@@ -10,14 +10,16 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
+import kotlinx.datetime.Instant
 import tj.relax.core.api.ErrorPresenter
 import tj.relax.core.events.LoyaltyPushEvents
+import tj.relax.core.util.parseToLocalDateTime
+import tj.relax.core.util.russianMonthGenitive
+import tj.relax.core.util.russianMonthNominative
+import tj.relax.core.util.twoDigits
 import tj.relax.data.LocalUserStore
 import tj.relax.data.LoyaltyRepository
-import java.time.OffsetDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 // Credits and debits share one paginated feed and are split into tabs client-side, so a small
 // page size can make one tab look empty while the other hogs the whole page — keep this generous.
@@ -140,11 +142,10 @@ class LoyaltyViewModel(
                 try {
                     qrState = QrState.Loading
                     val response  = loyaltyRepository.getQrToken()
-                    val expiresAt = java.time.Instant.parse(response.expiresAt)
+                    val expiresAt = Instant.parse(response.expiresAt)
                     qrState       = QrState.Ready(response.qrToken, expiresAt)
 
-                    val refreshIn = java.time.Instant.now()
-                        .until(expiresAt, java.time.temporal.ChronoUnit.MILLIS) - 5_000L
+                    val refreshIn = (expiresAt - Clock.System.now()).inWholeMilliseconds - 5_000L
                     if (refreshIn > 0) delay(refreshIn)
 
                 } catch (e: Exception) {
@@ -161,12 +162,9 @@ class LoyaltyViewModel(
     }
 }
 
-private val localZone: ZoneId = ZoneId.systemDefault()
-
 fun formatTransactionDate(raw: String): String = try {
-    OffsetDateTime.parse(raw)
-        .atZoneSameInstant(localZone)
-        .format(DateTimeFormatter.ofPattern("d MMMM, HH:mm", Locale("ru")))
+    val dt = parseToLocalDateTime(raw)
+    "${dt.dayOfMonth} ${russianMonthGenitive(dt.monthNumber)}, ${dt.hour.twoDigits()}:${dt.minute.twoDigits()}"
 } catch (e: Exception) {
     raw
 }
@@ -174,9 +172,8 @@ fun formatTransactionDate(raw: String): String = try {
 // Day + time only, no month name — for lists already grouped under a month header, where
 // repeating the month on every row reads as the same date shown twice.
 fun formatDayTime(raw: String): String = try {
-    OffsetDateTime.parse(raw)
-        .atZoneSameInstant(localZone)
-        .format(DateTimeFormatter.ofPattern("d, HH:mm", Locale("ru")))
+    val dt = parseToLocalDateTime(raw)
+    "${dt.dayOfMonth}, ${dt.hour.twoDigits()}:${dt.minute.twoDigits()}"
 } catch (e: Exception) {
     raw
 }
@@ -184,27 +181,23 @@ fun formatDayTime(raw: String): String = try {
 // Time only — for rows already grouped under a full-date header, where the date itself
 // would just repeat what the header already says.
 fun formatTimeOnly(raw: String): String = try {
-    OffsetDateTime.parse(raw)
-        .atZoneSameInstant(localZone)
-        .format(DateTimeFormatter.ofPattern("HH:mm", Locale("ru")))
+    val dt = parseToLocalDateTime(raw)
+    "${dt.hour.twoDigits()}:${dt.minute.twoDigits()}"
 } catch (e: Exception) {
     raw
 }
 
 // Full date — "14 февраля 2026" — used as a group-section header.
 fun formatFullDate(raw: String): String = try {
-    OffsetDateTime.parse(raw)
-        .atZoneSameInstant(localZone)
-        .format(DateTimeFormatter.ofPattern("d MMMM yyyy", Locale("ru")))
+    val dt = parseToLocalDateTime(raw)
+    "${dt.dayOfMonth} ${russianMonthGenitive(dt.monthNumber)} ${dt.year}"
 } catch (e: Exception) {
     raw
 }
 
 fun formatMemberSince(raw: String): String = try {
-    OffsetDateTime.parse(raw)
-        .atZoneSameInstant(localZone)
-        .format(DateTimeFormatter.ofPattern("LLLL yyyy", Locale("ru")))
-        .replaceFirstChar { it.uppercase() }
+    val dt = parseToLocalDateTime(raw)
+    "${russianMonthNominative(dt.monthNumber).replaceFirstChar { it.uppercase() }} ${dt.year}"
 } catch (e: Exception) {
     raw
 }

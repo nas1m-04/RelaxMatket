@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.orders
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -51,7 +51,7 @@ class OrdersViewModel(
                     uiState = uiState.copy(orders = MockData.orders, page = 1, totalPages = 1, totalCount = MockData.orders.size, isLoading = false)
                 }
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -69,7 +69,7 @@ class OrdersViewModel(
                 uiState = uiState.copy(orders = MockData.orders, page = 1, totalPages = 1, totalCount = MockData.orders.size, isRefreshing = false)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "refresh: error", e)
+            Napier.e("refresh: error", e, tag = TAG)
             uiState = uiState.copy(isRefreshing = false)
             ErrorPresenter.report(e)
         }
@@ -93,7 +93,7 @@ class OrdersViewModel(
                     isLoadingMore = false,
                 )
             } catch (e: Exception) {
-                Log.e(TAG, "loadMore: error", e)
+                Napier.e("loadMore: error", e, tag = TAG)
                 uiState = uiState.copy(isLoadingMore = false)
                 ErrorPresenter.report(e)
             }

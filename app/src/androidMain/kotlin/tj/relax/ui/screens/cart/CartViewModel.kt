@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.cart
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -46,7 +46,7 @@ class CartViewModel(
                     isLoading              = false,
                 )
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -58,7 +58,7 @@ class CartViewModel(
 
     fun add(product: Product) {
         if (!authRepository.isLoggedIn) {
-            Log.d(TAG, "add: skipped, user is not logged in")
+            Napier.d("add: skipped, user is not logged in", tag = TAG)
             return
         }
         val existing = uiState.items.find { it.product.id == product.id }
@@ -71,7 +71,7 @@ class CartViewModel(
             try {
                 cartRepository.upsert(product.id, 1)
             } catch (e: Exception) {
-                Log.e(TAG, "add: error productId=${product.id}", e)
+                Napier.e("add: error productId=${product.id}", e, tag = TAG)
                 ErrorPresenter.report(e)
             }
         }
@@ -85,7 +85,7 @@ class CartViewModel(
             try {
                 cartRepository.upsert(productId, newQty)
             } catch (e: Exception) {
-                Log.e(TAG, "increase: error productId=$productId", e)
+                Napier.e("increase: error productId=$productId", e, tag = TAG)
                 ErrorPresenter.report(e)
             }
         }
@@ -100,7 +100,7 @@ class CartViewModel(
             try {
                 cartRepository.upsert(productId, newQty)
             } catch (e: Exception) {
-                Log.e(TAG, "decrease: error productId=$productId", e)
+                Napier.e("decrease: error productId=$productId", e, tag = TAG)
                 ErrorPresenter.report(e)
             }
         }
@@ -112,7 +112,7 @@ class CartViewModel(
             try {
                 cartRepository.remove(productId)
             } catch (e: Exception) {
-                Log.e(TAG, "remove: error productId=$productId", e)
+                Napier.e("remove: error productId=$productId", e, tag = TAG)
                 ErrorPresenter.report(e)
             }
         }
@@ -124,7 +124,7 @@ class CartViewModel(
             try {
                 cartRepository.clear()
             } catch (e: Exception) {
-                Log.e(TAG, "clear: error", e)
+                Napier.e("clear: error", e, tag = TAG)
                 ErrorPresenter.report(e)
             }
         }

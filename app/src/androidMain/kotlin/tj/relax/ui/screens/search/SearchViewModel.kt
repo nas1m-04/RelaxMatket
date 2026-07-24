@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.search
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -43,7 +43,7 @@ class SearchViewModel(
                 val results = productRepository.search(trimmed)
                 uiState = uiState.copy(results = results, isLoading = false, hasSearched = true)
             } catch (e: Exception) {
-                Log.e(TAG, "setQuery: search error", e)
+                Napier.e("setQuery: search error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, hasSearched = true, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }

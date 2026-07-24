@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.branch
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -34,7 +34,7 @@ class SelectBranchViewModel(
                     ?: branches.firstOrNull()?.id
                 uiState = uiState.copy(isLoading = false, branches = branches, selectedBranchId = selected)
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -54,7 +54,7 @@ class SelectBranchViewModel(
                 userRepository.updateProfile(UpdateProfileRequest(preferredBranchId = branchId))
                 uiState = uiState.copy(isSaving = false, saved = true)
             } catch (e: Exception) {
-                Log.e(TAG, "confirm: error", e)
+                Napier.e("confirm: error", e, tag = TAG)
                 uiState = uiState.copy(isSaving = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }

@@ -1,34 +1,34 @@
 package tj.relax.data
 
-import android.content.Context
-import androidx.core.content.edit
-import com.google.gson.Gson
+import com.russhwolf.settings.Settings
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 /** Caches the user's profile locally so it's available instantly on app start, until logout. */
 class LocalUserStore(
-    context: Context,
+    private val settings: Settings,
 ) {
-    private val prefs = context.getSharedPreferences("user_prefs", Context.MODE_PRIVATE)
-    private val gson  = Gson()
+    private val json = Json { ignoreUnknownKeys = true }
 
     fun save(profile: UserProfile) {
-        prefs.edit { putString(KEY_PROFILE, gson.toJson(profile)) }
+        settings.putString(KEY_PROFILE, json.encodeToString<UserProfile>(profile))
     }
 
     fun get(): UserProfile? =
-        prefs.getString(KEY_PROFILE, null)?.let {
-            try { gson.fromJson(it, UserProfile::class.java) } catch (e: Exception) { null }
+        settings.getStringOrNull(KEY_PROFILE)?.let {
+            try { json.decodeFromString<UserProfile>(it) } catch (e: Exception) { null }
         }
 
     fun clear() {
-        prefs.edit { remove(KEY_PROFILE) }
+        settings.remove(KEY_PROFILE)
     }
 
     fun saveDeliveryAddress(address: String) {
-        prefs.edit { putString(KEY_DELIVERY_ADDRESS, address) }
+        settings.putString(KEY_DELIVERY_ADDRESS, address)
     }
 
-    fun getDeliveryAddress(): String = prefs.getString(KEY_DELIVERY_ADDRESS, "") ?: ""
+    fun getDeliveryAddress(): String = settings.getString(KEY_DELIVERY_ADDRESS, "")
 
     companion object {
         private const val KEY_PROFILE          = "profile"

@@ -1,6 +1,6 @@
 package tj.relax.ui.screens.favorites
 
-import android.util.Log
+import io.github.aakira.napier.Napier
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -33,7 +33,7 @@ class FavoritesViewModel(
                 val favorites = favoritesRepository.getFavorites()
                 uiState = uiState.copy(favorites = favorites, isLoading = false)
             } catch (e: Exception) {
-                Log.e(TAG, "load: error", e)
+                Napier.e("load: error", e, tag = TAG)
                 uiState = uiState.copy(isLoading = false, error = friendlyErrorMessage(e))
                 ErrorPresenter.report(e)
             }
@@ -52,7 +52,7 @@ class FavoritesViewModel(
                 try {
                     favoritesRepository.remove(product.id)
                 } catch (e: Exception) {
-                    Log.e(TAG, "toggle: remove error", e)
+                    Napier.e("toggle: remove error", e, tag = TAG)
                     ErrorPresenter.report(e)
                 }
             }
@@ -62,7 +62,7 @@ class FavoritesViewModel(
                 try {
                     favoritesRepository.add(product.id)
                 } catch (e: Exception) {
-                    Log.e(TAG, "toggle: add error", e)
+                    Napier.e("toggle: add error", e, tag = TAG)
                     ErrorPresenter.report(e)
                 }
             }

@@ -3,13 +3,14 @@ package tj.relax.core.crash
 import android.content.Context
 import android.os.Build
 import android.util.Log
+import io.github.aakira.napier.Napier
+import kotlinx.datetime.Clock
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import tj.relax.BuildConfig
 import tj.relax.core.api.RelaxApiService
 import tj.relax.data.CrashReportRequest
 import java.io.File
-import java.time.Instant
 
 private const val TAG = "CrashReporter"
 private const val CRASH_FILE_NAME = "pending_crash.json"
@@ -43,7 +44,7 @@ object CrashReporter {
             try {
                 writeCrashFile(appContext, throwable)
             } catch (e: Throwable) {
-                Log.e(TAG, "Failed to persist crash before process death", e)
+                Napier.e("Failed to persist crash before process death", e, tag = TAG)
             }
             previousHandler?.uncaughtException(thread, throwable)
         }
@@ -53,7 +54,7 @@ object CrashReporter {
         val crash = PendingCrash(
             message = throwable.message ?: throwable.toString(),
             stackTrace = Log.getStackTraceString(throwable),
-            occurredAt = Instant.now().toString(),
+            occurredAt = Clock.System.now().toString(),
         )
         File(context.filesDir, CRASH_FILE_NAME).writeText(json.encodeToString(PendingCrash.serializer(), crash))
     }
@@ -86,7 +87,7 @@ object CrashReporter {
                 )
             )
         } catch (e: Exception) {
-            Log.w(TAG, "Failed to upload pending crash report", e)
+            Napier.w("Failed to upload pending crash report", e, tag = TAG)
         }
     }
 }
