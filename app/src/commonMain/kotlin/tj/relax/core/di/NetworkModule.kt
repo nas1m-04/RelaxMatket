@@ -2,7 +2,6 @@ package tj.relax.core.di
 
 import io.github.aakira.napier.Napier
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.auth.Auth
 import io.ktor.client.plugins.auth.providers.bearer
@@ -13,17 +12,17 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.dsl.module
-import tj.relax.BuildConfig
 import tj.relax.core.Interceptor.LanguageInterceptor
 import tj.relax.core.Token.TokenAuthenticator
 import tj.relax.core.api.RelaxApiService
+import tj.relax.core.util.isDebugBuild
 
 val networkModule = module {
     single { TokenAuthenticator(get(), get()) }
 
     single<HttpClient> {
         val tokenAuthenticator = get<TokenAuthenticator>()
-        HttpClient(OkHttp) {
+        HttpClient {
             expectSuccess = false
 
             install(HttpTimeout) {
@@ -46,7 +45,7 @@ val networkModule = module {
                 }
             }
 
-            if (BuildConfig.DEBUG) {
+            if (isDebugBuild) {
                 install(Logging) {
                     level = LogLevel.BODY
                     logger = object : Logger {

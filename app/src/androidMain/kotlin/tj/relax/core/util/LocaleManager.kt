@@ -3,19 +3,16 @@ package tj.relax.core.util
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 
-/** Supported interface languages and helpers to switch between them at runtime. */
-object LocaleManager {
-    const val RUSSIAN = "ru"
-    const val ENGLISH = "en"
-    const val TAJIK   = "tg"
+actual object LocaleManager {
+    actual val RUSSIAN = "ru"
+    actual val ENGLISH = "en"
+    actual val TAJIK   = "tg"
 
-    /** Applies the given language code app-wide (persists across restarts). */
-    fun setLanguage(languageCode: String) {
+    actual fun setLanguage(languageCode: String) {
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(languageCode))
     }
 
-    /** Returns the currently applied language code, defaulting to Russian. */
-    fun getCurrentLanguage(): String {
+    actual fun getCurrentLanguage(): String {
         val locales = AppCompatDelegate.getApplicationLocales()
         if (locales.isEmpty) return RUSSIAN
         return when (locales[0]?.language) {

@@ -5,7 +5,7 @@ import kotlinx.coroutines.launch
 import tj.relax.core.api.RelaxApiService
 import tj.relax.core.api.apiErrorMessage
 import tj.relax.core.api.friendlyErrorMessage
-import tj.relax.core.firebase.RelaxFcmTokenManager
+import tj.relax.core.firebase.requestFcmTokenUpload
 import tj.relax.ui.screens.auth.data.dto.request.ChangePasswordRequest
 import tj.relax.ui.screens.auth.data.dto.request.LoginRequest
 import tj.relax.ui.screens.auth.data.dto.request.RegisterRequest
@@ -112,7 +112,7 @@ class AuthRepository(
 
     private suspend fun uploadFcmToken() {
         try {
-            RelaxFcmTokenManager.getTokenAndUpload { token ->
+            requestFcmTokenUpload { token ->
                 kotlinx.coroutines.GlobalScope.launch {
                     try {
                         api.updateFcmToken(RelaxApiService.UpdateFcmTokenRequest(token))
